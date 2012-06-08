@@ -19,11 +19,11 @@ $key = $veritrans->get_keys();
 
 // save order infomation and keys to your database
 $data = array(
-	'order_id' 		=> $order_id,
-	'session_id' 	=> $this->session->userdata('session_id'),
-	'amount'			=> $this->cart->total(),
-	'browser_key'	=> $key['browser_key'],
-	'merchant_key'=> $key['merchant_key']
+  'order_id'    => $order_id,
+  'session_id'  => $this->session->userdata('session_id'),
+  'amount'      => $this->cart->total(),
+  'browser_key' => $key['browser_key'],
+  'merchant_key'=> $key['merchant_key']
 );
 
 $this->db->insert('orders', $data);
