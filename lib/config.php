@@ -1,11 +1,15 @@
 <?php
   // Change with your merchant hash key
-  define('MERCHANT_ID', '10');
+  define('MERCHANT_ID', 'sample1');
   define('MERCHANT_HASH_KEY', 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz0123456789012345678901');
+  define('FINISH_PAYMENT_RETURN_URL', 'http://192.168.10.228');
+  define('UNFINISH_PAYMENT_RETURN_URL', 'http://192.168.10.228');
+  define('ERROR_PAYMENT_RETURN_URL', 'http://192.168.10.228');
   
-  // Configuration 
-  define('REQUEST_KEY_URL', 'http://localhost/~vcool/weblink/comodityRegist.txt');
-  define('PAYMENT_REDIRECT_URL', 'http://122.208.206.170:80/web1/deviceCheck.action');
+  // Configuration http://192.168.10.250:80/web1/deviceCheck.action
+  // define('REQUEST_KEY_URL', 'http://192.168.10.250:80/web1/confirm.action');
+  define('REQUEST_KEY_URL', 'http://192.168.10.250:80/web1/commodityRegist.action');
+  define('PAYMENT_REDIRECT_URL', 'http://192.168.10.250:80/web1/deviceCheck.action');
   
   // Settlement method:
   define('SETTLEMENT_TYPE_CARD', '01');
