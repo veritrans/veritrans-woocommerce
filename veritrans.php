@@ -10,23 +10,24 @@ require_once 'veritrans_notification.php';
 class Veritrans
 {
   // Required Params
-  private $settlement_type; // 00:payment type not set, 01:credit card settlement 
+  private $settlement_type = '01'; // 00:payment type not set, 01:credit card settlement 
   private $merchant_id;
   private $order_id;
   private $session_id;
-  private $amount;
+  private $gross_amount;
   private $merchanthash;
   private $card_capture_flag;
 
   // Optional Params
-  private $mailaddress;
-  private $name1;
-  private $name2;
-  private $zip_code;
+  private $email;
+  private $first_name;
+  private $last_name;
+  private $postal_code;
   private $address1;
   private $address2;
-  private $address3;
-  private $telephone_no;
+  private $city;
+  private $country_code;
+  private $phone;
   private $birthday;
   private $sex; // 1:male, 2:female, 3:other
   private $card_no;
@@ -72,9 +73,14 @@ class Veritrans
 
   public function get_keys()
   {
+    $this->gross_amount = '10';
+    
     // Generate merchant hash code
-    // $hash = HashGenerator::generate(MERCHANT_ID, $this->settlement_type, $this->order_id, $this->amount);
-    $hash = HashGenerator::generate(MERCHANT_ID, '01', $this->order_id, '10');
+    $hash = HashGenerator::generate(MERCHANT_ID, $this->settlement_type, '1212321111', $this->gross_amount);
+    
+    echo $hash;
+    exit();
+    // $hash = HashGenerator::generate(MERCHANT_ID, '01', $this->order_id, '20');
 
 
     // populate parameters for the post request
@@ -83,67 +89,49 @@ class Veritrans
       'MERCHANT_ID'                 => MERCHANT_ID,
       'ORDER_ID'                    => $this->order_id,
       'SESSION_ID'                  => $this->session_id,
-      'GROSS_AMOUNT'                => '10',
-      'PREVIOUS_CUSTOMER_FLAG'      => '',
-      'CUSTOMER_STATUS'             => '1',
-      // 'AMOUNT'                      => $this->amount,
+      'GROSS_AMOUNT'                => $this->gross_amount,
+      'PREVIOUS_CUSTOMER_FLAG'      => '1',
+      'CUSTOMER_STATUS'             => '',
       'MERCHANTHASH'                => $hash,
-      // 'CARD_CAPTURE_FLAG'           => $this->card_capture_flag,
-      'PREVIOUS_CUSTOMER_FLAG'      => '',
 
-      'EMAIL'                       => 'test@veritrans.co.jp',
-      // // 'NAME1'                       => $this->name1,
-      // // 'NAME2'                       => $this->name2,
-      'FIRST_NAME'                       => 'SMITH',
-      'LAST_NAME'                       => 'JOHN',
-      // // 'ZIP_CODE'                    => $this->zip_code,
-      'POSTAL_CODE'                    => 'GU24OBLs',
-      // // 'ADDRESS1'                    => $this->address1,
-      // // 'ADDRESS2'                    => $this->address2,
-      // // 'ADDRESS3'                    => $this->address3,
-      'ADDRESS1'                    => '52 The Street',
-      'ADDRESS2'                    => 'Village Town',
-      'CITY'                    => 'London',
-      'COUNTRY_CODE'                => 'GBR',
-      'PHONE'                       => '0123456789123',
-      // 'BIRTHDAY'                    => $this->birthday,
-      // 'SEX'                         => $this->sex, // 1:male, 2:female, 3:
-      // ship
-      'SHIPPING_INPUT_FLAG'           => '1',
-      'SHIPPING_SPECIFICATION_FLAG'   => '1',
-      'SHIPPING_FIRST_NAME'          => 'TARO',
-      'SHIPPING_LAST_NAME'            => 'YAMADA',
-      'SHIPPING_ADDRESS1'             => 'Roppongi1-6-1',
-      'SHIPPING_ADDRESS2'             => 'Minatoku',
-      'SHIPPING_CITY'                 => 'Tokyo',
-      'SHIPPING_COUNTRY_CODE'         => 'JPN',
-      'SHIPPING_POSTAL_CODE'          => '1606028',
-      'SHIPPING_PHONE'                => '03111122229',
-      // 'SHIPPING_METHOD'               => 'N',
-      // // ship
+      'EMAIL'                       => $this->email,
+      'FIRST_NAME'                  => $this->first_name,
+      'LAST_NAME'                   => $this->last_name,
+      'POSTAL_CODE'                 => $this->postal_code,
+      'ADDRESS1'                    => $this->address1,
+      'ADDRESS2'                    => $this->address2,
+      'CITY'                        => $this->city,
+      'COUNTRY_CODE'                => $this->country_code,
+      'PHONE'                       => $this->phone,
+      'SHIPPING_INPUT_FLAG'         => '1',
+      'SHIPPING_SPECIFICATION_FLAG' => '1',
+      'SHIPPING_FIRST_NAME'         => $this->first_name,
+      'SHIPPING_LAST_NAME'          => $this->last_name,
+      'SHIPPING_ADDRESS1'           => 'oke',
+      'SHIPPING_ADDRESS2'           => 'Minatoku',
+      'SHIPPING_CITY'               => 'Tokyo',
+      'SHIPPING_COUNTRY_CODE'       => 'JPN',
+      'SHIPPING_POSTAL_CODE'        => '1606028',
+      'SHIPPING_PHONE'              => '03111122229',
       'CARD_NO'                     => '4111111111111111',
       'CARD_EXP_DATE'               => '11/14', // mm/yy/form
-      // 'CARD_HOLDER_NAME'            => '',
-      // 'CARD_NUMBER_OF_INSTALLMENT'  => '',
-      // 'SETTLEMENT_SUB_TYPE'         => $this->settlement_sub_type,                      
-      // 'CARD_CAPTURE_FLAG'           => $this->card_capture_flag,
-      // 'SHOP_NAME'                   => $this->shop_name,
-      //     'SCREEN_TITLE'                => $this->screen_title,
-      //     'CONTENTS'                    => $this->contents,
-      //     'TIMELIMIT_OF_PAYMENT'        => $this->timelimit_of_payment,
-      //     'TIMELIMIT_OF_CANCEL'         => $this->timelimit_of_cancel,
       'FINISH_PAYMENT_RETURN_URL'   => FINISH_PAYMENT_RETURN_URL,
       'UNFINISH_PAYMENT_RETURN_URL' => UNFINISH_PAYMENT_RETURN_URL,
       'ERROR_PAYMENT_RETURN_URL'    => ERROR_PAYMENT_RETURN_URL,
       'LANG_ENABLE_FLAG'            => '',
       'LANG'                        => '',
-      'REPEAT_LINE'                 => '1',
-      'COMMODITY_ID'               => 'IDxx1',
-      'COMMODITY_UNIT'             => '10',
-      'COMMODITY_NUM'              => '1',
-      'COMMODITY_NAME1'            => 'Waterbotle',
-      'COMMODITY_NAME2'            => 'Waterbottle in Indonesian');
-      // 'JAN_CONDE'                   => $this->jan_conde );
+      'REPEAT_LINE'                  => '1',
+      // 'COMMODITY_ID'                => 'IDxx1',
+      // 'COMMODITY_UNIT'              => '10',
+      // 'COMMODITY_NUM'               => '1',
+      // 'COMMODITY_NAME1'             => 'Waterbostlea',
+      // 'COMMODITY_NAME2'             => 'Waterbotstleaaa in Indonesian',
+      'COMMODITY_ID'                => 'IDxx12',
+      'COMMODITY_UNIT'              => '10',
+      'COMMODITY_NUM'               => '1',
+      'COMMODITY_NAME1'             => 'Waterbostle',
+      'COMMODITY_NAME2'             => 'Waterbotstle in Indonen1'
+      );
 
     $client = new Pest(REQUEST_KEY_URL);
     $result = $client->post('', $data);
