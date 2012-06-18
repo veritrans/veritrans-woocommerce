@@ -42,11 +42,13 @@ class Veritrans
   private $timelimit_of_cancel;
   private $lang_enable_flag;
   private $lang;
-  private $commodity_id;
-  private $commodity_unit;
-  private $commodity_num;
-  private $commodity_name;
-  private $jan_conde;
+  
+  // Sample of array of commodity
+  // array(
+  //           array("COMMODITY_ID" => "123", "COMMODITY_UNIT" => "1", "COMMODITY_NUM" => "1", "COMMODITY_NAME1" => "BUKU", "COMMODITY_NAME2" => "BOOK"),
+  //           array("COMMODITY_ID" => "1243", "COMMODITY_UNIT" => "9", "COMMODITY_NUM" => "1", "COMMODITY_NAME1" => "BUKU Sembilan", "COMMODITY_NAME2" => "BOOK NINE")
+  //       )
+  private $commodity;
 
   public function __get($property) 
   {
@@ -72,15 +74,9 @@ class Veritrans
   }
 
   public function get_keys()
-  {
-    $this->gross_amount = '2';
-    
+  {    
     // Generate merchant hash code
     $hash = HashGenerator::generate(MERCHANT_ID, $this->settlement_type, $this->order_id, $this->gross_amount);
-    
-    // echo $hash;
-    // exit();
-    // $hash = HashGenerator::generate(MERCHANT_ID, '01', $this->order_id, '20');
 
 
     // populate parameters for the post request
@@ -90,8 +86,8 @@ class Veritrans
       'ORDER_ID'                    => $this->order_id,
       'SESSION_ID'                  => $this->session_id,
       'GROSS_AMOUNT'                => $this->gross_amount,
-      'PREVIOUS_CUSTOMER_FLAG'      => '1',
-      'CUSTOMER_STATUS'             => '',
+      'PREVIOUS_CUSTOMER_FLAG'      => $this->previous_customer_flag,
+      'CUSTOMER_STATUS'             => $this->customer_status,
       'MERCHANTHASH'                => $hash,
 
       'EMAIL'                       => $this->email,
@@ -103,64 +99,57 @@ class Veritrans
       'CITY'                        => $this->city,
       'COUNTRY_CODE'                => $this->country_code,
       'PHONE'                       => $this->phone,
-      'SHIPPING_INPUT_FLAG'         => '1',
-      'SHIPPING_SPECIFICATION_FLAG' => '1',
+      'SHIPPING_INPUT_FLAG'         => $this->shipping_input_flag,
+      'SHIPPING_SPECIFICATION_FLAG' => $this->shipping_specification_flag,
       'SHIPPING_FIRST_NAME'         => $this->first_name,
       'SHIPPING_LAST_NAME'          => $this->last_name,
-      'SHIPPING_ADDRESS1'           => 'oke',
-      'SHIPPING_ADDRESS2'           => 'Minatoku',
-      'SHIPPING_CITY'               => 'Tokyo',
-      'SHIPPING_COUNTRY_CODE'       => 'JPN',
-      'SHIPPING_POSTAL_CODE'        => '1606028',
-      'SHIPPING_PHONE'              => '03111122229',
-      'CARD_NO'                     => '4111111111111111',
-      'CARD_EXP_DATE'               => '11/14', // mm/yy/form
+      'SHIPPING_ADDRESS1'           => $this->shipping_address1,
+      'SHIPPING_ADDRESS2'           => $this->shipping_address2,
+      'SHIPPING_CITY'               => $this->shipping_city,
+      'SHIPPING_COUNTRY_CODE'       => $this->shipping_country_code,
+      'SHIPPING_POSTAL_CODE'        => $this->shipping_postal_code,
+      'SHIPPING_PHONE'              => $this->shipping_phone,
+      'CARD_NO'                     => $this->card_no,
+      'CARD_EXP_DATE'               => $this->card_exp_date,
       'FINISH_PAYMENT_RETURN_URL'   => FINISH_PAYMENT_RETURN_URL,
       'UNFINISH_PAYMENT_RETURN_URL' => UNFINISH_PAYMENT_RETURN_URL,
       'ERROR_PAYMENT_RETURN_URL'    => ERROR_PAYMENT_RETURN_URL,
-      'LANG_ENABLE_FLAG'            => '',
-      'LANG'                        => '',
-      // 'REPEAT_LINE'                  => '1',
-      // 'COMMODITY_ID'                => 'IDxx1',
-      // 'COMMODITY_UNIT'              => '10',
-      // 'COMMODITY_NUM'               => '1',
-      // 'COMMODITY_NAME1'             => 'Waterbostlea',
-      // 'COMMODITY_NAME2'             => 'Waterbotstleaaa in Indonesian',
-      // 'COMMODITY_ID'                => 'IDxx12',
-      // 'COMMODITY_UNIT'              => '10',
-      // 'COMMODITY_NUM'               => '1',
-      // 'COMMODITY_NAME1'             => 'Waterbostle',
-      // 'COMMODITY_NAME2'             => 'Waterbotstle in Indonen1'
-	  'COMMODITY'                   => 
-	    array(
-	      array("COMMODITY_ID" => "123", "COMMODITY_UNIT" => "1", "COMMODITY_NUM" => "1", "COMMODITY_NAME1" => "BUKU", "COMMODITY_NAME2" => "BOOK"),
-	      array("COMMODITY_ID" => "123", "COMMODITY_UNIT" => "1", "COMMODITY_NUM" => "1", "COMMODITY_NAME1" => "BUKU", "COMMODITY_NAME2" => "BOOK")
-	    )
+      'LANG_ENABLE_FLAG'            => $this->lang_enable_flag,
+      'LANG'                        => $this->lang
       );
 
-	$line = 0;
-	$query_string = "";
-	foreach ($data["COMMODITY"] as $row) {
-      $q = http_build_query($row);
-      if(!($query_string=="")) 
-        $query_string = $query_string . "&";
-      $query_string = $query_string . $q;
-      $line = $line + 1;
-	};
-	$query_string = $query_string . "&REPEAT_LINE=" . $line;
-
-	$clone = array($data);
-	$clone = $clone[0];
-	unset($clone["COMMODITY"]);
-
-	$query_string = http_build_query($clone) . "&" . $query_string;
-		
+    // data query string only without commodity
+    $query_string = http_build_query($data);
+        
+    if(isset($this->commodity)){
+      $commodity_query_string = $this->build_commodity_query_string($this->commodity);
+      $query_string = "$query_string&$commodity_query_string";
+    }
+    		
     $client = new Pest(REQUEST_KEY_URL);
     $result = $client->post('', $query_string);
 
     $key = $this->extract_keys_from($result);
 
     return $key;
+  }
+  
+  // Private methods
+  // return array of commodities
+  private function build_commodity_query_string($commodity)
+  {
+    $line = 0;
+  	$query_string = "";
+  	foreach ($commodity as $row) {
+        $q = http_build_query($row);
+        if(!($query_string=="")) 
+          $query_string = $query_string . "&";
+        $query_string = $query_string . $q;
+        $line = $line + 1;
+  	};
+  	$query_string = $query_string . "&REPEAT_LINE=" . $line;
+  	
+  	return $query_string;
   }
 
   // Private methods
