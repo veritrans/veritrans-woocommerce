@@ -73,13 +73,13 @@ class Veritrans
 
   public function get_keys()
   {
-    $this->gross_amount = '10';
+    $this->gross_amount = '2';
     
     // Generate merchant hash code
-    $hash = HashGenerator::generate(MERCHANT_ID, $this->settlement_type, '1212321111', $this->gross_amount);
+    $hash = HashGenerator::generate(MERCHANT_ID, $this->settlement_type, $this->order_id, $this->gross_amount);
     
-    echo $hash;
-    exit();
+    // echo $hash;
+    // exit();
     // $hash = HashGenerator::generate(MERCHANT_ID, '01', $this->order_id, '20');
 
 
@@ -120,21 +120,43 @@ class Veritrans
       'ERROR_PAYMENT_RETURN_URL'    => ERROR_PAYMENT_RETURN_URL,
       'LANG_ENABLE_FLAG'            => '',
       'LANG'                        => '',
-      'REPEAT_LINE'                  => '1',
+      // 'REPEAT_LINE'                  => '1',
       // 'COMMODITY_ID'                => 'IDxx1',
       // 'COMMODITY_UNIT'              => '10',
       // 'COMMODITY_NUM'               => '1',
       // 'COMMODITY_NAME1'             => 'Waterbostlea',
       // 'COMMODITY_NAME2'             => 'Waterbotstleaaa in Indonesian',
-      'COMMODITY_ID'                => 'IDxx12',
-      'COMMODITY_UNIT'              => '10',
-      'COMMODITY_NUM'               => '1',
-      'COMMODITY_NAME1'             => 'Waterbostle',
-      'COMMODITY_NAME2'             => 'Waterbotstle in Indonen1'
+      // 'COMMODITY_ID'                => 'IDxx12',
+      // 'COMMODITY_UNIT'              => '10',
+      // 'COMMODITY_NUM'               => '1',
+      // 'COMMODITY_NAME1'             => 'Waterbostle',
+      // 'COMMODITY_NAME2'             => 'Waterbotstle in Indonen1'
+	  'COMMODITY'                   => 
+	    array(
+	      array("COMMODITY_ID" => "123", "COMMODITY_UNIT" => "1", "COMMODITY_NUM" => "1", "COMMODITY_NAME1" => "BUKU", "COMMODITY_NAME2" => "BOOK"),
+	      array("COMMODITY_ID" => "123", "COMMODITY_UNIT" => "1", "COMMODITY_NUM" => "1", "COMMODITY_NAME1" => "BUKU", "COMMODITY_NAME2" => "BOOK")
+	    )
       );
 
+	$line = 0;
+	$query_string = "";
+	foreach ($data["COMMODITY"] as $row) {
+      $q = http_build_query($row);
+      if(!($query_string=="")) 
+        $query_string = $query_string . "&";
+      $query_string = $query_string . $q;
+      $line = $line + 1;
+	};
+	$query_string = $query_string . "&REPEAT_LINE=" . $line;
+
+	$clone = array($data);
+	$clone = $clone[0];
+	unset($clone["COMMODITY"]);
+
+	$query_string = http_build_query($clone) . "&" . $query_string;
+		
     $client = new Pest(REQUEST_KEY_URL);
-    $result = $client->post('', $data);
+    $result = $client->post('', $query_string);
 
     $key = $this->extract_keys_from($result);
 
