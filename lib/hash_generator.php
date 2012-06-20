@@ -16,11 +16,11 @@ class HashGenerator {
   * @param amount - Total Amount
   * @return hash value
   */
-  public function generate($merchantID, $settlementmethod, $orderID, $amount) {
+  public function generate($merchantID, $merchant_hash, $settlementmethod, $orderID, $amount) {
 
     $ctx  = hash_init('sha512');
 
-    $str  = MERCHANT_HASH_KEY .
+    $str  = $merchant_hash .
       "," . $merchantID .
       "," . ((is_null($settlementmethod) || strlen($settlementmethod) == 0) ? '00' : $settlementmethod) .
       "," . $orderID .

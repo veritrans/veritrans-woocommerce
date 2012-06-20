@@ -9,14 +9,18 @@ require_once 'veritrans_notification.php';
 
 class Veritrans
 {
+  
+  const REQUEST_KEY_URL = 'http://192.168.10.250:80/web1/commodityRegist.action';
+  const PAYMENT_REDIRECT_URL = 'http://192.168.10.250:80/web1/deviceCheck.action';
+  
   // Required Params
   private $settlement_type = '01'; // 00:payment type not set, 01:credit card settlement 
   private $merchant_id;
   private $order_id;
   private $session_id;
   private $gross_amount;
-  private $merchanthash;
-  private $card_capture_flag;
+  private $merchant_hash;
+  private $card_capture_flag = '1';
 
   // Optional Params
   private $email;
@@ -76,13 +80,13 @@ class Veritrans
   public function get_keys()
   {    
     // Generate merchant hash code
-    $hash = HashGenerator::generate(MERCHANT_ID, $this->settlement_type, $this->order_id, $this->gross_amount);
+    $hash = HashGenerator::generate($this->merchant_id, $this->merchant_hash, $this->settlement_type, $this->order_id, $this->gross_amount);
 
 
     // populate parameters for the post request
     $data = array(
       'SETTLEMENT_TYPE'             => '01',
-      'MERCHANT_ID'                 => MERCHANT_ID,
+      'MERCHANT_ID'                 => $this->merchant_id,
       'ORDER_ID'                    => $this->order_id,
       'SESSION_ID'                  => $this->session_id,
       'GROSS_AMOUNT'                => $this->gross_amount,
