@@ -46,6 +46,9 @@ class Veritrans
   private $timelimit_of_cancel;
   private $lang_enable_flag;
   private $lang;
+  private $finish_payment_return_url;
+  private $unfinish_payment_return_url;
+  private $error_payment_return_url;
   
   // Sample of array of commodity
   // array(
@@ -115,9 +118,9 @@ class Veritrans
       'SHIPPING_PHONE'              => $this->shipping_phone,
       'CARD_NO'                     => $this->card_no,
       'CARD_EXP_DATE'               => $this->card_exp_date,
-      'FINISH_PAYMENT_RETURN_URL'   => FINISH_PAYMENT_RETURN_URL,
-      'UNFINISH_PAYMENT_RETURN_URL' => UNFINISH_PAYMENT_RETURN_URL,
-      'ERROR_PAYMENT_RETURN_URL'    => ERROR_PAYMENT_RETURN_URL,
+      'FINISH_PAYMENT_RETURN_URL'   => $this->finish_payment_return_url,
+      'UNFINISH_PAYMENT_RETURN_URL' => $this->unfinish_payment_return_url,
+      'ERROR_PAYMENT_RETURN_URL'    => $this->error_payment_return_url,
       'LANG_ENABLE_FLAG'            => $this->lang_enable_flag,
       'LANG'                        => $this->lang
       );
