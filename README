@@ -4,13 +4,16 @@ Veritrans Weblink Type PHP integration library
 How to use
 -----------
 
+
+You need to edit lib/config.php to match with your configuration
+
 Given you already have cart ready for checkout.
 
 $veritrans = new Veritrans;
 $veritrans->settlement_type = '01';
 $veritrans->order_id = 'your_unique_order_id';
 $veritrans->session_id = 'your_application_session_id;
-$veritrans->amount = '150000';
+$veritrans->gross_amount = '150000';
 $veritrans->card_capture_flag = '1';
 
 # request for a key
@@ -26,8 +29,66 @@ $data = array(
   'merchant_key'=> $key['merchant_key']
 );
 
+// In this sample, we're assuming that we use CodeIgniter ActiveRecord
 $this->db->insert('orders', $data);
 
 
 # Redirect user to Veritrans payment page
-# @TODO
+# Prepare the FORM to redirect the customer
+
+<form action="<?= PAYMENT_REDIRECT_URL ?>" method="post"  onSubmit="document.getElementById('submitBtn').disabled=true;">
+  <input type="hidden" name="MERCHANT_ID" value="<?= MERCHANT_ID ?>" />
+  <input type="hidden" name="ORDER_ID" value="<?= $order['order_id'] ?>" />
+  <input type="hidden" name="BROWSER_ENCRYPTION_KEY" value="<?= $key['browser_key'] ?>" />
+  <input id="submitBtn" type="submit" value="Confirm Checkout" />
+</form>
+
+
+
+# After the payment is completed
+# Veritrans will contact Merchant's web server
+# As Merchant, you need to response this query
+# TODO Validate request from veritrans, make sure it comes from veritrans not from hacker
+ 
+ // Populate veritrans notification
+ $data['veritrans_notification'] = array(
+   'orderId'         => $this->input->post('orderId'),
+   'mStatus'         => $this->input->post('mStatus'),
+   'mErrMsg'         => $this->input->post('mErrMsg'),
+   'vResultCode'     => $this->input->post('vResultCode'),
+   'username'        => $this->input->post('username'),
+   'userNameKana'    => $this->input->post('userNameKana'),
+   'mailAddress'     => $this->input->post('mailAddress'),
+   'address'         => $this->input->post('address'),
+   'sex'             => $this->input->post('sex'),
+   'telephoneno'     => $this->input->post('telephoneno'),
+   'zipcode'         => $this->input->post('zipcode'),
+   'birthday'        => $this->input->post('birthday'),
+   'SETTLEMENTKEY1B' => $this->input->post('SETTLEMENTKEY1B')
+ );
+
+ $veritrans_notification = new VeritransNotification($data['veritrans_notification']);
+
+ // check if valid
+ if(!$veritrans_notification->is_valid()){
+   $this->load->view('cart/error');
+   return false;
+ }
+
+ // find order
+ $order_params = array('order_id'      => $this->input->post('order_id'));
+ 
+ $order_query = $this->db->get_where('orders', $order_params);
+ if($order_query->num_rows() > 0) {
+   $order = $order_query->row();
+   $this->db->insert('payment_notifications', $data['veritrans_notification']);
+
+   // mark order as paid
+   $this->db->where($order_params);
+   $this->db->update('orders', array('status' =>'paid'));
+   $this->load->view('cart/ok');
+   return true;
+ }else{
+   $this->load->view('cart/error');
+   return false;
+ }
