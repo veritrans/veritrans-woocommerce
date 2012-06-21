@@ -1,8 +1,6 @@
 <?php
 
 // Wraper for veritrans weblink type payment
-
-require_once 'lib/config.php';
 require_once 'lib/Pest.php';
 require_once 'lib/hash_generator.php';
 require_once 'veritrans_notification.php';
@@ -133,7 +131,7 @@ class Veritrans
       $query_string = "$query_string&$commodity_query_string";
     }
     		
-    $client = new Pest(REQUEST_KEY_URL);
+    $client = new Pest(self::REQUEST_KEY_URL);
     $result = $client->post('', $query_string);
 
     $key = $this->extract_keys_from($result);
