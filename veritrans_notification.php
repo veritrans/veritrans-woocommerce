@@ -4,8 +4,22 @@
 
 class VeritransNotification
 {
-  // Required Params
-  private $mailaddress;
+  
+  private $postalcode;
+  private $mStatus; 
+  private $phone; 
+  private $shippingPhone; 
+  private $mErrMsg; 
+  private $email; 
+  private $address; 
+  private $name;
+  private $vResultCode; 
+  private $shippingAddress;
+  private $orderId;
+  private $shippingPostalcode;
+  private $shippingName;
+  
+  const VERITRANS_IP_ADDRESS = '192.168.10.250';
 
 
   public function __get($property) 
@@ -28,12 +42,18 @@ class VeritransNotification
 
   function __construct($params = null) 
   {
-    
+    foreach($params as $key => $value){
+      $this->$key = $value;
+    }
   }
 
   public function is_valid()
   {
-    return false;
+    if($this->mStatus == 'success' && $_SERVER['REMOTE_ADDR'] == self::VERITRANS_IP_ADDRESS){
+      return true;
+    }else{
+      return false;
+    }
   }
 
 }
