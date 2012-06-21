@@ -14,8 +14,7 @@ $veritrans->merchant_id = 'sample1';
 $veritrans->order_id = 'your_unique_order_id';
 $veritrans->session_id = 'your_application_session_id;
 $veritrans->gross_amount = '150000';
-$veritrans->card_capture_flag = '1';
-```
+$veritrans->card_capture_flag = '1';```
 
 **request for a key**
 ```$key = $veritrans->get_keys();```
