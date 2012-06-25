@@ -9,7 +9,7 @@ class Veritrans
 {
   
   const REQUEST_KEY_URL = 'http://192.168.10.250:80/web1/commodityRegist.action';
-  const PAYMENT_REDIRECT_URL = 'http://192.168.10.250:80/web1/deviceCheck.action';
+  const PAYMENT_REDIRECT_URL = 'http://192.168.10.250:80/web1/paymentStart.action';
   
   // Required Params
   private $settlement_type = '01'; // 00:payment type not set, 01:credit card settlement 
@@ -165,10 +165,10 @@ class Veritrans
     $key = array();
     $body_lines = explode("\n", $body);
     foreach($body_lines as $line) {
-      if(preg_match('/^MERCHANT_ENCRYPTION_KEY=(.+)/', $line, $match)) {
-        $key['merchant_key'] = str_replace("\r", "", $match[1]);
-        } elseif(preg_match('/^BROWSER_ENCRYPTION_KEY=(.+)/', $line, $match)) {
-          $key['browser_key'] = str_replace("\r", "", $match[1]);
+      if(preg_match('/^TOKEN_MERCHANT=(.+)/', $line, $match)) {
+        $key['token_merchant'] = str_replace("\r", "", $match[1]);
+        } elseif(preg_match('/^TOKEN_BROWSER=(.+)/', $line, $match)) {
+          $key['token_browser'] = str_replace("\r", "", $match[1]);
           } elseif(preg_match('/^ERROR_MESSAGE=(.+)/', $line, $match)) {
             $key['error_message'] = str_replace("\r", "", $match[1]);
           }

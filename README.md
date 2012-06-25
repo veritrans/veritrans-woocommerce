@@ -48,8 +48,8 @@ $data = array(
   'order_id'    => $order_id,
   'session_id'  => $this->session->userdata('session_id'),
   'amount'      => $this->cart->total(),
-  'browser_key' => $key['browser_key'],
-  'merchant_key'=> $key['merchant_key']
+  'token_browser' => $key['token_browser'],
+  'token_merchant'=> $key['token_merchant']
 );
 ```
 
