@@ -21,29 +21,36 @@ class Veritrans
   private $card_capture_flag = '1';
 
   // Optional Params
-  private $email;
   private $first_name;
   private $last_name;
-  private $postal_code;
   private $address1;
   private $address2;
   private $city;
   private $country_code;
+  private $postal_code;
+  private $email;
   private $phone;
-  private $birthday;
-  private $sex; // 1:male, 2:female, 3:other
+  
+  private $shipping_input_flag;
+  private $shipping_specification_flag;
+  private $shipping_first_name;
+  private $shipping_last_name;
+  private $shipping_address1;
+  private $shipping_address2;
+  private $shipping_city;
+  private $shipping_country_code;
+  private $shipping_postal_code;
+  private $shipping_phone;
+  private $shipping_method;
+ 
   private $card_no;
   private $card_exp_date; // mm/yy/format
   private $card_holder_name;
   private $card_number_of_installment;
-  private $settlement_sub_type; 
-  private $shop_name;
-  private $screen_title;
-  private $contents;
-  private $timelimit_of_payment;
-  private $timelimit_of_cancel;
+  
   private $lang_enable_flag;
   private $lang;
+  
   private $finish_payment_return_url;
   private $unfinish_payment_return_url;
   private $error_payment_return_url;
@@ -106,14 +113,15 @@ class Veritrans
       'PHONE'                       => $this->phone,
       'SHIPPING_INPUT_FLAG'         => $this->shipping_input_flag,
       'SHIPPING_SPECIFICATION_FLAG' => $this->shipping_specification_flag,
-      'SHIPPING_FIRST_NAME'         => $this->first_name,
-      'SHIPPING_LAST_NAME'          => $this->last_name,
+      'SHIPPING_FIRST_NAME'         => $this->shipping_first_name,
+      'SHIPPING_LAST_NAME'          => $this->shipping_last_name,
       'SHIPPING_ADDRESS1'           => $this->shipping_address1,
       'SHIPPING_ADDRESS2'           => $this->shipping_address2,
       'SHIPPING_CITY'               => $this->shipping_city,
       'SHIPPING_COUNTRY_CODE'       => $this->shipping_country_code,
       'SHIPPING_POSTAL_CODE'        => $this->shipping_postal_code,
       'SHIPPING_PHONE'              => $this->shipping_phone,
+      'SHIPPING_METHOD'              => $this->shipping_method,
       'CARD_NO'                     => $this->card_no,
       'CARD_EXP_DATE'               => $this->card_exp_date,
       'FINISH_PAYMENT_RETURN_URL'   => $this->finish_payment_return_url,
