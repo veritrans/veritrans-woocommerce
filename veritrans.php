@@ -8,10 +8,8 @@ require_once 'veritrans_notification.php';
 class Veritrans
 {
   
-  // const REQUEST_KEY_URL = 'https://payments.veritrans.co.id/web1/commodityRegist.action';
-  const REQUEST_KEY_URL = 'http://192.168.10.250:80/web1/commodityRegist.action';
-  // const PAYMENT_REDIRECT_URL = 'https://payments.veritrans.co.id/web1/paymentStart.action';
-  const PAYMENT_REDIRECT_URL = 'http://192.168.10.250:80/web1/paymentStart.action';
+  const REQUEST_KEY_URL = 'https://payments.veritrans.co.id/web1/commodityRegist.action';
+  const PAYMENT_REDIRECT_URL = 'https://payments.veritrans.co.id/web1/paymentStart.action';
   
   // Required Params
   private $settlement_type = '01'; // 00:payment type not set, 01:credit card settlement 
