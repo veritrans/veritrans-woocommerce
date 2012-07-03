@@ -8,8 +8,13 @@ require_once 'veritrans_notification.php';
 class Veritrans
 {
   
-  const REQUEST_KEY_URL = 'https://payments.veritrans.co.id/web1/commodityRegist.action';
-  const PAYMENT_REDIRECT_URL = 'https://payments.veritrans.co.id/web1/paymentStart.action';
+  // const REQUEST_KEY_URL = 'https://payments.veritrans.co.id/web1/commodityRegist.action';
+  // const PAYMENT_REDIRECT_URL = 'https://payments.veritrans.co.id/web1/paymentStart.action';
+
+  // Ignore these lines, its a dev server
+  const REQUEST_KEY_URL = 'http://192.168.10.250/web1/commodityRegist.action';
+  const PAYMENT_REDIRECT_URL = 'http://192.168.10.250/web1/paymentStart.action';
+  
   
   // Required Params
   private $settlement_type = '01'; // 00:payment type not set, 01:credit card settlement 
@@ -19,6 +24,7 @@ class Veritrans
   private $gross_amount;
   private $merchant_hash;
   private $card_capture_flag = '1';
+  private $customer_specification_flag;
 
   // Optional Params
   private $first_name;
@@ -31,7 +37,7 @@ class Veritrans
   private $email;
   private $phone;
   
-  private $shipping_input_flag;
+  private $shipping_flag;
   private $shipping_specification_flag;
   private $shipping_first_name;
   private $shipping_last_name;
@@ -101,7 +107,8 @@ class Veritrans
       'PREVIOUS_CUSTOMER_FLAG'      => $this->previous_customer_flag,
       'CUSTOMER_STATUS'             => $this->customer_status,
       'MERCHANTHASH'                => $hash,
-
+      
+      'CUSTOMER_SPECIFICATION_FLAG' => $this->customer_specification_flag,
       'EMAIL'                       => $this->email,
       'FIRST_NAME'                  => $this->first_name,
       'LAST_NAME'                   => $this->last_name,
@@ -111,8 +118,7 @@ class Veritrans
       'CITY'                        => $this->city,
       'COUNTRY_CODE'                => $this->country_code,
       'PHONE'                       => $this->phone,
-      'SHIPPING_INPUT_FLAG'         => $this->shipping_input_flag,
-      'SHIPPING_SPECIFICATION_FLAG' => $this->shipping_specification_flag,
+      'SHIPPING_FLAG'               => $this->shipping_flag,
       'SHIPPING_FIRST_NAME'         => $this->shipping_first_name,
       'SHIPPING_LAST_NAME'          => $this->shipping_last_name,
       'SHIPPING_ADDRESS1'           => $this->shipping_address1,
@@ -121,7 +127,7 @@ class Veritrans
       'SHIPPING_COUNTRY_CODE'       => $this->shipping_country_code,
       'SHIPPING_POSTAL_CODE'        => $this->shipping_postal_code,
       'SHIPPING_PHONE'              => $this->shipping_phone,
-      'SHIPPING_METHOD'              => $this->shipping_method,
+      'SHIPPING_METHOD'             => $this->shipping_method,
       'CARD_NO'                     => $this->card_no,
       'CARD_EXP_DATE'               => $this->card_exp_date,
       'FINISH_PAYMENT_RETURN_URL'   => $this->finish_payment_return_url,
