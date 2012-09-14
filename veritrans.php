@@ -8,12 +8,12 @@ require_once 'veritrans_notification.php';
 class Veritrans
 {
   
-  // const REQUEST_KEY_URL = 'https://payments.veritrans.co.id/web1/commodityRegist.action';
-  // const PAYMENT_REDIRECT_URL = 'https://payments.veritrans.co.id/web1/paymentStart.action';
+  const REQUEST_KEY_URL = 'https://payments.veritrans.co.id/web1/commodityRegist.action';
+  const PAYMENT_REDIRECT_URL = 'https://payments.veritrans.co.id/web1/paymentStart.action';
 
   // Ignore these lines, its a dev server
-  const REQUEST_KEY_URL = 'http://192.168.10.250/web1/commodityRegist.action';
-  const PAYMENT_REDIRECT_URL = 'http://192.168.10.250/web1/paymentStart.action';
+  // const REQUEST_KEY_URL = 'http://192.168.10.250/web1/commodityRegist.action';
+  // const PAYMENT_REDIRECT_URL = 'http://192.168.10.250/web1/paymentStart.action';
   
   
   // Required Params

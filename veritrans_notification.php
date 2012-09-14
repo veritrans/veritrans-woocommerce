@@ -20,8 +20,6 @@ class VeritransNotification
   private $shippingName;
   private $TOKEN_MERCHANT;
   
-  const VERITRANS_IP_ADDRESS = '192.168.10.250';
-
 
   public function __get($property) 
   {
@@ -48,14 +46,6 @@ class VeritransNotification
     }
   }
 
-  public function is_valid()
-  {
-    if((string)$_SERVER['REMOTE_ADDR'] == (string)self::VERITRANS_IP_ADDRESS){
-      return true;
-    }else{
-      return false;
-    }
-  }
 
 }
 

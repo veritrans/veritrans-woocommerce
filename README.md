@@ -88,12 +88,9 @@ $veritrans_notification = new VeritransNotification($_POST);
 **Check if valid**
 
 ```
-if(!$veritrans_notification->is_valid()){
-  $this->load->view('cart/error');
-  return false;
-}else
-  // Up to this point you can do whatever you want regarding the order, for example :
-  // Find order and mark it as paid
-  // Clear the users cart
+if($order->token_merchant != $veritrans_notification->TOKEN_MERCHANT){
+  echo "ERR";
+  $this->db->insert('payment_notifications', array("params" => 'no match'));
+  exit();
 }
 ```
