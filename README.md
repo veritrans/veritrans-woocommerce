@@ -68,7 +68,7 @@ $this->db->insert('orders', $data);
 <form action="<?= Veritrans::PAYMENT_REDIRECT_URL ?>" method="post"  onSubmit="document.getElementById('submitBtn').disabled=true;">
   <input type="hidden" name="MERCHANT_ID" value="sample1" />
   <input type="hidden" name="ORDER_ID" value="<?= $order['order_id'] ?>" />
-  <input type="hidden" name="BROWSER_ENCRYPTION_KEY" value="<?= $key['browser_key'] ?>" />
+  <input type="hidden" name="BROWSER_ENCRYPTION_KEY" value="<?= $key['token_browser'] ?>" />
   <input id="submitBtn" type="submit" value="Confirm Checkout" />
 </form>
 ```
