@@ -12,6 +12,7 @@ We create a veritrans instance
 $veritrans = new Veritrans;
 $veritrans->settlement_type = '01';
 $veritrans->merchant_id = 'sample1';
+$veritrans->merchant_hash = '12323111';
 $veritrans->order_id = 'your_unique_order_id';
 $veritrans->session_id = 'your_application_session_id;
 $veritrans->gross_amount = '150000';
