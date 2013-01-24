@@ -17,17 +17,20 @@ $veritrans->order_id = 'your_unique_order_id';
 $veritrans->session_id = 'your_application_session_id;
 $veritrans->gross_amount = '150000';
 $veritrans->card_capture_flag = '1';
+$veritrans->billing_address_different_with_shipping_address = 1;
+$veritrans->required_shipping_address = 0;
+
 ```
 
 **dont forget to set your commodity**
 
 ```
 $commidities =  array (
-						array("COMMODITY_ID" => 'sku1', "COMMODITY_UNIT" => '10000', 
-							  "COMMODITY_NUM" => '2', 
+						array("COMMODITY_ID" => 'sku1', "COMMODITY_PRICE" => '10000', 
+							  "COMMODITY_QTY" => '2', 
 						      "COMMODITY_NAME1" => 'Kaos', "COMMODITY_NAME2" => 'T-Shirt'),
-						array("COMMODITY_ID" => 'sku2', "COMMODITY_UNIT" => '20000', 
-							  "COMMODITY_NUM" => '1', 
+						array("COMMODITY_ID" => 'sku2', "COMMODITY_PRICE" => '20000', 
+							  "COMMODITY_QTY" => '1', 
 						      "COMMODITY_NAME1" => 'Celana', "COMMODITY_NAME2" => 'Pants')
 						);
 						
