@@ -11,8 +11,8 @@ We create a veritrans instance
 ```
 $veritrans = new Veritrans;
 $veritrans->settlement_type = '01';
-$veritrans->merchant_id = 'sample1';
-$veritrans->merchant_hash = '12323111';
+$veritrans->merchant_id = 'T100000000000001000001';
+$veritrans->merchant_hash_key = '305e0328a366cbce8e17a385435bb7eb3f0cbcfbfc0f1c3ef56b658';
 $veritrans->order_id = 'your_unique_order_id';
 $veritrans->session_id = 'your_application_session_id';
 $veritrans->gross_amount = '150000';
@@ -68,12 +68,27 @@ $this->db->insert('orders', $data);
 **Prepare the FORM to redirect the customer**
 
 ```
-<form action="<?= Veritrans::PAYMENT_REDIRECT_URL ?>" method="post"  onSubmit="document.getElementById('submitBtn').disabled=true;">
-  <input type="hidden" name="MERCHANT_ID" value="sample1" />
-  <input type="hidden" name="ORDER_ID" value="<?= $order['order_id'] ?>" />
-  <input type="hidden" name="BROWSER_ENCRYPTION_KEY" value="<?= $key['token_browser'] ?>" />
-  <input id="submitBtn" type="submit" value="Confirm Checkout" />
-</form>
+<!DOCTYPE html>
+<html>
+<head>
+    <script language="javascript" type="text/javascript">
+    <!--
+    function onloadEvent() {
+      document.form_auto_post.submit();
+    }
+    //-->
+    </script>
+  </head>
+  <body onload="onloadEvent();">
+    <h1 align="center">Go to select payment options</h1>
+    <form action="<?= PAYMENT_REDIRECT_URL ?>" method="post" name='form_auto_post'>
+      <input type="hidden" name="MERCHANT_ID" value="T100000000000001000001" />
+      <input type="hidden" name="ORDER_ID" value="<?= $order['order_id'] ?>" />
+      <input type="hidden" name="TOKEN_BROWSER" value="<?= $key['token_browser'] ?>" />
+      <input id="submitBtn" type="submit" value="Confirm Checkout" />
+    </form>
+ </body>
+</html>
 ```
 
 

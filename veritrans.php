@@ -22,7 +22,7 @@ class Veritrans
   private $order_id;
   private $session_id;
   private $gross_amount;
-  private $merchant_hash;
+  private $merchant_hash_key;
   private $card_capture_flag = '1';
   private $customer_specification_flag;
   private $billing_address_different_with_shipping_address;
@@ -115,7 +115,7 @@ class Veritrans
   public function get_keys()
   {    
     // Generate merchant hash code
-    $hash = HashGenerator::generate($this->merchant_id, $this->merchant_hash, $this->settlement_type, $this->order_id, $this->gross_amount);
+    $hash = HashGenerator::generate($this->merchant_id, $this->merchant_hash_key, $this->settlement_type, $this->order_id, $this->gross_amount);
 
 
     // populate parameters for the post request
