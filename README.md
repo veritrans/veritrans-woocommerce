@@ -68,26 +68,25 @@ $this->db->insert('orders', $data);
 **Prepare the FORM to redirect the customer**
 
 ```
-<!DOCTYPE html>
 <html>
 <head>
-    <script language="javascript" type="text/javascript">
-    <!--
-    function onloadEvent() {
-      document.form_auto_post.submit();
-    }
-    //-->
-    </script>
-  </head>
-  <body onload="onloadEvent();">
-    <h1 align="center">Go to select payment options</h1>
-    <form action="<?= PAYMENT_REDIRECT_URL ?>" method="post" name='form_auto_post'>
-      <input type="hidden" name="MERCHANT_ID" value="T100000000000001000001" />
-      <input type="hidden" name="ORDER_ID" value="<?= $order['order_id'] ?>" />
-      <input type="hidden" name="TOKEN_BROWSER" value="<?= $key['token_browser'] ?>" />
-      <input id="submitBtn" type="submit" value="Confirm Checkout" />
-    </form>
- </body>
+	<title>Redirecting to Veritrans</title>
+</head>
+<body>	
+	<form action="<?= Veritrans::PAYMENT_REDIRECT_URL ?>" method="post" id='form'  onSubmit="document.getElementById('submitBtn').disabled=true;">
+  	<input type="hidden" name="MERCHANT_ID" value="<?= $merchant_id ?>" />
+  	<input type="hidden" name="ORDER_ID" value="<?= $order['order_id'] ?>" />
+  	<input type="hidden" name="TOKEN_BROWSER" value="<?= $key['token_browser'] ?>" />
+  	<input id="submitBtn" type="submit" value="Confirm Checkout" />
+	</form>
+	
+	<script language="javascript" type="text/javascript">
+		  window.onload = function() {
+		    document.getElementById("form").submit();
+		  }
+	</script>	
+	
+</body>
 </html>
 ```
 
