@@ -38,6 +38,8 @@ class Veritrans
   private $email;
   private $phone;
   
+  private $promo_id;
+  
   private $shipping_flag;
   private $required_shipping_address;
   private $shipping_specification_flag;
@@ -129,6 +131,7 @@ class Veritrans
       'CUSTOMER_STATUS'             => $this->customer_status,                
       'MERCHANTHASH'                => $hash,
       
+	  'PROMO_ID' 					=> $this->promo_id,
       'CUSTOMER_SPECIFICATION_FLAG' => $this->billing_address_different_with_shipping_address,   
       'EMAIL'                       => $this->email, 
       'FIRST_NAME'                  => $this->first_name,
