@@ -64,6 +64,7 @@ class Veritrans
   private $finish_payment_return_url;
   private $unfinish_payment_return_url;
   private $error_payment_return_url;
+  private $installment_option;
   
   // Sample of array of commodity
   // array(
@@ -158,7 +159,8 @@ class Veritrans
       'UNFINISH_PAYMENT_RETURN_URL' => $this->unfinish_payment_return_url,
       'ERROR_PAYMENT_RETURN_URL'    => $this->error_payment_return_url,
       'LANG_ENABLE_FLAG'            => $this->lang_enable_flag,
-      'LANG'                        => $this->lang
+      'LANG'                        => $this->lang,
+      'INSTALLMENT_OPTION'          => $this->installment_option
       );
 
     // data query string only without commodity
