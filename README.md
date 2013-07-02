@@ -25,7 +25,7 @@ $veritrans->required_shipping_address = 0;
 **dont forget to set your commodity**
 
 ```
-$commidities =  array (
+$commodities =  array (
 						array("COMMODITY_ID" => 'sku1', "COMMODITY_PRICE" => '10000', 
 							  "COMMODITY_QTY" => '2', 
 						      "COMMODITY_NAME1" => 'Kaos', "COMMODITY_NAME2" => 'T-Shirt'),
