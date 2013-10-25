@@ -10,25 +10,6 @@ class Veritrans
   const REQUEST_KEY_URL = 'https://vtweb.veritrans.co.id/web1/commodityRegist.action';
   const PAYMENT_REDIRECT_URL = 'https://vtweb.veritrans.co.id/web1/paymentStart.action';
   
-  
-  // const REQUEST_KEY_URL = 'https://payments.veritrans.co.id/web1/commodityRegist.action';
-  // const PAYMENT_REDIRECT_URL = 'https://payments.veritrans.co.id/web1/paymentStart.action';
-  
-  // const REQUEST_KEY_URL = 'http://vtweb.dev.veritrans.co.id/web1/commodityRegist.action';
-  // const PAYMENT_REDIRECT_URL = 'http://vtweb.dev.veritrans.co.id/web1/paymentStart.action';
-
-  // const REQUEST_KEY_URL = 'http://10.2.250.31/web1/commodityRegist.action';
-  // const REQUEST_KEY_URL = 'http://192.168.10.143:3000/web1/commodityRegist.action';
-  // const PAYMENT_REDIRECT_URL = 'http://10.2.250.31/web1/paymentStart.action';
-
-  // Ignore these lines, its a dev server
-  // const REQUEST_KEY_URL = 'http://192.168.10.250/web1/commodityRegist.action';
-  // const PAYMENT_REDIRECT_URL = 'http://192.168.10.250/web1/paymentStart.action';
-  
-  // const REQUEST_KEY_URL = 'http://localhost:3000/web1/commodityRegist.action';
-  // const PAYMENT_REDIRECT_URL = 'http://localhost:3000/web1/paymentStart.action';
-  
-  
   // Required Params
   private $settlement_type = '01'; // 00:payment type not set, 01:credit card settlement 
   private $merchant_id;
@@ -79,13 +60,11 @@ class Veritrans
   private $error_payment_return_url;
   private $installment_option;
   
-  // UAT
   private $point_banks;
   private $installment_banks;  
   private $promo_bins;
   private $enable_3d_secure;
-  // END UAT
-  
+
   // Sample of array of commodity
   // array(
   //           array("COMMODITY_ID" => "123", "COMMODITY_UNIT" => "1", "COMMODITY_NUM" => "1", "COMMODITY_NAME1" => "BUKU", "COMMODITY_NAME2" => "BOOK"),
