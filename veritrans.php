@@ -61,7 +61,8 @@ class Veritrans
   private $installment_option;
   
   private $point_banks;
-  private $installment_banks;  
+  private $installment_banks; 
+  private $installment_terms;   
   private $promo_bins;
   private $enable_3d_secure;
 
@@ -178,6 +179,11 @@ class Veritrans
       }
     }
     
+    // Build Installment Terms
+    if(isset($this->installment_terms)){
+      $query_string = "$query_string&installment_terms=$this->installment_terms";
+    }
+
     // Build Promo Bins
     if(isset($this->promo_bins)){
       foreach ($this->promo_bins as $bin){
