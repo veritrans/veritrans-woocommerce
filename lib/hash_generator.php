@@ -16,7 +16,7 @@ class HashGenerator {
   * @param amount - Total Amount
   * @return hash value
   */
-  public function generate($merchantID, $merchant_hash, $settlementmethod, $orderID, $amount) {
+  public static function generate($merchantID, $merchant_hash, $settlementmethod, $orderID, $amount) {
 
     $ctx  = hash_init('sha512');
 
