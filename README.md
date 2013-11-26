@@ -100,7 +100,7 @@ As Merchant, you need to response this query
 **Create Veritrans Notification instance**
 
 ```
-$veritrans_notification = new VeritransNotification($_POST);
+$veritrans_notification = new VeritransNotification();
 ```
 
 **Check if valid**
