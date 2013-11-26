@@ -7,14 +7,8 @@ require_once 'veritrans_notification.php';
 
 class Veritrans
 {
-  
-  const REQUEST_KEY_URL = 'https://payments.veritrans.co.id/web1/commodityRegist.action';
-  const PAYMENT_REDIRECT_URL = 'https://payments.veritrans.co.id/web1/paymentStart.action';
-
-  // Ignore these lines, its a dev server
-  // const REQUEST_KEY_URL = 'http://192.168.10.250/web1/commodityRegist.action';
-  // const PAYMENT_REDIRECT_URL = 'http://192.168.10.250/web1/paymentStart.action';
-  
+  const REQUEST_KEY_URL = 'https://vtweb.veritrans.co.id/web1/commodityRegist.action';
+  const PAYMENT_REDIRECT_URL = 'https://vtweb.veritrans.co.id/web1/paymentStart.action';
   
   // Required Params
   private $settlement_type = '01'; // 00:payment type not set, 01:credit card settlement 
@@ -66,6 +60,12 @@ class Veritrans
   private $error_payment_return_url;
   private $installment_option;
   
+  private $point_banks;
+  private $installment_banks; 
+  private $installment_terms;   
+  private $promo_bins;
+  private $enable_3d_secure;
+
   // Sample of array of commodity
   // array(
   //           array("COMMODITY_ID" => "123", "COMMODITY_UNIT" => "1", "COMMODITY_NUM" => "1", "COMMODITY_NAME1" => "BUKU", "COMMODITY_NAME2" => "BOOK"),
@@ -132,7 +132,7 @@ class Veritrans
       'CUSTOMER_STATUS'             => $this->customer_status,                
       'MERCHANTHASH'                => $hash,
       
-	  'PROMO_ID' 					=> $this->promo_id,
+	    'PROMO_ID' 				          	=> $this->promo_id,
       'CUSTOMER_SPECIFICATION_FLAG' => $this->billing_address_different_with_shipping_address,   
       'EMAIL'                       => $this->email, 
       'FIRST_NAME'                  => $this->first_name,
@@ -160,15 +160,42 @@ class Veritrans
       'ERROR_PAYMENT_RETURN_URL'    => $this->error_payment_return_url,
       'LANG_ENABLE_FLAG'            => $this->lang_enable_flag,
       'LANG'                        => $this->lang,
-      'INSTALLMENT_OPTION'          => $this->installment_option
+      'enable_3d_secure'            => $this->enable_3d_secure           
       );
 
     // data query string only without commodity
     $query_string = http_build_query($data);
-        
+    
+    // Build Commodity
     if(isset($this->commodity)){
       $commodity_query_string = $this->build_commodity_query_string($this->commodity);
       $query_string = "$query_string&$commodity_query_string";
+    }
+    
+    // Build Installment Banks
+    if(isset($this->installment_banks)){
+      foreach ($this->installment_banks as $bank){
+        $query_string = "$query_string&installment_banks[]=$bank";
+      }
+    }
+    
+    // Build Installment Terms
+    if(isset($this->installment_terms)){
+      $query_string = "$query_string&installment_terms=$this->installment_terms";
+    }
+
+    // Build Promo Bins
+    if(isset($this->promo_bins)){
+      foreach ($this->promo_bins as $bin){
+        $query_string = "$query_string&promo_bins[]=$bin";
+      }
+    }
+    
+    // Build Point Banks
+    if(isset($this->point_banks)){
+      foreach ($this->point_banks as $bank){
+        $query_string = "$query_string&point_banks[]=$bank";
+      }
     }
     		
     $client = new Pest(self::REQUEST_KEY_URL);
