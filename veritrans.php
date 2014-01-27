@@ -7,8 +7,8 @@ require_once 'veritrans_notification.php';
 
 class Veritrans
 {
-  const REQUEST_KEY_URL = 'https://vtweb.veritrans.co.id/web1/commodityRegist.action';
-  const PAYMENT_REDIRECT_URL = 'https://vtweb.veritrans.co.id/web1/paymentStart.action';
+  const REQUEST_KEY_URL = 'https://vtweb.veritrans.co.id/v1/tokens';
+  const PAYMENT_REDIRECT_URL = 'https://vtweb.veritrans.co.id/v1/payments';
   
   // Required Params
   private $settlement_type = '01'; // 00:payment type not set, 01:credit card settlement 
