@@ -1,0 +1,9 @@
+{
+    "name": "andrisetiawan/veritrans-php",
+    "description": "Veritrans VT-Web PHP integration library.",
+    "homepage": "https://veritrans.co.id",
+    "type": "library",
+    "require": {
+        "php": ">=5.3.0"
+    }
+}
