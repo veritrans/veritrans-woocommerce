@@ -1,6 +1,6 @@
 <?php
 
-// Wraper for veritrans weblink type payment response
+// PHP Wraper for Veritrans VT-Web Payment HTTP(S) POST notification response
 
 class VeritransNotification
 {
