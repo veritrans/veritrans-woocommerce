@@ -3,7 +3,16 @@
     "description": "Veritrans VT-Web PHP integration library.",
     "homepage": "https://veritrans.co.id",
     "type": "library",
+    "authors": [
+        {
+            "name": "Andri Setiawan",
+            "email": "andri.setiawan@veritrans.co.id"
+        }
+    ],
     "require": {
         "php": ">=5.3.0"
+    },
+    "autoload": {
+        "classmap": [""]
     }
 }
