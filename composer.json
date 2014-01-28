@@ -1,6 +1,6 @@
 {
     "name": "andrisetiawan/veritrans-php",
-    "description": "Veritrans VT-Web PHP integration library.",
+    "description": "PHP Wraper for Veritrans VT-Web Payment API.",
     "homepage": "https://veritrans.co.id",
     "type": "library",
     "authors": [
