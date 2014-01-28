@@ -1,6 +1,6 @@
 <?php
 
-// Wraper for veritrans weblink type payment
+// PHP Wraper for Veritrans VT-Web Payment API.
 require_once 'lib/Pest.php';
 require_once 'lib/hash_generator.php';
 require_once 'veritrans_notification.php';
