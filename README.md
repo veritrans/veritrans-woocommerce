@@ -7,7 +7,7 @@ Ruby Wrapper for Veritrans VT-Web. Visit [https://www.veritrans.co.id](https://w
 
 ### Composer Installation
 
-If you are using Composer, add this require line to your `composer.json` file:
+If you are using [Composer](https://getcomposer.org), add this require line to your `composer.json` file:
 
 ```
 "require": {
