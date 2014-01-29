@@ -7,36 +7,17 @@ require_once 'veritrans_notification.php';
 
 class Veritrans
 {
-  const REQUEST_KEY_URL = 'https://vtweb.veritrans.co.id/web1/commodityRegist.action';
-  const PAYMENT_REDIRECT_URL = 'https://vtweb.veritrans.co.id/web1/paymentStart.action';
+  const REQUEST_KEY_URL = 'https://vtweb.veritrans.co.id/v1/tokens';
+  const PAYMENT_REDIRECT_URL = 'https://vtweb.veritrans.co.id/v1/payments';
   
-  // Required Params
-  private $settlement_type = '01'; // 00:payment type not set, 01:credit card settlement 
+  // Required parameters
   private $merchant_id;
   private $order_id;
-  private $session_id;
-  private $gross_amount;
   private $merchant_hash_key;
-  private $card_capture_flag = '1';
-  private $customer_specification_flag;
-  private $billing_address_different_with_shipping_address;
-
-  // Optional Params
-  private $first_name;
-  private $last_name;
-  private $address1;
-  private $address2;
-  private $city;
-  private $country_code;
-  private $postal_code;
-  private $email;
-  private $phone;
-  
-  private $promo_id;
-  
-  private $shipping_flag;
+  private $billing_different_with_shipping;
   private $required_shipping_address;
-  private $shipping_specification_flag;
+  
+  // Required field if required_shipping_address = 1
   private $shipping_first_name;
   private $shipping_last_name;
   private $shipping_address1;
@@ -45,32 +26,38 @@ class Veritrans
   private $shipping_country_code;
   private $shipping_postal_code;
   private $shipping_phone;
-  private $shipping_method;
- 
-  private $card_no;
-  private $card_exp_date; // mm/yy/format
-  private $card_holder_name;
-  private $card_number_of_installment;
-  
-  private $lang_enable_flag;
-  private $lang;
-  
+  private $email;
+
+  // Optional parameters
+  private $payment_methods;
   private $finish_payment_return_url;
   private $unfinish_payment_return_url;
   private $error_payment_return_url;
-  private $installment_option;
   
+  private $first_name;
+  private $last_name;
+  private $address1;
+  private $address2;
+  private $city;
+  private $country_code;
+  private $postal_code;
+  private $phone; 
+  
+  private $promo_bins;
+  private $enable_3d_secure;
   private $point_banks;
   private $installment_banks; 
   private $installment_terms;   
-  private $promo_bins;
-  private $enable_3d_secure;
+  private $bank;
+  
+  
 
   // Sample of array of commodity
   // array(
   //           array("COMMODITY_ID" => "123", "COMMODITY_UNIT" => "1", "COMMODITY_NUM" => "1", "COMMODITY_NAME1" => "BUKU", "COMMODITY_NAME2" => "BOOK"),
   //           array("COMMODITY_ID" => "1243", "COMMODITY_UNIT" => "9", "COMMODITY_NUM" => "1", "COMMODITY_NAME1" => "BUKU Sembilan", "COMMODITY_NAME2" => "BOOK NINE")
   //       )
+  
   private $commodity;
 
   public function __get($property) 
@@ -118,22 +105,15 @@ class Veritrans
   public function get_keys()
   {    
     // Generate merchant hash code
-    $hash = HashGenerator::generate($this->merchant_id, $this->merchant_hash_key, $this->settlement_type, $this->order_id, $this->gross_amount);
+    $hash = HashGenerator::generate($this->merchant_id, $this->merchant_hash_key, $this->order_id);
 
 
     // populate parameters for the post request
     $data = array(
-      'SETTLEMENT_TYPE'             => '01',
       'MERCHANT_ID'                 => $this->merchant_id,
       'ORDER_ID'                    => $this->order_id,
-      'SESSION_ID'                  => $this->session_id,
-      'GROSS_AMOUNT'                => $this->gross_amount,                   
-      'PREVIOUS_CUSTOMER_FLAG'      => $this->previous_customer_flag,         
-      'CUSTOMER_STATUS'             => $this->customer_status,                
-      'MERCHANTHASH'                => $hash,
-      
-	    'PROMO_ID' 				          	=> $this->promo_id,
-      'CUSTOMER_SPECIFICATION_FLAG' => $this->billing_address_different_with_shipping_address,   
+      'GROSS_AMOUNT'                => $this->gross_amount,               
+      'MERCHANTHASH'                => $hash,  
       'EMAIL'                       => $this->email, 
       'FIRST_NAME'                  => $this->first_name,
       'LAST_NAME'                   => $this->last_name,
@@ -153,13 +133,9 @@ class Veritrans
       'SHIPPING_POSTAL_CODE'        => $this->shipping_postal_code,
       'SHIPPING_PHONE'              => $this->shipping_phone,
       'SHIPPING_METHOD'             => $this->shipping_method,
-      'CARD_NO'                     => $this->card_no,
-      'CARD_EXP_DATE'               => $this->card_exp_date,
       'FINISH_PAYMENT_RETURN_URL'   => $this->finish_payment_return_url,
       'UNFINISH_PAYMENT_RETURN_URL' => $this->unfinish_payment_return_url,
       'ERROR_PAYMENT_RETURN_URL'    => $this->error_payment_return_url,
-      'LANG_ENABLE_FLAG'            => $this->lang_enable_flag,
-      'LANG'                        => $this->lang,
       'enable_3d_secure'            => $this->enable_3d_secure           
       );
 
@@ -228,8 +204,7 @@ class Veritrans
 
   // Private methods
   // return array of keys or error
-  private function extract_keys_from($body)
-  {
+  private function extract_keys_from($body)  {
     
     $key = array();
     $body_lines = explode("\n", $body);
