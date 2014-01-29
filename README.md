@@ -1,24 +1,21 @@
-PHP Wraper for Veritrans VT-Web Payment API
+Veritrans VT-Web PHP Wrapper
 ==============================================
 
 Ruby Wrapper for Veritrans VT-Web. Visit [https://www.veritrans.co.id](https://www.veritrans.co.id) for more information about the product and see documentation at [http://docs.veritrans.co.id](http://docs.veritrans.co.id/vtweb/index.html) for more technical details.
 
 # Installation
 
-### Composer Instalation
+### Composer Installation
 
-If you are using Composer: 
-
-	1. Add this require line to your `composer.json` file:
+If you are using Composer, add this require line to your `composer.json` file:
 
 ```
 "require": {
         "andrisetiawan/veritrans-php": "dev-master"
 }
-
 ```
 
-	2. Run `composer install` on your terminal.
+and run `composer install` on your terminal.
 
 ### Manual Instalation
 
