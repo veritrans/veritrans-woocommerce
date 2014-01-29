@@ -1,7 +1,7 @@
 Veritrans VT-Web PHP Wrapper
 ==============================================
 
-Ruby Wrapper for Veritrans VT-Web. Visit [https://www.veritrans.co.id](https://www.veritrans.co.id) for more information about the product and see documentation at [http://docs.veritrans.co.id](http://docs.veritrans.co.id/vtweb/index.html) for more technical details.
+PHP wrapper for Veritrans VT-Web payment API. Visit [https://www.veritrans.co.id](https://www.veritrans.co.id) for more information about the product and see documentation at [http://docs.veritrans.co.id](http://docs.veritrans.co.id/vtweb/index.html) for more technical details.
 
 # Installation
 
