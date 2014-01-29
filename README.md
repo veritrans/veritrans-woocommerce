@@ -1,12 +1,36 @@
- Veritrans Weblink Type PHP integration library 
+PHP Wraper for Veritrans VT-Web Payment API
 ==============================================
+
+Ruby Wrapper for Veritrans VT-Web. Visit [https://www.veritrans.co.id](https://www.veritrans.co.id) for more information about the product and see documentation at [http://docs.veritrans.co.id](http://docs.veritrans.co.id/vtweb/index.html) for more technical details.
+
+# Installation
+
+### Composer Instalation
+
+If you are using Composer: 
+
+	1. Add this require line to your `composer.json` file:
+
+```
+"require": {
+        "andrisetiawan/veritrans-php": "dev-master"
+}
+
+```
+
+	2. Run `composer install` on your terminal.
+
+### Manual Instalation
+
+If you are not using Composer, just copy all files in this repository into your project's library.
+
 
 ## How to use
 
-###STEP 1 : Requesting key
+### STEP 1 : Requesting key
 
 Given you already have cart ready for checkout.
-We create a veritrans instance
+We create a veritrans instance.
 
 ```
 $veritrans = new Veritrans;
@@ -63,7 +87,7 @@ $data = array(
 $this->db->insert('orders', $data);
 ```
 
-###STEP 2 :  Redirect user to Veritrans payment page
+### STEP 2 :  Redirect user to Veritrans payment page
 
 **Prepare the FORM to redirect the customer**
 
@@ -91,7 +115,7 @@ $this->db->insert('orders', $data);
 ```
 
 
-###STEP 3 : Responding Veritrans Payment Notification
+### STEP 3 : Responding Veritrans Payment Notification
 After the payment is completed
 Veritrans will contact Merchant's web server
 As Merchant, you need to response this query
