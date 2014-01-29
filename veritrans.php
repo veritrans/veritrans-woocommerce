@@ -118,7 +118,7 @@ class Veritrans
   public function get_keys()
   {    
     // Generate merchant hash code
-    $hash = HashGenerator::generate($this->merchant_id, $this->merchant_hash_key, $this->settlement_type, $this->order_id, $this->gross_amount);
+    $hash = HashGenerator::generate($this->merchant_id, $this->merchant_hash_key, $this->order_id);
 
 
     // populate parameters for the post request
