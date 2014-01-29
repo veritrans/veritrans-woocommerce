@@ -19,7 +19,7 @@ class HashGenerator {
 
     $ctx  = hash_init('sha512');
 
-    $str  = $merchant_hash .
+    $str  = $merchant_hash_key .
       "," . $merchantID .
       "," . $orderID;
 	  
