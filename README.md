@@ -11,7 +11,7 @@ If you are using [Composer](https://getcomposer.org), add this require line to y
 
 ```
 "require": {
-        "andrisetiawan/veritrans-php": "dev-master"
+	"andrisetiawan/veritrans-php": "dev-master"
 }
 ```
 
@@ -31,7 +31,6 @@ We create a veritrans instance.
 
 ```
 $veritrans = new Veritrans;
-
 
 //TODO: Change with your actual merchant id and merchant hash key
 $veritrans->merchant_id 		= 'T100000000000001000001';
@@ -83,7 +82,6 @@ $veritrans->shipping_country_code 	= "IDN";
 $veritrans->shipping_postal_code 	= "12346";
 $veritrans->shipping_phone 			= "082313123131";
 
-
 //Call Veritrans VT-Web API Get Token
 $keys = $veritrans->get_keys();
 	
@@ -101,12 +99,12 @@ else
 	//Use this token_browser for redirecting customer to Veritrans payment page.
 	$token_browser = $keys['token_browser'];
 }
+```
 
-
-### STEP 2 :  Redirect user to Veritrans payment page
+### STEP 2:  Redirect user to Veritrans payment page
 
 **Prepare the FORM to redirect the customer**
-
+	
 ```
 <!DOCTYPE html>
 <html>
