@@ -48,17 +48,17 @@ class Veritrans
   private $point_banks;
   private $installment_banks; 
   private $installment_terms;   
-  private $bank;
+  private $bank;  
   
+	/*
+	  Sample of array of commodity items
+	  array (
+			array("item_id" => 'sku1', "price" => '10000', "quantity" => '2', "item_name1" => 'Kaos', "item_name2" => 'T-Shirt'),
+			array("item_id" => 'sku2', "price" => '20000', "quantity" => '1', "item_name1" => 'Celana', "item_name2" => 'Pants')
+			)
+	*/
   
-
-  // Sample of array of commodity
-  // array(
-  //           array("COMMODITY_ID" => "123", "COMMODITY_UNIT" => "1", "COMMODITY_NUM" => "1", "COMMODITY_NAME1" => "BUKU", "COMMODITY_NAME2" => "BOOK"),
-  //           array("COMMODITY_ID" => "1243", "COMMODITY_UNIT" => "9", "COMMODITY_NUM" => "1", "COMMODITY_NAME1" => "BUKU Sembilan", "COMMODITY_NAME2" => "BOOK NINE")
-  //       )
-  
-  private $commodity;
+  private $items;
 
   public function __get($property) 
   {
@@ -105,47 +105,50 @@ class Veritrans
   public function get_keys()
   {    
     // Generate merchant hash code
-    $hash = HashGenerator::generate($this->merchant_id, $this->merchant_hash_key, $this->order_id);
+    $hash = HashGenerator::generate($this->merchant_hash_key, $this->merchant_id, , $this->order_id);
 
 
     // populate parameters for the post request
     $data = array(
-      'MERCHANT_ID'                 => $this->merchant_id,
-      'ORDER_ID'                    => $this->order_id,
-      'GROSS_AMOUNT'                => $this->gross_amount,               
-      'MERCHANTHASH'                => $hash,  
-      'EMAIL'                       => $this->email, 
-      'FIRST_NAME'                  => $this->first_name,
-      'LAST_NAME'                   => $this->last_name,
-      'POSTAL_CODE'                 => $this->postal_code,
-      'ADDRESS1'                    => $this->address1,
-      'ADDRESS2'                    => $this->address2,
-      'CITY'                        => $this->city,
-      'COUNTRY_CODE'                => $this->country_code,
-      'PHONE'                       => $this->phone,
-      'SHIPPING_FLAG'               => $this->required_shipping_address,                 
-      'SHIPPING_FIRST_NAME'         => $this->shipping_first_name,
-      'SHIPPING_LAST_NAME'          => $this->shipping_last_name,
-      'SHIPPING_ADDRESS1'           => $this->shipping_address1,
-      'SHIPPING_ADDRESS2'           => $this->shipping_address2,
-      'SHIPPING_CITY'               => $this->shipping_city,
-      'SHIPPING_COUNTRY_CODE'       => $this->shipping_country_code,
-      'SHIPPING_POSTAL_CODE'        => $this->shipping_postal_code,
-      'SHIPPING_PHONE'              => $this->shipping_phone,
-      'SHIPPING_METHOD'             => $this->shipping_method,
-      'FINISH_PAYMENT_RETURN_URL'   => $this->finish_payment_return_url,
-      'UNFINISH_PAYMENT_RETURN_URL' => $this->unfinish_payment_return_url,
-      'ERROR_PAYMENT_RETURN_URL'    => $this->error_payment_return_url,
-      'enable_3d_secure'            => $this->enable_3d_secure           
+      'merchant_id'                 => $this->merchant_id,
+      'order_id'                    => $this->order_id,             
+      'merchanthash'                => $hash,  
+      'email'                       => $this->email, 
+      'first_name'                  => $this->first_name,
+      'last_name'                   => $this->last_name,
+      'postal_code'                 => $this->postal_code,
+      'address1'                    => $this->address1,
+      'address2'                    => $this->address2,
+      'city'                        => $this->city,
+      'country_code'                => $this->country_code,
+      'phone'                       => $this->phone,
+      'required_shipping_address'   => $this->required_shipping_address,                 
+      'shipping_first_name'         => $this->shipping_first_name,
+      'shipping_last_name'          => $this->shipping_last_name,
+      'shipping_address1'           => $this->shipping_address1,
+      'shipping_address2'           => $this->shipping_address2,
+      'shipping_city'               => $this->shipping_city,
+      'shipping_country_code'       => $this->shipping_country_code,
+      'shipping_postal_code'        => $this->shipping_postal_code,
+      'shipping_phone'              => $this->shipping_phone,
+      'finish_payment_return_url'   => $this->finish_payment_return_url,
+      'unfinish_payment_return_url' => $this->unfinish_payment_return_url,
+      'error_payment_return_url'    => $this->error_payment_return_url,
+      'enable_3d_secure'            => $this->enable_3d_secure, 
+	  'promo_bins'                  => $this->promo_bins,
+	  'point_banks'					=> $this->point_banks,
+      'installment_banks'			=> $this->installment_banks, 
+      'installment_terms'			=> $this->installment_terms,   
+	  'bank'						=> $this->bank	  
       );
 
     // data query string only without commodity
     $query_string = http_build_query($data);
     
-    // Build Commodity
-    if(isset($this->commodity)){
-      $commodity_query_string = $this->build_commodity_query_string($this->commodity);
-      $query_string = "$query_string&$commodity_query_string";
+    // Build Commodity items
+    if(isset($this->items)){
+      $items_query_string = $this->build_items_query_string($this->items);
+      $query_string = "$query_string&$items_query_string";
     }
     
     // Build Installment Banks
@@ -183,12 +186,12 @@ class Veritrans
   }
   
   // Private methods
-  // return array of commodities
-  private function build_commodity_query_string($commodity)
+  // return array of commodity items
+  private function build_items_query_string($items)
   {
     $line = 0;
   	$query_string = "";
-  	foreach ($commodity as $row) {
+  	foreach ($items as $row) {
         $row = $this->replace_commodity_params_with_legacy_params($row);
   	    
         $q = http_build_query($row);
@@ -239,15 +242,43 @@ class Veritrans
    {
      if(array_key_exists("COMMODITY_QTY", $commodity) && $commodity["COMMODITY_QTY"] != '' )
      {
-       $commodity["COMMODITY_NUM"] = $commodity["COMMODITY_QTY"];
+       $commodity["quantity"] = $commodity["COMMODITY_QTY"];
        unset($commodity["COMMODITY_QTY"]);
      }
      if(array_key_exists("COMMODITY_PRICE", $commodity) && $commodity["COMMODITY_PRICE"] != '')
      {
-       $commodity["COMMODITY_UNIT"] = $commodity["COMMODITY_PRICE"];
+       $commodity["price"] = $commodity["COMMODITY_PRICE"];
        unset($commodity["COMMODITY_PRICE"]);
      }
-     
+	
+     if(array_key_exists("COMMODITY_QUANTITY", $commodity) && $commodity["COMMODITY_QUANTITY"] != '' )
+     {
+       $commodity["quantity"] = $commodity["COMMODITY_QUANTITY"];
+       unset($commodity["COMMODITY_QUANTITY"]);
+     }
+	 if(array_key_exists("COMMODITY_UNIT", $commodity) && $commodity["COMMODITY_UNIT"] != '')
+     {
+       $commodity["price"] = $commodity["COMMODITY_UNIT"];
+       unset($commodity["COMMODITY_UNIT"]);
+     }
+	 
+	 if(array_key_exists("COMMODITY_ID", $commodity) && $commodity["COMMODITY_ID"] != '' )
+     {
+       $commodity["item_id"] = $commodity["COMMODITY_ID"];
+       unset($commodity["COMMODITY_ID"]);
+     }
+	 
+	 if(array_key_exists("COMMODITY_NAME1", $commodity) && $commodity["COMMODITY_NAME1"] != '')
+     {
+       $commodity["item_name1"] = $commodity["COMMODITY_NAME1"];
+       unset($commodity["COMMODITY_NAME1"]);
+     }
+	 
+	 if(array_key_exists("COMMODITY_NAME2", $commodity) && $commodity["COMMODITY_NAME2"] != '')
+     {
+       $commodity["item_name2"] = $commodity["COMMODITY_NAME2"];
+       unset($commodity["COMMODITY_NAME2"]);
+     }
      return $commodity;
    }
 
