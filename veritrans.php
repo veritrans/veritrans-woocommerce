@@ -16,6 +16,7 @@ class Veritrans
   private $merchant_hash_key;
   private $billing_different_with_shipping;
   private $required_shipping_address;
+  private $version;
   
   // Required field if required_shipping_address = 1
   private $shipping_first_name;
@@ -105,7 +106,7 @@ class Veritrans
   public function get_keys()
   {    
     // Generate merchant hash code
-    $hash = HashGenerator::generate($this->merchant_hash_key, $this->merchant_id, , $this->order_id);
+    $hash = HashGenerator::generate($this->merchant_hash_key, $this->merchant_id, $this->order_id);
 
 
     // populate parameters for the post request
@@ -113,6 +114,7 @@ class Veritrans
       'merchant_id'                 => $this->merchant_id,
       'order_id'                    => $this->order_id,             
       'merchanthash'                => $hash,  
+	  'version'						=> $this->version,
       'email'                       => $this->email, 
       'first_name'                  => $this->first_name,
       'last_name'                   => $this->last_name,
@@ -134,6 +136,7 @@ class Veritrans
       'finish_payment_return_url'   => $this->finish_payment_return_url,
       'unfinish_payment_return_url' => $this->unfinish_payment_return_url,
       'error_payment_return_url'    => $this->error_payment_return_url,
+	  'payment_methods'				=> $this->payment_methods,
       'enable_3d_secure'            => $this->enable_3d_secure, 
 	  'promo_bins'                  => $this->promo_bins,
 	  'point_banks'					=> $this->point_banks,
@@ -145,11 +148,13 @@ class Veritrans
     // data query string only without commodity
     $query_string = http_build_query($data);
     
+	
     // Build Commodity items
     if(isset($this->items)){
       $items_query_string = $this->build_items_query_string($this->items);
       $query_string = "$query_string&$items_query_string";
     }
+	
     
     // Build Installment Banks
     if(isset($this->installment_banks)){
@@ -157,6 +162,15 @@ class Veritrans
         $query_string = "$query_string&installment_banks[]=$bank";
       }
     }
+	
+	
+	// Build Payment Methods
+    if(isset($this->payment_methods)){
+      foreach ($this->payment_methods as $methods){
+        $query_string = "$query_string&payment_methods[]=$methods";
+      }
+    }
+	
     
     // Build Installment Terms
     if(isset($this->installment_terms)){
