@@ -15,7 +15,7 @@ class HashGenerator {
   * @param merchant_hash_key
   * @return hash value
   */
-  public static function generate($merchantID, $merchant_hash_key, $orderID) {
+  public static function generate($merchant_hash_key,$merchantID, $orderID) {
 
     $ctx  = hash_init('sha512');
 
