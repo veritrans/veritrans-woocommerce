@@ -101,7 +101,7 @@ else
 }
 ```
 
-### STEP 2:  Redirect user to Veritrans payment page
+### STEP 2:  Redirecting user to Veritrans payment page
 
 **Prepare the FORM to redirect the customer**
 	
@@ -130,9 +130,9 @@ else
 ```
 
 
-### STEP 3 : Responding Veritrans Payment Notification
+### STEP 3 : Responding Veritrans payment notification
 After the payment process is completed, Veritrans will send HTTP(S) POST notification to merchant's web server.
-As a merchant, you need to process this POST paramters to update order status in your database server.
+As a merchant, you need to process this POST paramters to update order status in your database server. Veritrans will send 3 POST parameters: `orderId`, `mStatus`, and `TOKEN_MERCHANT`.
 
 ```
 $notification = new VeritransNotification();
