@@ -4,20 +4,8 @@
 
 class VeritransNotification
 {
-  
-  private $postalcode;
   private $mStatus; 
-  private $phone; 
-  private $shippingPhone; 
-  private $mErrMsg; 
-  private $email; 
-  private $address; 
-  private $name;
-  private $vResultCode; 
-  private $shippingAddress;
   private $orderId;
-  private $shippingPostalcode;
-  private $shippingName;
   private $TOKEN_MERCHANT;
   
 
