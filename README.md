@@ -5,7 +5,7 @@ PHP wrapper for Veritrans VT-Web payment API. Visit [https://www.veritrans.co.id
 
 # Installation
 
-### Composer Installation
+#### Composer Installation
 
 If you are using [Composer](https://getcomposer.org), add this require line to your `composer.json` file:
 
@@ -17,7 +17,7 @@ If you are using [Composer](https://getcomposer.org), add this require line to y
 
 and run `composer install` on your terminal.
 
-### Manual Instalation
+#### Manual Instalation
 
 If you are not using Composer, just copy all files in this repository into your project's library.
 
