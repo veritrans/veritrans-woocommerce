@@ -30,7 +30,7 @@ Given you already have cart ready for checkout.
 We create a veritrans instance.
 
 ```
-$veritrans = new Veritrans;
+$veritrans = new Veritrans();
 
 //TODO: Change with your actual merchant id and merchant hash key
 $veritrans->merchant_id 		= 'T100000000000001000001';
@@ -39,24 +39,25 @@ $veritrans->merchant_hash_key 	= '305e0328a366cbce8e17a385435bb7eb3f0cbcfbfc0f1c
 //TODO: Change with your actual order_id.
 $veritrans->order_id 			= 'your_unique_order_id';
 
-// Set commodities
-$commodities =  array (
-	array(
-		"COMMODITY_ID" => 'sku1', 
-		"COMMODITY_PRICE" => '10000', 
-		"COMMODITY_QTY" => '2', 
-		"COMMODITY_NAME1" => 'Kaos',
-		"COMMODITY_NAME2" => 'T-Shirt'
-	),
-	array(
-		"COMMODITY_ID" => 'sku2', 
-		"COMMODITY_PRICE" => '20000', 
-		"COMMODITY_QTY" => '1', 
-		"COMMODITY_NAME1" => 'Celana', 
-		"COMMODITY_NAME2" => 'Pants'
-	)
-);
-$veritrans->commodity = $commodities;
+// Set commodity items
+$items = array(
+			array(
+				"item_id" => 'itemsatu',
+				"price" => '250000',
+				"quantity"   => '1',
+				"item_name1" => 'sepatu',
+				"item_name2" => 'Shoes'
+			),
+			array(
+				"item_id" => 'itemdua',
+				"price" => '500000',
+				"quantity"   => '2',
+				"item_name1" => 'Tas',
+				"item_name2" => 'Bag'
+			),
+		);
+
+$veritrans->items = $items;
 
 $veritrans->required_shipping_address 						= 1; // Set '0' if shipping address is not required
 $veritrans->billing_address_different_with_shipping_address = 1; // Set '0' if shipping address = billing address
@@ -83,21 +84,21 @@ $veritrans->shipping_postal_code 	= "12346";
 $veritrans->shipping_phone 			= "082313123131";
 
 //Call Veritrans VT-Web API Get Token
-$keys = $veritrans->get_keys();
-	
-if(!empty($keys['error_message']))
-{
-	echo "Error while getting token from Veritrans.";
-	var_dump($keys);
-	exit;
-}
-else
-{
-	//Save this token_merchant on your database to be used for checking veritrans notification response.
-	$token_merchant = $keys['token_merchant'];
-	
-	//Use this token_browser for redirecting customer to Veritrans payment page.
-	$token_browser = $keys['token_browser'];
+try {
+	$keys = $veritrans->getTokens();
+
+	if(!$keys) {
+		print_r($veritrans->errors);
+		exit();
+	} else {
+		//Save this token_merchant on your database to be used for checking veritrans notification response.
+		$token_merchant = $keys['token_merchant'];
+
+		//Use this token_browser for redirecting customer to Veritrans payment page.
+		$token_browser = $keys['token_browser'];
+	}
+} catch (Exception $e) {
+	var_dump($e);
 }
 ```
 
