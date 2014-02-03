@@ -11,7 +11,7 @@ If you are using [Composer](https://getcomposer.org), add this require line to y
 
 ```
 "require": {
-	"andrisetiawan/veritrans-php": "dev-master"
+	"veritrans/veritrans-php": "dev-vtweb-2"
 }
 ```
 
