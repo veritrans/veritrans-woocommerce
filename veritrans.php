@@ -9,14 +9,9 @@ require_once 'veritrans_notification.php';
 class Veritrans
 {
 
-  //const REQUEST_KEY_URL       = 'https://vtweb.veritrans.co.id/v1/tokens';
-  //const PAYMENT_REDIRECT_URL  = 'https://vtweb.veritrans.co.id/v1/payments';
+  const REQUEST_KEY_URL       = 'https://vtweb.veritrans.co.id/v1/tokens';
+  const PAYMENT_REDIRECT_URL  = 'https://vtweb.veritrans.co.id/v1/payments';
 
-  // staging configuration
-  // TODO: DELETE
-  const REQUEST_KEY_URL       = 'http://10.2.250.31/v1/tokens';
-  const PAYMENT_REDIRECT_URL  = 'http://10.2.250.31/v1/payments';
-  
   // Required parameters
   private $version = '1';
   private $merchant_id;

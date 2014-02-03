@@ -18,7 +18,7 @@ $veritrans->merchant_hash_key = $MERCHANT_HASH_KEY;
 //TODO: Change with your actual order_id.
 $veritrans->order_id          = 'order'.rand();
 
-$veritrans->billing_address_different_with_shipping_address = 1;
+$veritrans->billing_different_with_shipping = 1;
 $veritrans->required_shipping_address = 1;
 
 // Billing info. [Optional]
