@@ -30,13 +30,14 @@
 		</tr>
 	</table>
 	<form action="checkout_process.php" method="post">		
+		<label>Email</label><br />
+		<input name="email" size="30" type="text" value="customer@email.com"><br /><br />
+		
 		<h3>Billing Info</h3>
 		<label>First name</label><br />
 		<input name="billing_first_name" size="30" type="text" value="Andri"><br /><br />
 		<label>Last name</label><br />
 		<input name="billing_last_name" size="30" type="text" value="Setiawan"><br /><br />
-		<label>Email</label><br />
-		<input name="billing_email" size="30" type="text" value="customer@email.com"><br /><br />
 		<label>Address 1</label><br />
 		<input name="billing_address1" size="30" type="text" value="Bakerstreet 221B"><br /><br />
 		<label>Address 2</label><br />
