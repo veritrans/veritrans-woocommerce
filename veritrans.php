@@ -1,42 +1,31 @@
 <?php
 
 // PHP Wraper for Veritrans VT-Web Payment API.
-require_once 'lib/Pest.php';
+
+require_once 'lib/PestJSON.php';
 require_once 'lib/hash_generator.php';
 require_once 'veritrans_notification.php';
 
 class Veritrans
 {
-  const REQUEST_KEY_URL = 'https://vtweb.veritrans.co.id/v1/tokens';
-  const PAYMENT_REDIRECT_URL = 'https://vtweb.veritrans.co.id/v1/payments';
-  
-  // Required Params
-  private $settlement_type = '01'; // 00:payment type not set, 01:credit card settlement 
-  private $merchant_id;
-  private $order_id;
-  private $session_id;
-  private $gross_amount;
-  private $merchant_hash_key;
-  private $card_capture_flag = '1';
-  private $customer_specification_flag;
-  private $billing_address_different_with_shipping_address;
+  //const REQUEST_KEY_URL       = 'https://vtweb.veritrans.co.id/v1/tokens';
+  //const PAYMENT_REDIRECT_URL  = 'https://vtweb.veritrans.co.id/v1/payments';
 
-  // Optional Params
-  private $first_name;
-  private $last_name;
-  private $address1;
-  private $address2;
-  private $city;
-  private $country_code;
-  private $postal_code;
-  private $email;
-  private $phone;
+  // staging configuration
+  // TODO: DELETE
+  const REQUEST_KEY_URL       = 'http://10.2.250.31/v1/tokens';
+  const PAYMENT_REDIRECT_URL  = 'http://10.2.250.31/v1/payments';
   
-  private $promo_id;
-  
-  private $shipping_flag;
+  // Required parameters
+  private $version = '1';
+  private $merchant_id;
+  private $merchant_hash_key;
+
+  private $order_id;
+  private $billing_different_with_shipping;
   private $required_shipping_address;
-  private $shipping_specification_flag;
+  
+  // Shipping info [Required field if required_shipping_address = 1]
   private $shipping_first_name;
   private $shipping_last_name;
   private $shipping_address1;
@@ -45,33 +34,40 @@ class Veritrans
   private $shipping_country_code;
   private $shipping_postal_code;
   private $shipping_phone;
-  private $shipping_method;
- 
-  private $card_no;
-  private $card_exp_date; // mm/yy/format
-  private $card_holder_name;
-  private $card_number_of_installment;
+  private $email;
   
-  private $lang_enable_flag;
-  private $lang;
-  
-  private $finish_payment_return_url;
-  private $unfinish_payment_return_url;
-  private $error_payment_return_url;
-  private $installment_option;
-  
+  // Billing info [optional]
+  private $first_name;
+  private $last_name;
+  private $address1;
+  private $address2;
+  private $city;
+  private $country_code;
+  private $postal_code;
+  private $phone; 
+
+  // Payment options [optional]
+  private $payment_methods;
+  private $promo_bins;
+  private $enable_3d_secure;
   private $point_banks;
   private $installment_banks; 
   private $installment_terms;   
-  private $promo_bins;
-  private $enable_3d_secure;
+  private $bank;
 
-  // Sample of array of commodity
-  // array(
-  //           array("COMMODITY_ID" => "123", "COMMODITY_UNIT" => "1", "COMMODITY_NUM" => "1", "COMMODITY_NAME1" => "BUKU", "COMMODITY_NAME2" => "BOOK"),
-  //           array("COMMODITY_ID" => "1243", "COMMODITY_UNIT" => "9", "COMMODITY_NUM" => "1", "COMMODITY_NAME1" => "BUKU Sembilan", "COMMODITY_NAME2" => "BOOK NINE")
-  //       )
-  private $commodity;
+  // Redirect url configuration [optional. Can also be set at Merchant Administration Portal(MAP)]
+  private $finish_payment_return_url;
+  private $unfinish_payment_return_url;
+  private $error_payment_return_url;
+  
+  /*
+    Sample of array of commodity items
+    array (
+      array("item_id" => 'sku1', "price" => '10000', "quantity" => '2', "item_name1" => 'Kaos', "item_name2" => 'T-Shirt'),
+      array("item_id" => 'sku2', "price" => '20000', "quantity" => '1', "item_name1" => 'Celana', "item_name2" => 'Pants')
+      )
+  */
+  private $items;
 
   public function __get($property) 
   {
@@ -83,30 +79,7 @@ class Veritrans
 
   public function __set($property, $value) 
   {
-    if (property_exists($this, $property)) 
-    {
-      $alias_attributes = $this->alias_attributes();
-      
-      if(array_key_exists($property, $alias_attributes))
-      {
-        // set the corresponding attribute
-        $this->$property = $value;
-        // set the aliassed attribute
-        $this->$alias_attributes[$property] = $value;
-      }
-      else
-      {
-        $deprecated_attributes = $this->deprecated_attributes();
-        if(array_key_exists($property, $deprecated_attributes)){
-          trigger_error("$property is deprecated use $deprecated_attributes[$property] instead");
-          $this->$deprecated_attributes[$property] = $value;
-        }
-        $this->$property = $value;
-       
-      }
-        
-    }
-
+    $this->$property = $value;
     return $this;
   }
 
@@ -115,167 +88,91 @@ class Veritrans
 
   }
 
-  public function get_keys()
+  public function getTokens()
   {    
     // Generate merchant hash code
     $hash = HashGenerator::generate($this->merchant_id, $this->merchant_hash_key, $this->order_id);
 
-
     // populate parameters for the post request
     $data = array(
-      'SETTLEMENT_TYPE'             => '01',
-      'MERCHANT_ID'                 => $this->merchant_id,
-      'ORDER_ID'                    => $this->order_id,
-      'SESSION_ID'                  => $this->session_id,
-      'GROSS_AMOUNT'                => $this->gross_amount,                   
-      'PREVIOUS_CUSTOMER_FLAG'      => $this->previous_customer_flag,         
-      'CUSTOMER_STATUS'             => $this->customer_status,                
-      'MERCHANTHASH'                => $hash,
+      'version'                     => $this->version,
+      'merchant_id'                 => $this->merchant_id,
+      'merchanthash'                => $hash,
+
+      'order_id'                        => $this->order_id,
+      'billing_different_with_shipping' => $this->billing_different_with_shipping,
+      'required_shipping_address'       => $this->required_shipping_address,
+
+      'shipping_first_name'         => $this->shipping_first_name,
+      'shipping_last_name'          => $this->shipping_last_name,
+      'shipping_address1'           => $this->shipping_address1,
+      'shipping_address2'           => $this->shipping_address2,
+      'shipping_city'               => $this->shipping_city,
+      'shipping_country_code'       => $this->shipping_country_code,
+      'shipping_postal_code'        => $this->shipping_postal_code,
+      'shipping_phone'              => $this->shipping_phone,
+      'email'                       => $this->email, 
       
-	    'PROMO_ID' 				          	=> $this->promo_id,
-      'CUSTOMER_SPECIFICATION_FLAG' => $this->billing_address_different_with_shipping_address,   
-      'EMAIL'                       => $this->email, 
-      'FIRST_NAME'                  => $this->first_name,
-      'LAST_NAME'                   => $this->last_name,
-      'POSTAL_CODE'                 => $this->postal_code,
-      'ADDRESS1'                    => $this->address1,
-      'ADDRESS2'                    => $this->address2,
-      'CITY'                        => $this->city,
-      'COUNTRY_CODE'                => $this->country_code,
-      'PHONE'                       => $this->phone,
-      'SHIPPING_FLAG'               => $this->required_shipping_address,                 
-      'SHIPPING_FIRST_NAME'         => $this->shipping_first_name,
-      'SHIPPING_LAST_NAME'          => $this->shipping_last_name,
-      'SHIPPING_ADDRESS1'           => $this->shipping_address1,
-      'SHIPPING_ADDRESS2'           => $this->shipping_address2,
-      'SHIPPING_CITY'               => $this->shipping_city,
-      'SHIPPING_COUNTRY_CODE'       => $this->shipping_country_code,
-      'SHIPPING_POSTAL_CODE'        => $this->shipping_postal_code,
-      'SHIPPING_PHONE'              => $this->shipping_phone,
-      'SHIPPING_METHOD'             => $this->shipping_method,
-      'CARD_NO'                     => $this->card_no,
-      'CARD_EXP_DATE'               => $this->card_exp_date,
-      'FINISH_PAYMENT_RETURN_URL'   => $this->finish_payment_return_url,
-      'UNFINISH_PAYMENT_RETURN_URL' => $this->unfinish_payment_return_url,
-      'ERROR_PAYMENT_RETURN_URL'    => $this->error_payment_return_url,
-      'LANG_ENABLE_FLAG'            => $this->lang_enable_flag,
-      'LANG'                        => $this->lang,
-      'enable_3d_secure'            => $this->enable_3d_secure           
+      'first_name'                  => $this->first_name,
+      'last_name'                   => $this->last_name,
+      'postal_code'                 => $this->postal_code,
+      'address1'                    => $this->address1,
+      'address2'                    => $this->address2,
+      'city'                        => $this->city,
+      'country_code'                => $this->country_code,
+      'phone'                       => $this->phone,      
+      
+      'finish_payment_return_url'   => $this->finish_payment_return_url,
+      'unfinish_payment_return_url' => $this->unfinish_payment_return_url,
+      'error_payment_return_url'    => $this->error_payment_return_url,
+
+      'enable_3d_secure'            => $this->enable_3d_secure, 
+      'bank'                        => $this->bank,
+      'installment_banks'           => $this->installment_banks, //array ["bni", "cimb"]
+      'promo_bins'                  => $this->promo_bins,
+      'point_banks'                 => $this->point_banks,
+      'payment_methods'             => $this->payment_methods, //array ["credit_card", "mandiri_clickpay"]
+      'installment_terms'           => $this->installment_terms
       );
 
-    // data query string only without commodity
-    $query_string = http_build_query($data);
-    
-    // Build Commodity
-    if(isset($this->commodity)){
-      $commodity_query_string = $this->build_commodity_query_string($this->commodity);
-      $query_string = "$query_string&$commodity_query_string";
-    }
-    
-    // Build Installment Banks
-    if(isset($this->installment_banks)){
-      foreach ($this->installment_banks as $bank){
-        $query_string = "$query_string&installment_banks[]=$bank";
-      }
-    }
-    
-    // Build Installment Terms
-    if(isset($this->installment_terms)){
-      $query_string = "$query_string&installment_terms=$this->installment_terms";
+    // Populate items
+    $data['repeat_line'] = 0;
+    foreach ($this->items as $item) {
+      $item_id[]    = $item['item_id'];
+      $item_name1[] = $item['item_name1'];
+      $item_name2[] = $item['item_name2'];
+      $price[]      = $item['price'];
+      $quantity[]   = $item['quantity'];
+      
+      $data['repeat_line'] ++;
     }
 
-    // Build Promo Bins
-    if(isset($this->promo_bins)){
-      foreach ($this->promo_bins as $bin){
-        $query_string = "$query_string&promo_bins[]=$bin";
-      }
-    }
-    
-    // Build Point Banks
-    if(isset($this->point_banks)){
-      foreach ($this->point_banks as $bank){
-        $query_string = "$query_string&point_banks[]=$bank";
-      }
-    }
-    		
-    $client = new Pest(self::REQUEST_KEY_URL);
-    $result = $client->post('', $query_string);
+    $data['item_id']    = $item_id;
+    $data['item_name1'] = $item_name1;
+    $data['item_name2'] = $item_name2;
+    $data['price']      = $price;
+    $data['quantity']   = $quantity;
 
-    $key = $this->extract_keys_from($result);
+    // Call Veritrans API
+    try {
+      $pest = new PestJSON();
+      $result = $pest->post(self::REQUEST_KEY_URL, $data);
+    } catch (Exception $e) {
+      throw $e;
+    }
 
-    return $key;
-  }
-  
-  // Private methods
-  // return array of commodities
-  private function build_commodity_query_string($commodity)
-  {
-    $line = 0;
-  	$query_string = "";
-  	foreach ($commodity as $row) {
-        $row = $this->replace_commodity_params_with_legacy_params($row);
-  	    
-        $q = http_build_query($row);
-        if(!($query_string=="")) 
-          $query_string = $query_string . "&";
-        $query_string = $query_string . $q;
-        $line = $line + 1;
-  	};
-  	$query_string = $query_string . "&REPEAT_LINE=" . $line;
-  	
-  	return $query_string;
+    // Check result
+    if(!empty($result['token_merchant'])) {
+      // OK
+      return $result;
+    }
+    else {
+      // Veritrans doesn't return tokens
+      $this->errors = $result['errors'];
+      return false;
+    }
   }
 
-  // Private methods
-  // return array of keys or error
-  private function extract_keys_from($body)
-  {
-    
-    $key = array();
-    $body_lines = explode("\n", $body);
-    foreach($body_lines as $line) {
-      if(preg_match('/^TOKEN_MERCHANT=(.+)/', $line, $match)) {
-        $key['token_merchant'] = str_replace("\r", "", $match[1]);
-        } elseif(preg_match('/^TOKEN_BROWSER=(.+)/', $line, $match)) {
-          $key['token_browser'] = str_replace("\r", "", $match[1]);
-          } elseif(preg_match('/^ERROR_MESSAGE=(.+)/', $line, $match)) {
-            $key['error_message'] = str_replace("\r", "", $match[1]);
-          }
-      }
-    return $key;
-
-   }
-   
-   private function alias_attributes()
-   {
-    $alias = array( 'billing_address_different_with_shipping_address' => 'customer_specification_flag',
-                    'required_shipping_address' => 'shipping_flag');
-    return $alias;
-   }
-   
-   private function deprecated_attributes()
-   {
-     $alias_attributes = $this->alias_attributes();
-     $deprecated_attributes = array_flip($alias_attributes);
-     return $deprecated_attributes;
-   }
-   
-   private function replace_commodity_params_with_legacy_params($commodity)
-   {
-     if(array_key_exists("COMMODITY_QTY", $commodity) && $commodity["COMMODITY_QTY"] != '' )
-     {
-       $commodity["COMMODITY_NUM"] = $commodity["COMMODITY_QTY"];
-       unset($commodity["COMMODITY_QTY"]);
-     }
-     if(array_key_exists("COMMODITY_PRICE", $commodity) && $commodity["COMMODITY_PRICE"] != '')
-     {
-       $commodity["COMMODITY_UNIT"] = $commodity["COMMODITY_PRICE"];
-       unset($commodity["COMMODITY_PRICE"]);
-     }
-     
-     return $commodity;
-   }
-
-  }
+}
 
 ?>
