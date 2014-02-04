@@ -9,11 +9,11 @@ require_once 'veritrans_notification.php';
 class Veritrans
 {
 
-  const REQUEST_KEY_URL       = 'https://vtweb.veritrans.co.id/v1/tokens';
-  const PAYMENT_REDIRECT_URL  = 'https://vtweb.veritrans.co.id/v1/payments';
+  const REQUEST_KEY_URL       = 'https://vtweb.veritrans.co.id/v1/tokens.json';
+  const PAYMENT_REDIRECT_URL  = 'https://vtweb.veritrans.co.id/v1/payments.json';
 
   // Required parameters
-  private $version = '1';
+  private $version = 1;
   private $merchant_id;
   private $merchant_hash_key;
 
@@ -60,8 +60,8 @@ class Veritrans
   /*
     Sample of array of commodity items
     array (
-      array("item_id" => 'sku1', "price" => '10000', "quantity" => '2', "item_name1" => 'Kaos', "item_name2" => 'T-Shirt'),
-      array("item_id" => 'sku2', "price" => '20000', "quantity" => '1', "item_name1" => 'Celana', "item_name2" => 'Pants')
+      array("item_id" => 'sku1', "price" => 10000, "quantity" => 2, "item_name1" => 'Kaos', "item_name2" => 'T-Shirt'),
+      array("item_id" => 'sku2', "price" => 20000, "quantity" => 1, "item_name1" => 'Celana', "item_name2" => 'Pants')
       )
   */
   private $items;

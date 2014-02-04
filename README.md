@@ -43,15 +43,15 @@ $veritrans->order_id 			= 'your_unique_order_id';
 $items = array(
 			array(
 				"item_id" => 'itemsatu',
-				"price" => '250000',
-				"quantity"   => '1',
+				"price" => 250000,
+				"quantity"   => 1,
 				"item_name1" => 'sepatu',
 				"item_name2" => 'Shoes'
 			),
 			array(
 				"item_id" => 'itemdua',
-				"price" => '500000',
-				"quantity"   => '2',
+				"price" => 500000,
+				"quantity"   => 2,
 				"item_name1" => 'Tas',
 				"item_name2" => 'Bag'
 			),
@@ -82,6 +82,18 @@ $veritrans->shipping_city 			= "Jakarta";
 $veritrans->shipping_country_code 	= "IDN";
 $veritrans->shipping_postal_code 	= "12346";
 $veritrans->shipping_phone 			= "082313123131";
+
+// Payment options
+$veritrans->enable_3d_secure	= 1;
+$veritrans->bank 				= "bni";
+$veritrans->installment_banks 	= ["bni", "cimb"];
+$veritrans->promo_bins			= ["411111", "444444"];
+$veritrans->point_banks			= ["bni", "cimb"];
+$veritrans->payment_methods		= ["credit_card", "mandiri_clickpay"];
+$veritrans->installment_terms   = array(
+	'bni' => [3,12],
+	'cimb' => [3, 6, 12]
+	);
 
 //Call Veritrans VT-Web API Get Token
 try {
