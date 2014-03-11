@@ -377,7 +377,7 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 														"COMMODITY_UNIT" => ceil( $item['line_total'] / $item['qty'] ), 
 														"COMMODITY_NUM" => $item['qty'] / 1, 
                             							"COMMODITY_NAME1" => preg_replace("/[^A-Za-z0-9 \-\_\'\,\.\@]/", '', substr($item['name'],0,20)), 
-														"COMMODITY_NAME2" =>preg_replace("/[^A-Za-z0-9 \-\_\'\,\.\@]/", '', substr($item,0,20))
+														"COMMODITY_NAME2" =>preg_replace("/[^A-Za-z0-9 \-\_\'\,\.\@]/", '', substr($item['name'],0,20))
 											);							
 				}
 			}
