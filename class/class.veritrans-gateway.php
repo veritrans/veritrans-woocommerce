@@ -4,8 +4,17 @@
 	 */
 class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 
-	const VT_REQUEST_KEY_URL = 'https://payments.veritrans.co.id/web1/commodityRegist.action';
-  const VT_PAYMENT_REDIRECT_URL = 'https://payments.veritrans.co.id/web1/paymentStart.action';
+  // const VT_REQUEST_KEY_URL = 'https://payments.veritrans.co.id/web1/commodityRegist.action';
+  // const VT_PAYMENT_REDIRECT_URL = 'https://payments.veritrans.co.id/web1/paymentStart.action';
+  const VT_REQUEST_KEY_URL = 'https://vtweb.veritrans.co.id/v1/tokens.json';
+  const VT_PAYMENT_REDIRECT_URL = 'https://vtweb.veritrans.co.id/v1/payments.json';
+
+  private $version = 1;
+
+  // Redirect url configuration [optional. Can also be set at Merchant Administration Portal(MAP)]
+  private $finish_payment_return_url;
+  private $unfinish_payment_return_url;
+  private $error_payment_return_url;
 
   /**
    * Constructor
@@ -35,7 +44,8 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 		
     add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( &$this, 'process_admin_options' ) ); 
     add_action( 'wp_enqueue_scripts', array( &$this, 'veritrans_scripts' ) );
-		add_action( 'admin_print_scripts-woocommerce_page_woocommerce_settings', array( &$this, 'veritrans_admin_scripts' ));
+    add_action( 'admin_print_scripts-woocommerce_page_woocommerce_settings', array( &$this, 'veritrans_admin_scripts' ));
+		add_action( 'admin_print_scripts-woocommerce_page_wc-settings', array( &$this, 'veritrans_admin_scripts' ));
 		add_action( 'valid-veritrans-web-request', array( $this, 'successful_request' ) );
 		add_action( 'woocommerce_receipt_veritrans', array( $this, 'receipt_page' ) );
   }
@@ -79,68 +89,69 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
    * Show form containing Credit Cards details
    */
   function payment_fields() { 
-		if($this->description)echo '<p>'.$this->description.'</p>';
-		if('veritrans_direct'==$this->select_veritrans_payment){
-		?>	
-    <p class="form-row validate-required" id="veritrans_credit_card_field">
-      <label for="veritrans_credit_card_field">
-        <?php _e('Credit Card Number'); ?>
-        <abbr class="required" title="required">*</abbr>
-      </label>
-      <input type="text" class="input-text" name="veritrans_credit_card" maxlength="16">
-    </p>
+		if($this->description) echo '<p>'.$this->description.'</p>';
 
-    <p class="form-row" id="veritrans_card_exp_month_field">
-      <label for="veritrans_card_exp_month_field">
-        <?php _e('Expiration Date - Month', 'woocommerce'); ?>
-        <abbr class="required" title="required">*</abbr>
-      </label>
-      <select name="veritrans_card_exp_month">
-        <?php $month_list = array(
-          '01' => '01 - January',
-          '02' => '02 - February',
-          '03' => '03 - March',
-          '04' => '04 - April',
-          '05' => '05 - May',
-          '06' => '06 - June',
-          '07' => '07 - July',
-          '08' => '08 - August',
-          '09' => '09 - September',
-          '10' => '10 - October',
-          '11' => '11 - November',
-          '12' => '12 - December'
-        ); ?>
-        <option value="">--</option>
-        <?php foreach( $month_list as $month => $name ) : ?>
-          <option value="<?php echo $month; ?>"><?php echo $name; ?></option>
-        <?php endforeach; ?>
-      </select>
-    </p>
+		if('veritrans_direct'==$this->select_veritrans_payment) : ?>	
+      <p class="form-row validate-required" id="veritrans_credit_card_field">
+        <label for="veritrans_credit_card_field">
+          <?php _e('Credit Card Number'); ?>
+          <abbr class="required" title="required">*</abbr>
+        </label>
+        <input type="text" class="input-text" name="veritrans_credit_card" maxlength="16">
+      </p>
 
-    <p class="form-row" id="veritrans_card_exp_year_field">
-      <label for="veritrans_card_exp_year_field">
-        <?php _e('Expiration Date - Year', 'woocommerce'); ?>
-        <abbr class="required" title="required">*</abbr>
-      </label>
-      <select name="veritrans_card_exp_year">
-        <option value="">--</option>
-        <?php $years = range( date("Y"), date("Y") + 14 );
-        foreach( $years as $year ) : ?>
-          <option value="<?php echo $year; ?>"><?php echo $year; ?></option>
-        <?php endforeach; ?>
-      </select>
-    </p>
+      <p class="form-row" id="veritrans_card_exp_month_field">
+        <label for="veritrans_card_exp_month_field">
+          <?php _e('Expiration Date - Month', 'woocommerce'); ?>
+          <abbr class="required" title="required">*</abbr>
+        </label>
+        <select name="veritrans_card_exp_month">
+          <?php $month_list = array(
+            '01' => '01 - January',
+            '02' => '02 - February',
+            '03' => '03 - March',
+            '04' => '04 - April',
+            '05' => '05 - May',
+            '06' => '06 - June',
+            '07' => '07 - July',
+            '08' => '08 - August',
+            '09' => '09 - September',
+            '10' => '10 - October',
+            '11' => '11 - November',
+            '12' => '12 - December'
+          ); ?>
+          <option value="">--</option>
+          <?php foreach( $month_list as $month => $name ) : ?>
+            <option value="<?php echo $month; ?>"><?php echo $name; ?></option>
+          <?php endforeach; ?>
+        </select>
+      </p>
 
-    <p class="form-row validate-required" id="veritrans_security_field" maxlength="3">
-      <label for="veritrans_security_field">
-        <?php _e('Security Code', 'woocommerce'); ?>
-        <abbr class="required" title="required"><a target="_blank" href="https://www.veritrans.co.id/payment-help.html">[?]</a></abbr>
-      </label>
-      <input type="text" class="input-text" name="veritrans_security">
-    </p>
+      <p class="form-row" id="veritrans_card_exp_year_field">
+        <label for="veritrans_card_exp_year_field">
+          <?php _e('Expiration Date - Year', 'woocommerce'); ?>
+          <abbr class="required" title="required">*</abbr>
+        </label>
+        <select name="veritrans_card_exp_year">
+          <option value="">--</option>
+          <?php $years = range( date("Y"), date("Y") + 14 );
+          foreach( $years as $year ) : ?>
+            <option value="<?php echo $year; ?>"><?php echo $year; ?></option>
+          <?php endforeach; ?>
+        </select>
+      </p>
 
-    <input type="text" name="veritrans_token_id" class="hide" style="display:none">
-  <?php }}
+      <p class="form-row validate-required" id="veritrans_security_field" maxlength="3">
+        <label for="veritrans_security_field">
+          <?php _e('Security Code', 'woocommerce'); ?>
+          <abbr class="required" title="required"><a target="_blank" href="https://www.veritrans.co.id/payment-help.html">[?]</a></abbr>
+        </label>
+        <input type="text" class="input-text" name="veritrans_security">
+      </p>
+
+      <input type="text" name="veritrans_token_id" class="hide" style="display:none">
+    <?php endif; ?>
+  <?php }
 
   /**
    * Validate Payment Fields
@@ -262,7 +273,10 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
   function charge_payment( $order_id ) {
     global $woocommerce;
 		$order_items = array();
-		if('veritrans_direct'==$this->select_veritrans_payment){
+
+    // VT-DIRECT
+    // ---------
+		if( 'veritrans_direct' == $this->select_veritrans_payment ){
 			// Check token id
 			if( $_POST['veritrans_token_id'] == '' ) {
 				throw new Exception( __('Invalid Token ID', 'woocommerce') );
@@ -366,179 +380,191 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 			// Remove cart
 			$woocommerce->cart->empty_cart();
 		
-    }else{
-			$order = new WC_Order( $order_id );
-			$order_items = array();
-			// Order Items
-			if( sizeof( $order->get_items() ) > 0 ) {
-				foreach( $order->get_items() as $item ) {
-					$order_items[] = array(
-														"COMMODITY_ID" => $item['product_id'], 
-														"COMMODITY_UNIT" => ceil( $item['line_total'] / $item['qty'] ), 
-                            "COMMODITY_NUM" => $item['qty'] / 1, 
-                            "COMMODITY_NAME1" => substr($item['name'], 0, 20), 
-														"COMMODITY_NAME2" => substr($item['name'], 0, 20)
-													);							
-				}
-			}
-			
-			$merchant_hash = $this->generate_merchant_hash($this->merchant_id, $this->merchant_hash_key, '01', $order_id, ceil($order->order_total));
-			
-			$datas = array(
-				'MERCHANT_ID' => $this->merchant_id,
-				'SETTLEMENT_TYPE' => '01',
-				'MERCHANTHASH' => $merchant_hash,
-				'ORDER_ID' => $order_id,
-				'SESSION_ID' => $_COOKIE['PHPSESSID'],
-				'GROSS_AMOUNT' => ceil($order->order_total),
-				'EMAIL' => $order->billing_email,
-				'SHIPPING_FLAG' => 0,
-				'CUSTOMER_SPECIFICATION_FLAG' => 1,
-				'LANG_ENABLE_FLAG' => 0,
-				'FINISH_PAYMENT_RETURN_URL' => $this->notify_url,
-				'ERROR_PAYMENT_RETURN_URL' => $this->notify_url
-			);
-			$billings = array();
-			$shippings = array();
-			$billings = array(
-				'FIRST_NAME' 		=> $_POST['billing_first_name'],
-				'LAST_NAME' 		=> $_POST['billing_last_name'],
-				'ADDRESS1' 			=> $_POST['billing_address_1'],
-				'ADDRESS2' 			=> $_POST['billing_address_2'],
-				'CITY' 					=> $_POST['billing_city'],
-				'COUNTRY_CODE' 	=> $_POST['billing_country'],
-				'POSTAL_CODE' 	=> $_POST['billing_postcode'],
-				'PHONE'					=> $_POST['billing_phone'],
-			);
-			if($_POST['shiptobilling']!=1){
-				$shippings = array(
-					'SHIPPING_FIRST_NAME' 		=> $_POST['shipping_first_name'],
-					'SHIPPING_LAST_NAME' 			=> $_POST['shipping_last_name'],
-					'SHIPPING_ADDRESS1' 			=> $_POST['shipping_address_1'],
-					'SHIPPING_ADDRESS2' 			=> $_POST['shipping_address_2'],
-					'SHIPPING_CITY' 					=> $_POST['shipping_city'],
-					'SHIPPING_COUNTRY_CODE' 	=> $_POST['shipping_country'],
-					'SHIPPING_POSTAL_CODE' 		=> $_POST['shipping_postcode'],
-					'SHIPPING_PHONE'					=> $_POST['shipping_phone'],
-				);
-			}
+    }
 
-			$query_string = http_build_query($datas);
-			$commodity_query_string = $this->build_commodity_query_string( $order_items );
-			$query_string = $query_string.'&'.$billings.'&'.$shippings.'&'.$commodity_query_string;
+    // VT-WEB
+    // ------
+    else {
+			$order = new WC_Order( $order_id );			
+			$merchant_hash = $this->generate_merchant_hash($this->merchant_id, $this->merchant_hash_key, $order_id);
+
+      $data = array(
+        'version'                         => $this->version,
+        'merchant_id'                     => $this->merchant_id,
+        'merchanthash'                    => $merchant_hash,
+
+        'order_id'                        => $order_id,
+        'billing_different_with_shipping' => isset($_POST['ship_to_different_address']) ? $_POST['ship_to_different_address'] : 0,
+        'required_shipping_address'       => 1,
+
+        'shipping_first_name'             => $_POST['shipping_first_name'],
+        'shipping_last_name'              => $_POST['shipping_last_name'],
+        'shipping_address1'               => $_POST['shipping_address_1'],
+        'shipping_address2'               => $_POST['shipping_address_2'],
+        'shipping_city'                   => $_POST['shipping_city'],
+        'shipping_country_code'           => $this->convert_country_code( $_POST['shipping_country'] ), //ISO 3166-1 alpha-3
+        'shipping_postal_code'            => $_POST['shipping_postcode'],
+        'shipping_phone'                  => $_POST['billing_phone'],
+
+        'email'                           => $_POST['billing_email'], 
+
+        'first_name'                      => $_POST['billing_first_name'],
+        'last_name'                       => $_POST['billing_last_name'],
+        'postal_code'                     => $_POST['billing_postcode'],
+        'address1'                        => $_POST['billing_address_1'],
+        'address2'                        => $_POST['billing_address_2'],
+        'city'                            => $_POST['billing_city'],
+        'country_code'                    => $this->convert_country_code( $_POST['billing_country'] ), //ISO 3166-1 alpha-3
+        'phone'                           => $_POST['billing_phone'], 
+
+        'finish_payment_return_url'       => $this->finish_payment_return_url,
+        'unfinish_payment_return_url'     => $this->unfinish_payment_return_url,
+        'error_payment_return_url'        => $this->error_payment_return_url,
+
+        'enable_3d_secure'                => 1,
+
+        /* Optional 
+        'bank'                            => 'bni',
+        'installment_banks'               => ["bni", "cimb"]
+        'promo_bins'                      => '',
+        'point_banks'                     => ["bni", "cimb"],
+        'payment_methods'                 => ["credit_card", "mandiri_clickpay"]
+        'installment_terms'               => ''
+        */
+      );      
+
+      // Populate Items
+      $data['repeat_line'] = 0;
+      if( sizeof( $order->get_items() ) > 0 ) {
+        foreach( $order->get_items() as $item ) {
+          $item_id[]    = $item['product_id'];
+          $item_name1[] = $item['name'];
+          $item_name2[] = $item['name'];
+          $price[]      = $item['line_total'];
+          $quantity[]   = $item['qty'];
+
+          $data['repeat_line']++;
+        }
+      }
+
+      $data['item_id']    = $item_id;
+      $data['item_name1'] = $item_name1;
+      $data['item_name2'] = $item_name2;
+      $data['price']      = $price;
+      $data['quantity']   = $quantity;
+
+      $headers = array( 
+        'accept' => 'application/json',
+        'content-type' => 'application/json'
+      );
+
 			$vtweb = wp_remote_post( self::VT_REQUEST_KEY_URL, array(
-				'body' => $query_string,
-				'timeout' => 20,
-				'sslverify' => false
+				'body' => json_encode($data),
+				'timeout' => 30,
+				'sslverify' => false,
+        'headers' => $headers
 			) );
+
 			// If wp_remote_post failed
 			if( is_wp_error( $vtweb ) ) {
 				throw new Exception( $vtweb->get_error_message() );
 			}else{
-				$token = array();
-				$token = $this->extract_keys_from($vtweb['body']);
-				//echo $this->generate_veritrans_form( $order_id, $token );
-				//die();
-				if ( ! empty( $token['token_browser'] ) )
-	        update_post_meta( $order->id, '_token_browser', $token['token_browser'] );
-				if ( ! empty( $token['token_merchant'] ) )
-	        update_post_meta( $order->id, '_token_merchant', $token['token_merchant'] );	
+        $result = json_decode( wp_remote_retrieve_body( $vtweb ), true );
+
+        // check result
+        if( !empty($result['token_merchant']) ) {
+          // No error
+
+          // Reduce stock levels
+          // $order->reduce_order_stock();
+
+          // Remove cart
+          // $woocommerce->cart->empty_cart();
+          if ( ! empty( $result['token_browser'] ) )
+            update_post_meta( $order->id, '_token_browser', $result['token_browser'] );
+          if ( ! empty( $result['token_merchant'] ) )
+            update_post_meta( $order->id, '_token_merchant', $result['token_merchant'] );  
+        }
+
+        else {
+          // Veritrans doesn't return tokens
+          $error_str = '';
+          foreach( $result['errors'] as $error_name => $error_message ) {
+            $error_str .= "<br><strong>{$error_name}</strong>: {$error_message}\n";
+          }
+          throw new Exception( $error_str );
+        }
 			}
 
 		}
 	
   }
+
+  /**
+   * Hook into receipt page, the destination page after checkout redirect
+   */
 	function receipt_page( $order ) {
-
 		echo '<p>'.__( 'Thank you for your order, please click the button below to pay with Veritrans.', 'woocommerce' ).'</p>';
-
 		echo $this->generate_veritrans_form( $order );
-
 	}
 	
-	private function generate_veritrans_form($order_id) {
+  /**
+   * Generate redirect form
+   * @param  Int $order_id Order ID
+   * @return void
+   */
+	public function generate_veritrans_form($order_id) {
 		global $woocommerce;
 		
 		$order = new WC_Order( $order_id );
-		
+    
 		$woocommerce->add_inline_js( '
-			jQuery("body").block({
-					message: "' . esc_js( __( 'Thank you for your order. We are now redirecting you to Veritrans to make payment.', 'woocommerce' ) ) . '",
-					baseZ: 99999,
-					overlayCSS:
-					{
-						background: "#fff",
-						opacity: 0.6
-					},
-					css: {
-				        padding:        "20px",
-				        zindex:         "9999999",
-				        textAlign:      "center",
-				        color:          "#555",
-				        border:         "3px solid #aaa",
-				        backgroundColor:"#fff",
-				        cursor:         "wait",
-				        lineHeight:		"24px",
-				    }
-				});
+			$.blockUI({
+				message: "' . esc_js( __( 'Thank you for your order. We are now redirecting you to Veritrans to make payment.', 'woocommerce' ) ) . '",
+				baseZ: 99999,
+				overlayCSS: {
+					background: "#fff",
+					opacity: 0.6
+				},
+				css: {
+	        padding:        "20px",
+	        zindex:         "9999999",
+	        textAlign:      "center",
+	        color:          "#555",
+	        border:         "3px solid #aaa",
+	        backgroundColor:"#fff",
+	        cursor:         "wait",
+	        lineHeight:		"24px",
+		    }
+			});
 			jQuery("#submit_veritrans_payment_form").click();
 		' );
-		return '<form action="'.self::VT_PAYMENT_REDIRECT_URL.'" method="post" id="sent_form_token" target="_top">
-							<input type="hidden" name="MERCHANT_ID" value="'.$this->merchant_id.'" />
-							<input type="hidden" name="ORDER_ID" value="'.$order_id.'" />
-							<input type="hidden" name="TOKEN_BROWSER" value="'.$order->order_custom_fields['_token_browser'][0].'" />
-							<input type="hidden" name="TOKEN_MERCHANT" value="'.$order->order_custom_fields['_token_merchant'][0].'" />
-							<input id="submit_veritrans_payment_form" type="submit" class="button alt" value="Confirm Checkout" />
-							<a class="button cancel" href="'.esc_url( $order->get_cancel_order_url() ).'">'.__( 'Cancel order &amp; restore cart', 'woocommerce' ).'</a>
-						</form>';
-	}	
-	private function extract_keys_from($body)
-  {
-    
-    $key = array();
-    $body_lines = explode("\n", $body);
-    foreach($body_lines as $line) {
-      if(preg_match('/^TOKEN_MERCHANT=(.+)/', $line, $match)) {
-        $key['token_merchant'] = str_replace("\r", "", $match[1]);
-        } elseif(preg_match('/^TOKEN_BROWSER=(.+)/', $line, $match)) {
-          $key['token_browser'] = str_replace("\r", "", $match[1]);
-          } elseif(preg_match('/^ERROR_MESSAGE=(.+)/', $line, $match)) {
-            $key['error_message'] = str_replace("\r", "", $match[1]);
-          }
-      }
-    return $key;
 
-  }
-	private function generate_merchant_hash($merchantID, $merchant_hash, $settlementmethod, $orderID, $amount) {
+		return '
+      <form action="'.self::VT_PAYMENT_REDIRECT_URL.'" method="post" id="sent_form_token" target="_top">
+  			<input type="hidden" name="merchant_id" value="'.$this->merchant_id.'" />
+  			<input type="hidden" name="order_id" value="'.$order_id.'" />
+  			<input type="hidden" name="token_browser" value="'.get_post_meta( $order_id, '_token_browser', true ).'" />
+  			<input id="submit_veritrans_payment_form" type="submit" class="button alt" value="Confirm Checkout" />
+  			<a class="button cancel" href="'.esc_url( $order->get_cancel_order_url() ).'">'.__( 'Cancel order &amp; restore cart', 'woocommerce' ).'</a>
+  		</form>';
+	}	
+
+  /**
+   * Generate Merchant Hashs
+   * @param  String $merchantID       Merchant ID
+   * @param  String $merchant_hash    Merchant Hash Key
+   * @param  String $orderID          Order ID
+   * @return String                   Generated Hash Value
+   */
+	private function generate_merchant_hash($merchantID, $merchant_hash, $orderID) {
     $ctx  = hash_init('sha512');
     $str  = $merchant_hash .
       "," . $merchantID .
-      "," . ((is_null($settlementmethod) || strlen($settlementmethod) == 0) ? '00' : $settlementmethod) .
-      "," . $orderID .
-      "," . $amount;
+      "," . $orderID;
     hash_update($ctx, $str);
     $hash = hash_final($ctx, true);
     return bin2hex($hash);
-  }
-	
-	private function build_commodity_query_string($commodity)
-  {
-    $line = 0;
-    $query_string = "";
- 
-    foreach ($commodity as $row) {
-      $q = http_build_query($row);
-     
-      if(!($query_string==""))
-        $query_string = $query_string . "&";
- 
-      $query_string = $query_string . $q;
-      $line = $line + 1;
-    };
-   
-    $query_string = $query_string . "&REPEAT_LINE=" . $line;
-             
-    return $query_string;
   }
 	
 	/**
@@ -569,10 +595,270 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 		$order = new WC_Order( $posted['orderId'] );
 		// Set order as complete
     $order->payment_complete();
-
-    // Remove cart
-    $woocommerce->cart->empty_cart();
 		
 		wp_redirect( add_query_arg('key', $order->order_key, add_query_arg('order', $posted['orderId'], get_permalink(woocommerce_get_page_id('thanks')))) ); exit;
-	}	
+	}
+
+  /**
+   * Convert 2 digits coundry code to 3 digit country code
+   *
+   * @param String $country_code Country code which will be converted
+   */
+  public function convert_country_code( $country_code ) {
+
+    // 3 digits country codes
+    $cc_three = array(
+      'AF' => 'AFG',
+      'AX' => 'ALA',
+      'AL' => 'ALB',
+      'DZ' => 'DZA',
+      'AD' => 'AND',
+      'AO' => 'AGO',
+      'AI' => 'AIA',
+      'AQ' => 'ATA',
+      'AG' => 'ATG',
+      'AR' => 'ARG',
+      'AM' => 'ARM',
+      'AW' => 'ABW',
+      'AU' => 'AUS',
+      'AT' => 'AUT',
+      'AZ' => 'AZE',
+      'BS' => 'BHS',
+      'BH' => 'BHR',
+      'BD' => 'BGD',
+      'BB' => 'BRB',
+      'BY' => 'BLR',
+      'BE' => 'BEL',
+      'PW' => 'PLW',
+      'BZ' => 'BLZ',
+      'BJ' => 'BEN',
+      'BM' => 'BMU',
+      'BT' => 'BTN',
+      'BO' => 'BOL',
+      'BQ' => 'BES',
+      'BA' => 'BIH',
+      'BW' => 'BWA',
+      'BV' => 'BVT',
+      'BR' => 'BRA',
+      'IO' => 'IOT',
+      'VG' => 'VGB',
+      'BN' => 'BRN',
+      'BG' => 'BGR',
+      'BF' => 'BFA',
+      'BI' => 'BDI',
+      'KH' => 'KHM',
+      'CM' => 'CMR',
+      'CA' => 'CAN',
+      'CV' => 'CPV',
+      'KY' => 'CYM',
+      'CF' => 'CAF',
+      'TD' => 'TCD',
+      'CL' => 'CHL',
+      'CN' => 'CHN',
+      'CX' => 'CXR',
+      'CC' => 'CCK',
+      'CO' => 'COL',
+      'KM' => 'COM',
+      'CG' => 'COG',
+      'CD' => 'COD',
+      'CK' => 'COK',
+      'CR' => 'CRI',
+      'HR' => 'HRV',
+      'CU' => 'CUB',
+      'CW' => 'CUW',
+      'CY' => 'CYP',
+      'CZ' => 'CZE',
+      'DK' => 'DNK',
+      'DJ' => 'DJI',
+      'DM' => 'DMA',
+      'DO' => 'DOM',
+      'EC' => 'ECU',
+      'EG' => 'EGY',
+      'SV' => 'SLV',
+      'GQ' => 'GNQ',
+      'ER' => 'ERI',
+      'EE' => 'EST',
+      'ET' => 'ETH',
+      'FK' => 'FLK',
+      'FO' => 'FRO',
+      'FJ' => 'FJI',
+      'FI' => 'FIN',
+      'FR' => 'FRA',
+      'GF' => 'GUF',
+      'PF' => 'PYF',
+      'TF' => 'ATF',
+      'GA' => 'GAB',
+      'GM' => 'GMB',
+      'GE' => 'GEO',
+      'DE' => 'DEU',
+      'GH' => 'GHA',
+      'GI' => 'GIB',
+      'GR' => 'GRC',
+      'GL' => 'GRL',
+      'GD' => 'GRD',
+      'GP' => 'GLP',
+      'GT' => 'GTM',
+      'GG' => 'GGY',
+      'GN' => 'GIN',
+      'GW' => 'GNB',
+      'GY' => 'GUY',
+      'HT' => 'HTI',
+      'HM' => 'HMD',
+      'HN' => 'HND',
+      'HK' => 'HKG',
+      'HU' => 'HUN',
+      'IS' => 'ISL',
+      'IN' => 'IND',
+      'ID' => 'IDN',
+      'IR' => 'RIN',
+      'IQ' => 'IRQ',
+      'IE' => 'IRL',
+      'IM' => 'IMN',
+      'IL' => 'ISR',
+      'IT' => 'ITA',
+      'CI' => '',
+      'JM' => 'JAM',
+      'JP' => 'JPN',
+      'JE' => 'JEY',
+      'JO' => 'JOR',
+      'KZ' => 'KAZ',
+      'KE' => 'KEN',
+      'KI' => 'KIR',
+      'KW' => 'KWT',
+      'KG' => 'KGZ',
+      'LA' => 'LAO',
+      'LV' => 'LVA',
+      'LB' => 'LBN',
+      'LS' => 'LSO',
+      'LR' => 'LBR',
+      'LY' => 'LBY',
+      'LI' => 'LIE',
+      'LT' => 'LTU',
+      'LU' => 'LUX',
+      'MO' => 'MAC',
+      'MK' => 'MKD',
+      'MG' => 'MDG',
+      'MW' => 'MWI',
+      'MY' => 'MYS',
+      'MV' => 'MDV',
+      'ML' => 'MLI',
+      'MT' => 'MLT',
+      'MH' => 'MHL',
+      'MQ' => 'MTQ',
+      'MR' => 'MRT',
+      'MU' => 'MUS',
+      'YT' => 'MYT',
+      'MX' => 'MEX',
+      'FM' => 'FSM',
+      'MD' => 'MDA',
+      'MC' => 'MCO',
+      'MN' => 'MNG',
+      'ME' => 'MNE',
+      'MS' => 'MSR',
+      'MA' => 'MAR',
+      'MZ' => 'MOZ',
+      'MM' => 'MMR',
+      'NA' => 'NAM',
+      'NR' => 'NRU',
+      'NP' => 'NPL',
+      'NL' => 'NLD',
+      'AN' => 'ANT',
+      'NC' => 'NCL',
+      'NZ' => 'NZL',
+      'NI' => 'NIC',
+      'NE' => 'NER',
+      'NG' => 'NGA',
+      'NU' => 'NIU',
+      'NF' => 'NFK',
+      'KP' => 'MNP',
+      'NO' => 'NOR',
+      'OM' => 'OMN',
+      'PK' => 'PAK',
+      'PS' => 'PSE',
+      'PA' => 'PAN',
+      'PG' => 'PNG',
+      'PY' => 'PRY',
+      'PE' => 'PER',
+      'PH' => 'PHL',
+      'PN' => 'PCN',
+      'PL' => 'POL',
+      'PT' => 'PRT',
+      'QA' => 'QAT',
+      'RE' => 'REU',
+      'RO' => 'SHN',
+      'RU' => 'RUS',
+      'RW' => 'EWA',
+      'BL' => 'BLM',
+      'SH' => 'SHN',
+      'KN' => 'KNA',
+      'LC' => 'LCA',
+      'MF' => 'MAF',
+      'SX' => 'SXM',
+      'PM' => 'SPM',
+      'VC' => 'VCT',
+      'SM' => 'SMR',
+      'ST' => 'STP',
+      'SA' => 'SAU',
+      'SN' => 'SEN',
+      'RS' => 'SRB',
+      'SC' => 'SYC',
+      'SL' => 'SLE',
+      'SG' => 'SGP',
+      'SK' => 'SVK',
+      'SI' => 'SVN',
+      'SB' => 'SLB',
+      'SO' => 'SOM',
+      'ZA' => 'ZAF',
+      'GS' => 'SGS',
+      'KR' => '',
+      'SS' => 'SSD',
+      'ES' => 'ESP',
+      'LK' => 'LKA',
+      'SD' => 'SDN',
+      'SR' => 'SUR',
+      'SJ' => 'SJM',
+      'SZ' => 'SWZ',
+      'SE' => 'SWE',
+      'CH' => 'CHE',
+      'SY' => 'SYR',
+      'TW' => 'TWN',
+      'TJ' => 'TJK',
+      'TZ' => 'TZA',
+      'TH' => 'THA',
+      'TL' => 'TLS',
+      'TG' => 'TGO',
+      'TK' => 'TKL',
+      'TO' => 'TON',
+      'TT' => 'TTO',
+      'TN' => 'TUN',
+      'TR' => 'TUR',
+      'TM' => 'TKM',
+      'TC' => 'TCA',
+      'TV' => 'TUV',
+      'UG' => 'UGA',
+      'UA' => 'UKR',
+      'AE' => 'ARE',
+      'GB' => 'GBR',
+      'US' => 'USA',
+      'UY' => 'URY',
+      'UZ' => 'UZB',
+      'VU' => 'VUT',
+      'VA' => 'VAT',
+      'VE' => 'VEN',
+      'VN' => 'VNM',
+      'WF' => 'WLF',
+      'EH' => 'ESH',
+      'WS' => 'WSM',
+      'YE' => 'YEM',
+      'ZM' => 'ZMB',
+      'ZW' => 'ZWE'
+    );
+
+    // Check if country code exists
+    if( isset( $cc_three[ $country_code ] ) && $cc_three[ $country_code ] != '' ) {
+      $country_code = $cc_three[ $country_code ];
+    }
+
+    return $country_code;
+  }
 }
