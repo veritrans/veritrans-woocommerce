@@ -154,7 +154,7 @@ class Veritrans
 
     // Call Veritrans API
     try {
-      $pest = new PestJSON();
+      $pest = new PestJSON('');
       $result = $pest->post(self::REQUEST_KEY_URL, $data);
     } catch (Exception $e) {
       throw $e;
