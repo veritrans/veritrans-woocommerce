@@ -24,7 +24,7 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
     // Get Settings
     $this->title          		= $this->get_option( 'title' );
     $this->description    		= $this->get_option( 'description' );
-	$this->select_veritrans_payment = $this->get_option( 'select_veritrans_payment' );
+	 $this->select_veritrans_payment = $this->get_option( 'select_veritrans_payment' );
     $this->client_key     		= $this->get_option( 'client_key' );
     $this->server_key     		= $this->get_option( 'server_key' );
 	$this->merchant_id     		= $this->get_option( 'merchant_id' );
@@ -32,11 +32,12 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 		
 		// Payment listener/API hook
 		add_action( 'woocommerce_api_wc_gateway_veritrans', array( &$this, 'veritrans_vtweb_response' ) );
-    	add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( &$this, 'process_admin_options' ) ); 
-    	add_action( 'wp_enqueue_scripts', array( &$this, 'veritrans_scripts' ) );
+    add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( &$this, 'process_admin_options' ) ); 
+    add_action( 'wp_enqueue_scripts', array( &$this, 'veritrans_scripts' ) );
 		add_action( 'admin_print_scripts-woocommerce_page_woocommerce_settings', array( &$this, 'veritrans_admin_scripts' ));
 		add_action( 'valid-veritrans-web-request', array( $this, 'successful_request' ) );
 		add_action( 'woocommerce_receipt_veritrans', array( $this, 'receipt_page' ) );
+    add_action('woocommerce_checkout_fields', array($this, 'custom_override_checkout_fields'));
   }
 
   /**
@@ -392,39 +393,57 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 				'SESSION_ID' => $_COOKIE['PHPSESSID'],
 				'GROSS_AMOUNT' => ceil($order->order_total),
 				'EMAIL' => $order->billing_email,
-				'SHIPPING_FLAG' => 0,
 				'CUSTOMER_SPECIFICATION_FLAG' => 1,
 				//'LANG_ENABLE_FLAG' => 0,
 				//'FINISH_PAYMENT_RETURN_URL' => $this->notify_url,
 				//'ERROR_PAYMENT_RETURN_URL' => $this->notify_url
 			);
-			
-			$billings = array();
-			$shippings = array();
+
+      // since WooCommerce returns ISO 3166-1 alpha-2 format, 
+      // convert it to ISO 3166-1 alpha-3 format first before
+      // sending it to the server
+      $filename = dirname(__FILE__) . '/..' . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'countries.csv';
+      $handle = fopen($filename, 'r');
+      $countries = array();
+      while (!feof($handle)) {
+        $country = fgetcsv($handle);
+        $countries[$country[0]] = $country;
+      }
+      fclose($handle);
+      
 			$billings = array(
 				'FIRST_NAME' 		=> $_POST['billing_first_name'],
 				'LAST_NAME' 		=> $_POST['billing_last_name'],
 				'ADDRESS1' 			=> $_POST['billing_address_1'],
 				'ADDRESS2' 			=> $_POST['billing_address_2'],
 				'CITY' 				=> $_POST['billing_city'],
-				'COUNTRY_CODE' 		=> $_POST['billing_country'],
+				'COUNTRY_CODE' 		=> $countries[$_POST['billing_country']][1],
 				'POSTAL_CODE' 		=> $_POST['billing_postcode'],
 				'PHONE'				=> $_POST['billing_phone'],
 			);
-			if($_POST['shiptobilling']!=1){
+			
+      if($_POST['ship_to_different_address'] == 1) {
 				$shippings = array(
+          'BILLING_DIFFERENT_WITH_SHIPPING' => 1,
+          'REQUIRED_SHIPPING_ADDRESS' => 1,
 					'SHIPPING_FIRST_NAME' 		=> $_POST['shipping_first_name'],
 					'SHIPPING_LAST_NAME' 		=> $_POST['shipping_last_name'],
 					'SHIPPING_ADDRESS1' 		=> $_POST['shipping_address_1'],
 					'SHIPPING_ADDRESS2' 		=> $_POST['shipping_address_2'],
 					'SHIPPING_CITY' 			=> $_POST['shipping_city'],
-					'SHIPPING_COUNTRY_CODE' 	=> $_POST['shipping_country'],
+					'SHIPPING_COUNTRY_CODE' 	=> $countries[$_POST['shipping_country']][1],
 					'SHIPPING_POSTAL_CODE' 		=> $_POST['shipping_postcode'],
 					'SHIPPING_PHONE'			=> $_POST['shipping_phone'],
-				);
-			}
+				);        
+			} else {
+        $shippings = array(
+          'BILLING_DIFFERENT_WITH_SHIPPING' => 0,
+          );
+      }
 
-			$query_string = http_build_query($datas);
+      $billings = http_build_query($billings);
+      $shippings = http_build_query($shippings);
+      $query_string = http_build_query($datas);
 			$commodity_query_string = $this->build_commodity_query_string( $order_items );
 			$query_string = $query_string.'&'.$billings.'&'.$shippings.'&'.$commodity_query_string;
 			$vtweb = wp_remote_post(self::VT_REQUEST_KEY_URL, array(
@@ -441,11 +460,9 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 				$token = array();
 				$token = $this->extract_keys_from($vtweb['body']);
 				
-				print_r($token);	
-				// exit();
-				
 				echo $this->generate_veritrans_form( $order_id, $token['token_browser'] );
 				exit();
+        // var_dump($query_string);
 				
 				// if ( ! empty( $token['token_browser'] ) )
 					// update_post_meta( $order->id, '_token_browser', $token['token_browser'] );
@@ -496,9 +513,8 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 				<input type="hidden" name="MERCHANT_ID" value="'.$this->merchant_id.'" />
 				<input type="hidden" name="ORDER_ID" value="'.$order_id.'" />
 				<input type="hidden" name="TOKEN_BROWSER" value="'.$token_browser.'" />
-				<input id="submit_veritrans_payment_form" type="submit" class="button alt" value="Confirm Checkout" />
-				<a class="button cancel" href="'.esc_url( $order->get_cancel_order_url() ).'">'.__( 'Cancel order &amp; restore cart', 'woocommerce' ).'</a>
-				</form>';
+				<!-- <a class="button cancel" href="'.esc_url( $order->get_cancel_order_url() ).'">'.__( 'Cancel order &amp; restore cart', 'woocommerce' ).'</a> -->
+				</form><script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script><script>$(function(){$(\'#sent_form_token\').submit();});</script>';
 	}	
 	
 	private function extract_keys_from($body) {
@@ -587,5 +603,16 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 		
 		wp_redirect( add_query_arg('key', $order->order_key, add_query_arg('order', $posted['orderId'], get_permalink(woocommerce_get_page_id('thanks')))) ); 
 		exit;
-	}	
+	}
+
+  function custom_override_checkout_fields($fields) {
+    $fields['shipping']['shipping_phone'] = array(
+      'label' => __('Phone', 'woocommerce'),
+      'placeholder' => _x('Phone', 'placeholder', 'woocommerce'),
+      'required' => true,
+      'class' => array('form-row-wide'),
+      'clear' => true
+      );
+    return $fields;
+  }
 }
