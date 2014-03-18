@@ -438,6 +438,7 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 			} else {
         $shippings = array(
           'BILLING_DIFFERENT_WITH_SHIPPING' => 0,
+          'REQUIRED_SHIPPING_ADDRESS' => 0,
           );
       }
 
