@@ -398,20 +398,29 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 				//'FINISH_PAYMENT_RETURN_URL' => $this->notify_url,
 				//'ERROR_PAYMENT_RETURN_URL' => $this->notify_url
 			);
+
+      $filename = dirname(__FILE__) . '/..' . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'countries.csv';
+      $handle = fopen($filename, 'r');
+      $countries = array();
+      while (!feof($handle)) {
+        $country = fgetcsv($handle);
+        $countries[$country[0]] = $country;
+      }
+      fclose($handle);
+      $country_alpha_3 = $countries[$_POST['billing_country']][1];
 			
-			$billings = array();
-			$shippings = array();
 			$billings = array(
 				'FIRST_NAME' 		=> $_POST['billing_first_name'],
 				'LAST_NAME' 		=> $_POST['billing_last_name'],
 				'ADDRESS1' 			=> $_POST['billing_address_1'],
 				'ADDRESS2' 			=> $_POST['billing_address_2'],
 				'CITY' 				=> $_POST['billing_city'],
-				'COUNTRY_CODE' 		=> $_POST['billing_country'],
+				'COUNTRY_CODE' 		=> $country_alpha_3,
 				'POSTAL_CODE' 		=> $_POST['billing_postcode'],
 				'PHONE'				=> $_POST['billing_phone'],
 			);
-			if($_POST['shiptobilling']!=1){
+			
+      if($_POST['shiptobilling']!=1) {
 				$shippings = array(
 					'SHIPPING_FIRST_NAME' 		=> $_POST['shipping_first_name'],
 					'SHIPPING_LAST_NAME' 		=> $_POST['shipping_last_name'],
@@ -424,6 +433,8 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 				);
 			}
 
+      $datas = array_merge($datas, $billings);
+      // $datas = array_merge($datas, $shippings);
 			$query_string = http_build_query($datas);
 			$commodity_query_string = $this->build_commodity_query_string( $order_items );
 			$query_string = $query_string.'&'.$billings.'&'.$shippings.'&'.$commodity_query_string;
@@ -440,9 +451,6 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 			
 				$token = array();
 				$token = $this->extract_keys_from($vtweb['body']);
-				
-				// print_r($token);	
-				// exit();
 				
 				echo $this->generate_veritrans_form( $order_id, $token['token_browser'] );
 				exit();
