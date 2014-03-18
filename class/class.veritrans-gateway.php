@@ -441,7 +441,7 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 				$token = array();
 				$token = $this->extract_keys_from($vtweb['body']);
 				
-				print_r($token);	
+				// print_r($token);	
 				// exit();
 				
 				echo $this->generate_veritrans_form( $order_id, $token['token_browser'] );
@@ -496,9 +496,8 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 				<input type="hidden" name="MERCHANT_ID" value="'.$this->merchant_id.'" />
 				<input type="hidden" name="ORDER_ID" value="'.$order_id.'" />
 				<input type="hidden" name="TOKEN_BROWSER" value="'.$token_browser.'" />
-				<input id="submit_veritrans_payment_form" type="submit" class="button alt" value="Confirm Checkout" />
-				<a class="button cancel" href="'.esc_url( $order->get_cancel_order_url() ).'">'.__( 'Cancel order &amp; restore cart', 'woocommerce' ).'</a>
-				</form>';
+				<!-- <a class="button cancel" href="'.esc_url( $order->get_cancel_order_url() ).'">'.__( 'Cancel order &amp; restore cart', 'woocommerce' ).'</a> -->
+				</form><script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script><script>$(function(){$(\'#sent_form_token\').submit();});</script>';
 	}	
 	
 	private function extract_keys_from($body) {
