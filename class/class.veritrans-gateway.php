@@ -38,7 +38,9 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
     $this->server_key     		= $this->get_option( 'server_key' );
 		$this->merchant_id     		= $this->get_option( 'merchant_id' );
     $this->merchant_hash_key 	= $this->get_option( 'merchant_hash_key' );
-		
+
+    $this->log = new WC_Logger(); 
+
 		// Payment listener/API hook
 		add_action( 'woocommerce_api_wc_gateway_veritrans', array( &$this, 'veritrans_vtweb_response' ) );
 		
@@ -249,12 +251,15 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 		
 		try {
 			$this->charge_payment( $order_id );
-			if('veritrans_direct'==$this->select_veritrans_payment){
+			
+      if('veritrans_direct'==$this->select_veritrans_payment) {
 				return array(
 					'result' => 'success',
 					'redirect'  => add_query_arg('key', $order->order_key, add_query_arg('order', $order_id, get_permalink(woocommerce_get_page_id('thanks'))))
 				);
-			}else{
+			}
+
+      else {
 				return array(
 					'result' 	=> 'success',
 					'redirect'	=> add_query_arg('order', $order->id, add_query_arg('key', $order->order_key, get_permalink(woocommerce_get_page_id('pay' ))))
@@ -417,13 +422,13 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
         'country_code'                    => $this->convert_country_code( $_POST['billing_country'] ), //ISO 3166-1 alpha-3
         'phone'                           => $_POST['billing_phone'], 
 
+        /* Optional 
         'finish_payment_return_url'       => $this->finish_payment_return_url,
         'unfinish_payment_return_url'     => $this->unfinish_payment_return_url,
         'error_payment_return_url'        => $this->error_payment_return_url,
 
         'enable_3d_secure'                => 1,
 
-        /* Optional 
         'bank'                            => 'bni',
         'installment_banks'               => ["bni", "cimb"]
         'promo_bins'                      => '',
@@ -437,13 +442,50 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
       $data['repeat_line'] = 0;
       if( sizeof( $order->get_items() ) > 0 ) {
         foreach( $order->get_items() as $item ) {
-          $item_id[]    = $item['product_id'];
-          $item_name1[] = $item['name'];
-          $item_name2[] = $item['name'];
-          $price[]      = $item['line_total'];
-          $quantity[]   = $item['qty'];
+          if ( $item['qty'] ) {
+            $product = $order->get_product_from_item( $item );
 
+            $item_id[]    = $item['product_id'];
+            $item_name1[] = substr($item['name'], 0, 20);
+            $item_name2[] = substr($item['name'], 0, 20);
+            $price[]      = $order->get_item_subtotal( $item, false );
+            $quantity[]   = $item['qty'];
+
+            $data['repeat_line']++;
+          }
+        }
+      }
+
+      // Shipping fee
+      if( $order->get_total_shipping() > 0 ) {
+        $item_id[] = 'shippingfee';
+        $item_name1[] = 'Shipping Fee';
+        $item_name2[] = 'Shipping Fee';
+        $price[] = $order->get_total_shipping();
+        $quantity[] = 1;
+
+        $data['repeat_line']++;
+      }
+
+      // Tax
+      if( $order->get_total_tax() > 0 ) {
+        $item_id[] = 'taxfee';
+        $item_name1[] = 'Tax';
+        $item_name2[] = 'Tax';
+        $price[] = ceil($order->get_total_tax());
+        $quantity[] = 1;
+
+        $data['repeat_line']++;
+      }
+
+      // Fees
+      if ( sizeof( $order->get_fees() ) > 0 ) {
+        foreach ( $order->get_fees() as $item ) {
           $data['repeat_line']++;
+
+          $paypal_args[ 'item_name_' . $data['repeat_line'] ]   = substr($item['name'], 0, 20);
+          $paypal_args[ 'quantity_' . $data['repeat_line'] ]  = 1;
+          $paypal_args[ 'amount_' . $data['repeat_line'] ]    = $item['line_total'];
         }
       }
 
@@ -475,11 +517,6 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
         if( !empty($result['token_merchant']) ) {
           // No error
 
-          // Reduce stock levels
-          // $order->reduce_order_stock();
-
-          // Remove cart
-          // $woocommerce->cart->empty_cart();
           if ( ! empty( $result['token_browser'] ) )
             update_post_meta( $order->id, '_token_browser', $result['token_browser'] );
           if ( ! empty( $result['token_merchant'] ) )
@@ -575,16 +612,34 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 	 */
 	function veritrans_vtweb_response() {
 		@ob_clean();
-		if( ('' != $_POST['orderId']) && ('success' == $_POST['mStatus']) ){
-			header( 'HTTP/1.1 200 OK' );
-			
-      do_action( "valid-veritrans-web-request", $_POST );
-		}else {
 
-		wp_die( "Veritrans Request Failure" );
+    $params = json_decode( file_get_contents('php://input'), true );
 
-   	}
+    if( $params ) {
 
+      if( ('' != $params['orderId']) && ('success' == $params['mStatus']) ){
+        $token_merchant = get_post_meta( $params['orderId'], '_token_merchant', true );
+        
+        $this->log->add('veritrans', 'Receiving notif for order with ID: ' . $params['orderId']);
+        $this->log->add('veritrans', 'Matching token merchant: ' . $token_merchant . ' = ' . $params['TOKEN_MERCHANT'] );
+
+        if( $params['TOKEN_MERCHANT'] == $token_merchant ) {
+          header( 'HTTP/1.1 200 OK' );
+          $this->log->add( 'veritrans', 'Token Merchant match' );
+          do_action( "valid-veritrans-web-request", $params );
+        }
+      }
+
+      elseif( 'failure' == $params['mStatus'] ) {
+        global $woocommerce;
+        // Remove cart
+        $woocommerce->cart->empty_cart();
+      }
+
+      else {
+        wp_die( "Veritrans Request Failure" );
+      }
+    }
 	}
 	
 	function successful_request( $posted ) {
@@ -595,6 +650,12 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 		$order = new WC_Order( $posted['orderId'] );
 		// Set order as complete
     $order->payment_complete();
+
+    // Reduce stock levels
+    $order->reduce_order_stock();
+
+    // Remove cart
+    $woocommerce->cart->empty_cart();
 		
 		wp_redirect( add_query_arg('key', $order->order_key, add_query_arg('order', $posted['orderId'], get_permalink(woocommerce_get_page_id('thanks')))) ); exit;
 	}
