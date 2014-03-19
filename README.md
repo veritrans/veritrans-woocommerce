@@ -9,7 +9,7 @@ PHP wrapper for Veritrans VT-Web payment API. Visit [https://www.veritrans.co.id
 
 If you are using [Composer](https://getcomposer.org), add this require line to your `composer.json` file:
 
-```
+```json
 "require": {
 	"veritrans/veritrans-php": "dev-vtweb-2"
 }
@@ -29,7 +29,7 @@ If you are not using Composer, just copy all files in this repository into your 
 Given you already have cart ready for checkout.
 We create a veritrans instance.
 
-```
+```php
 $veritrans = new Veritrans();
 
 //TODO: Change with your actual merchant id and merchant hash key
@@ -60,7 +60,7 @@ $items = array(
 $veritrans->items = $items;
 
 $veritrans->required_shipping_address 						= 1; // Set '0' if shipping address is not required
-$veritrans->billing_address_different_with_shipping_address = 1; // Set '0' if shipping address = billing address
+$veritrans->billing_different_with_shipping = 1; // Set '0' if shipping address = billing address
 
 // Set billing info. If you don't set this info, customer will need to fill it at the Veritrans payment page.
 $veritrans->first_name 	= "Andri";
@@ -118,7 +118,7 @@ try {
 
 **Prepare the FORM to redirect the customer**
 	
-```
+```html
 <!DOCTYPE html>
 <html>
 <head>
@@ -147,7 +147,7 @@ try {
 After the payment process is completed, Veritrans will send HTTP(S) POST notification to merchant's web server.
 As a merchant, you need to process this POST paramters to update order status in your database server. Veritrans will send 3 POST parameters: `orderId`, `mStatus`, and `TOKEN_MERCHANT`.
 
-```
+```php
 $notification = new VeritransNotification();
 
 if($notification->mStatus == "fatal")
