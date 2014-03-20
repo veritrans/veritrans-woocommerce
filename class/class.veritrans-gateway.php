@@ -99,7 +99,7 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
           <?php _e('Credit Card Number'); ?>
           <abbr class="required" title="required">*</abbr>
         </label>
-        <input type="text" class="input-text" name="veritrans_credit_card" maxlength="16">
+        <input type="text" class="input-text veritrans_credit_card" maxlength="16">
       </p>
 
       <p class="form-row" id="veritrans_card_exp_month_field">
@@ -107,7 +107,7 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
           <?php _e('Expiration Date - Month', 'woocommerce'); ?>
           <abbr class="required" title="required">*</abbr>
         </label>
-        <select name="veritrans_card_exp_month">
+        <select class="veritrans_card_exp_month">
           <?php $month_list = array(
             '01' => '01 - January',
             '02' => '02 - February',
@@ -134,7 +134,7 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
           <?php _e('Expiration Date - Year', 'woocommerce'); ?>
           <abbr class="required" title="required">*</abbr>
         </label>
-        <select name="veritrans_card_exp_year">
+        <select class="veritrans_card_exp_year">
           <option value="">--</option>
           <?php $years = range( date("Y"), date("Y") + 14 );
           foreach( $years as $year ) : ?>
@@ -148,7 +148,7 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
           <?php _e('Security Code', 'woocommerce'); ?>
           <abbr class="required" title="required"><a target="_blank" href="https://www.veritrans.co.id/payment-help.html">[?]</a></abbr>
         </label>
-        <input type="text" class="input-text" name="veritrans_security">
+        <input type="text" class="input-text veritrans_security">
       </p>
 
       <input type="text" name="veritrans_token_id" class="hide" style="display:none">
@@ -160,7 +160,7 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
    */
   function validate_fields() {
     global $woocommerce;
-		if('veritrans_direct'==$this->select_veritrans_payment){
+		/*if('veritrans_direct'==$this->select_veritrans_payment){
 			if( empty($_POST['veritrans_credit_card']) || $_POST['veritrans_credit_card'] == '' ) {
 				$woocommerce->add_error( __('Please input your Credit Card Number', 'woocommerce') );
 			}
@@ -173,7 +173,7 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 			if( empty($_POST['veritrans_security']) || $_POST['veritrans_security'] == '' ) {
 				$woocommerce->add_error( __('Please input your Security Code', 'woocommerce') );
 			}
-		}
+		}*/
     return true;
   }
 
@@ -304,26 +304,44 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 						'id' => $item['product_id'],
 						'name' => substr($item['name'], 0, 20),
 						'qty' => $item['qty'] / 1,
-						'price' => ceil( $item['line_total'] / $item['qty'] )
+						'price' => ceil( $order->get_item_subtotal( $item, false ) )
 					);
 				}
 			}
 
 			// Shipping Fee
-			$order_items[] = array(
-				'id' => '1',
-				'name' => 'Shipping Fee',
-				'qty' => 1,
-				'price' => ceil( $order->order_shipping / 1 )
-			);
-			
-			// Tax Fee
-			$order_items[] = array(
-				'id' => '2',
-				'name' => 'Tax',
-				'qty' => 1,
-				'price' => ceil( ($order->order_tax / 1) + ($order->order_shipping_tax / 1) )
-			);
+      if( $order->get_total_shipping() > 0 ) {
+        $order_items[] = array(
+          'id' => 'shippingfee',
+          'name' => 'Shipping Fee',
+          'qty' => 1,
+          'price' => ceil( $order->get_total_shipping() )
+        );
+      }
+
+      // Tax
+      if( $order->get_total_tax() > 0 ) {
+        $order_items[] = array(
+          'id' => 'taxfee',
+          'name' => 'Tax',
+          'qty' => 1,
+          'price' => ceil($order->get_total_tax())
+        );
+      }
+
+      // Fees
+      if ( sizeof( $order->get_fees() ) > 0 ) {
+        $fee_counter = 0;
+        foreach ( $order->get_fees() as $item ) {
+          $fee_counter++;
+          $order_items[] = array(
+            'id' => 'feeitem' . $fee_counter,
+            'name' => 'Fee Item ' . $fee_counter,
+            'qty' => 1,
+            'price' => ceil( $item['line_total'] )
+          );
+        }
+      }
 
 			// Shipping Address
 			$shipping_address['first_name'] = $order->shipping_first_name;
@@ -436,7 +454,7 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
         'payment_methods'                 => ["credit_card", "mandiri_clickpay"]
         'installment_terms'               => ''
         */
-      );      
+      );
 
       // Populate Items
       $data['repeat_line'] = 0;
@@ -448,7 +466,7 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
             $item_id[]    = $item['product_id'];
             $item_name1[] = substr($item['name'], 0, 20);
             $item_name2[] = substr($item['name'], 0, 20);
-            $price[]      = $order->get_item_subtotal( $item, false );
+            $price[]      = ceil( $order->get_item_subtotal( $item, false ) );
             $quantity[]   = $item['qty'];
 
             $data['repeat_line']++;
@@ -461,7 +479,7 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
         $item_id[] = 'shippingfee';
         $item_name1[] = 'Shipping Fee';
         $item_name2[] = 'Shipping Fee';
-        $price[] = $order->get_total_shipping();
+        $price[] = ceil($order->get_total_shipping());
         $quantity[] = 1;
 
         $data['repeat_line']++;
@@ -483,9 +501,11 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
         foreach ( $order->get_fees() as $item ) {
           $data['repeat_line']++;
 
-          $paypal_args[ 'item_name_' . $data['repeat_line'] ]   = substr($item['name'], 0, 20);
-          $paypal_args[ 'quantity_' . $data['repeat_line'] ]  = 1;
-          $paypal_args[ 'amount_' . $data['repeat_line'] ]    = $item['line_total'];
+          $item_id[] = 'itemfee' . $data['repeat_line'];
+          $item_name1[] = 'Fee ' . $data['repeat_line'];
+          $item_name2[] = 'Fee ' . $data['repeat_line'];
+          $price[] = ceil($item['line_total']);
+          $quantity[] = 1;
         }
       }
 

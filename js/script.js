@@ -53,10 +53,10 @@ var wc_veritrans = {
    */
   _cardset: function() {
     return {
-      card_number: $('[name="veritrans_credit_card"]').val(),
-      card_exp_month: $('[name="veritrans_card_exp_month"]').val(),
-      card_exp_year: $('[name="veritrans_card_exp_year"]').val(),
-      card_cvv: $('[name="veritrans_security"]').val()
+      card_number: $('.veritrans_credit_card').val(),
+      card_exp_month: $('.veritrans_card_exp_month').val(),
+      card_exp_year: $('.veritrans_card_exp_year').val(),
+      card_cvv: $('.veritrans_security').val()
     }
   },
 
@@ -79,7 +79,7 @@ var wc_veritrans = {
         validate_message += '<li><strong>'+ label +'</strong> is a required field.</li>';
       }
     });
-
+    
     if( veritrans_error ) {
       if( veritrans_error.status == 'failure' ) {
         veritrans_error.message = veritrans_error.message.replace('[','').replace(']','');
@@ -88,7 +88,7 @@ var wc_veritrans = {
     }
 
     // Show error message if form is not valid
-    if( $form.find('.woocommerce-invalid').length > 0 ) {
+    if( $form.find('.woocommerce-invalid').length > 0 || veritrans_error ) {
       $('<ul class="woocommerce-error">'+ validate_message +'</ul>').prependTo( $form );
     }
   },
@@ -163,15 +163,22 @@ var wc_veritrans = {
   submit_form_ajax: function() {
     var _this = this,
         $form = this.el.$form,
-        form_data = $form.data();
+        form_data = $form.data(),
+        serialized_data = $form.serialize();
         
+    // Get credit cart data
+    serialized_data += '&veritrans_credit_card=' + $('.veritrans_credit_card').val();
+    serialized_data += '&veritrans_card_exp_month=' + $('.veritrans_card_exp_month').val();
+    serialized_data += '&veritrans_card_exp_year=' + $('.veritrans_card_exp_year').val();
+    serialized_data += '&veritrans_security_field=' + $('.veritrans_security_field').val();
+
     $.ajax({
       type:     'POST',
-      url:      woocommerce_params.checkout_url,
-      data:     $form.serialize(),
+      url:      wc_checkout_params.checkout_url,
+      data:     serialized_data,
       success:  function( code ) {
         var result = '';
-
+        
         try {
           // Get the valid JSON only from the returned string
           if ( code.indexOf("<!--WC_START-->") >= 0 )
@@ -179,7 +186,7 @@ var wc_veritrans = {
 
           if ( code.indexOf("<!--WC_END-->") >= 0 )
             code = code.split("<!--WC_END-->")[0]; // Strip off anything after WC_END
-
+          debugger;
           // Parse
           result = $.parseJSON( code );
 
