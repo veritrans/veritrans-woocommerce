@@ -93,12 +93,16 @@ class Veritrans
     $this->environment = self::ENVIRONMENT_DEVELOPMENT;
     $this->veritrans_method = self::VT_WEB;
     $this->veritrans_factory = new Veritrans\Factory($this);
-    $this->veritrans_engine = $this->veritrans_factory->get($this->version);
   }
 
   public function getTokens()
   {
-    return $this->veritrans_engine->getTokens();
+    return $this->veritrans_factory->get()->getTokens();
+  }
+
+  public function getData()
+  {
+    return $this->data;
   }
 
 }

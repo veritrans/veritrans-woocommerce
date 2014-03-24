@@ -8,20 +8,23 @@ require 'veritrans_2014.php';
 class Factory {
 
   private $veritrans;
+  private $engines = array();
 
   public function __construct($veritrans)
   {
     $this->veritrans = $veritrans;
+    $this->engines['2014'] = new Veritrans2014($this->veritrans);
+    $this->engines['2013'] = new Veritrans2013($this->veritrans);
   }
 
-  public function get($stack_version)
+  public function get()
   {
-    if ($stack_version == \Veritrans::STACK_2014)
+    if ($this->veritrans->version == \Veritrans::STACK_2014)
     {
-      return new  Veritrans2014($this->veritrans);
+      return $this->engines['2014'];
     } else
     {
-      return new Veritrans2013($this->veritrans);
+      return $this->engines['2013'];
     }
   }
 }

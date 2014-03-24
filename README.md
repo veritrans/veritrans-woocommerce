@@ -72,23 +72,23 @@ Veritrans PHP will default to the __Development__ environment. You can set the e
 $veritrans->environment = Veritrans::ENVIRONMENT_PRODUCTION;
 ```
 
-### Veritrans methods
+### Payment types
 
-Independently from the stacks, you may define the method the library use to connect with the API. The available payment methods are also defined in the `veritrans.php` file.
+Independently from the stacks, you may define the payment type which will be used by the library. The available payment types are also defined in the `veritrans.php` file.
 
 ```php
 class Veritrans {
 	// ...
 	/***
 	  *
-	  * VT-Web payment method
+	  * VT-Web payment type
 	  *
 	  */
 	const VT_WEB = 0;
 
 	/***
 	  *
-	  * VT-Direct payment method
+	  * VT-Direct payment type
 	  *
 	  */
 	const VT_DIRECT = 1;
@@ -96,10 +96,10 @@ class Veritrans {
 }
 ```
 
-At initialization, Veritrans defaults to `VT_WEB` method. You can change the payment method by accessing the `veritrans_method` method.
+At initialization, Veritrans defaults to `VT_WEB` type. You can change the payment method by accessing the `payment_type` method.
 
 ```php
-$veritrans->veritrans_method(Veritrans::VT_DIRECT);
+$veritrans->payment_type = Veritrans::VT_DIRECT;
 ```
 
 ### Setting up customer's billing information
@@ -218,8 +218,8 @@ There are myriads of options to be set with Veritrans. Please consult [this page
 
 	$veritrans->installment_banks = array("bni", "cimb");
 	$veritrans->installment_terms = array(
-		'bni' => [3,12],
-		'cimb' => [3, 6, 12]
+		'bni' => array(3, 12),
+		'cimb' => array(3, 6, 12)
 		);
 	```
 
