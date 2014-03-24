@@ -62,14 +62,14 @@ $veritrans->version = Veritrans::STACK_2014;
 
 There are two environments in Veritrans:
 
-1. __Development__ environment, which is defined as `Veritrans::STACK_DEVELOPMENT` and
-2. __Production__ environment, which is defined as `Veritrans::STACK_PRODUCTION`.
+1. __Development__ environment, which is defined as `Veritrans::ENVIRONMENT_DEVELOPMENT` and
+2. __Production__ environment, which is defined as `Veritrans::ENVIRONMENT_PRODUCTION`.
 
 Veritrans PHP will default to the __Development__ environment. You can set the environment by accessing the `environment` property.
 
 ```php
 // Set the environment to production
-$veritrans->environment = Veritrans::STACK_PRODUCTION;
+$veritrans->environment = Veritrans::ENVIRONMENT_PRODUCTION;
 ```
 
 ### Veritrans methods
@@ -84,14 +84,14 @@ class Veritrans {
 	  * VT-Web payment method
 	  *
 	  */
-	const VT_WEB 0;
+	const VT_WEB = 0;
 
 	/***
 	  *
 	  * VT-Direct payment method
 	  *
 	  */
-	const VT_DIRECT 1;
+	const VT_DIRECT = 1;
 	// ...
 }
 ```
@@ -126,7 +126,7 @@ $veritrans->address1 = "Karet Belakang"; // obligatory in 2014 stack
 $veritrans->address2 = "Setiabudi";
 
 // ...or by setting the address property
-$veritrans->address = "Karet Belakang Setiabudi"
+$veritrans->address = "Karet Belakang Setiabudi";
 ```
 
 ### Do you need a shipping address?
@@ -203,7 +203,7 @@ There are myriads of options to be set with Veritrans. Please consult [this page
 - __Promo:__ Set promotion.
   
   ```php
-  $veritrans->promo_bins = ["411111", "444444"];
+  $veritrans->promo_bins = array("411111", "444444");
   ```
 
 - __Acquiring bank:__ Set the acquiring bank if you have multiple accounts registered with Veritrans.
@@ -214,21 +214,53 @@ There are myriads of options to be set with Veritrans. Please consult [this page
 
 - __Installment transactions:__ 
 
+	```php
+
+	$veritrans->installment_banks = array("bni", "cimb");
+	$veritrans->installment_terms = array(
+		'bni' => [3,12],
+		'cimb' => [3, 6, 12]
+		);
+	```
+
+- __Transaction with shopping points:__
+	```php
+	$veritrans->point_banks	= array("bni", "cimb");
+	```
+
+- __Setting the available payment methods for the VT-Web:__
+	```php
+	$veritrans->payment_methods	= array("credit_card", "mandiri_clickpay");
+	```
+
+## Step 2: Setting up your API keys
+
+As a final step, you have to set your API keys in order to let yourself get authenticated by Veritrans API. The methods to set the keys are different for each stack.
+
+### Current Stack
+
+In the current stack (2013), set the `merchant_id` property with your Merchant ID and `merchant_hash_key` with your Merchant Hash Key. Both of them are available [here](https://payments.veritrans.co.id/map).
+
 ```php
-
-$veritrans->installment_banks = ["bni", "cimb"];
-
-$veritrans->point_banks	= ["bni", "cimb"];
-$veritrans->payment_methods	= ["credit_card", "mandiri_clickpay"];
-$veritrans->installment_terms = array(
-	'bni' => [3,12],
-	'cimb' => [3, 6, 12]
-	);
-
 //TODO: Change with your actual merchant id and merchant hash key
 $veritrans->merchant_id 		= 'T100000000000001000001';
 $veritrans->merchant_hash_key 	= '305e0328a366cbce8e17a385435bb7eb3f0cbcfbfc0f1c3ef56b658';
+```
 
+### 2014 Stack
+
+If you set the `version` to `Veritrans::STACK_2014`, you have to set your keys by setting the `server_key` property with the Server Key from your account. The server key can be obtained [here](https://my.sandbox.veritrans.co.id/settings/config_info)
+
+```php
+//TODO: Change with your actual server key
+$veritrans->server_key 		= 'eebadfec-fa3a-496a-8ea0-bb5795179ce6';
+```
+
+## Step 3: Authenticate with Veritrans API
+
+### VT-Web
+
+```php
 //Call Veritrans VT-Web API Get Token
 try {
 	$keys = $veritrans->getTokens();
@@ -248,7 +280,11 @@ try {
 }
 ```
 
-### STEP 2:  Redirecting user to Veritrans payment page
+### VT-Direct
+
+TODO
+
+## STEP 4:  Redirecting user to Veritrans payment page
 
 **Prepare the FORM to redirect the customer**
 	
@@ -275,7 +311,6 @@ try {
 
 </body>
 ```
-
 
 ### STEP 3 : Responding Veritrans payment notification
 After the payment process is completed, Veritrans will send HTTP(S) POST notification to merchant's web server.
