@@ -21,7 +21,6 @@ class Veritrans2014 {
     $ch = curl_init();
     
     $body = json_encode($this->_getPostData());
-    var_dump($body);
 
     curl_setopt($ch, CURLOPT_URL, $this->_getBaseUrl() . '/charge');
     curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
@@ -31,14 +30,14 @@ class Veritrans2014 {
       'Authorization: Basic ' . base64_encode($this->veritrans->server_key . ':')
       ));
     curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
-    if (!$result = curl_exec($ch)) {
-      trigger_error(curl_exec($ch));
-    }
+    $result = curl_exec($ch);
 
     curl_close($ch);
 
-    return json_decode($result);
+    // convert the result into an associative array
+    return json_decode($result, true);
 
   }
 
@@ -103,9 +102,13 @@ class Veritrans2014 {
     $data['customer_details']['phone'] = $this->veritrans->phone;
 
     $data['customer_details']['billing_address'] = array();
+    $data['customer_details']['billing_address']['first_name'] = $this->veritrans->first_name;
+    $data['customer_details']['billing_address']['last_name'] = $this->veritrans->last_name;
     $data['customer_details']['billing_address']['address'] = $this->_getAddress();
     $data['customer_details']['billing_address']['city'] = $this->veritrans->city;
     $data['customer_details']['billing_address']['postal_code'] = $this->veritrans->postal_code;
+    $data['customer_details']['billing_address']['phone'] = $this->veritrans->phone;
+
 
     return $data;
         

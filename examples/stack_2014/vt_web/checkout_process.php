@@ -79,47 +79,18 @@ $veritrans->items = $items;
 
 //Call Veritrans VT-Web API Get Token
 try {
-  $keys = $veritrans->getTokens();
 
-  if(!in_array($keys['status_code'], array('201', '202', '203'))) 
+  $keys = $veritrans->getTokens();
+  if(!in_array($keys['status_code'], array(201, 202, 203))) 
   {
     // print the error
     print_r($veritrans->errors);
+    
     exit();
 
   } else {
-    
-    //Save this token_merchant on your database to be used for checking veritrans notification response.
-    $token_merchant = $keys['token_merchant'];
 
-    //Use this token_browser for redirecting customer to Veritrans payment page.
-    $token_browser = $keys['token_browser'];
-    ?>
-
-<!DOCTYPE html>
-<html>
-<head>
-  <script language="javascript" type="text/javascript">
-  <!--
-  function onloadEvent() {
-    document.form_auto_post.submit();
-  }
-  //-->
-  </script>
-</head>
-
-<body onload="onloadEvent();">
-<form action="<?php echo $veritrans->redirect_url ?>" method="post" name='form_auto_post'>
-<input type="hidden" name="MERCHANT_ID" value="<?php echo $veritrans->merchant_id ?>" />
-<input type="hidden" name="ORDER_ID" value="<?php echo $veritrans->order_id ?>" />
-<input type="hidden" name="TOKEN_BROWSER" value="<?php echo $token_browser ?>" />
-<span>Please wait. You are being redirected to Veritrans payment page...</span>
-</form>
-
-</body>
-
-
-    <?php
+    header('Location: ' . $keys['redirect_url']);
   }
 } catch (Exception $e) {
   var_dump($e);

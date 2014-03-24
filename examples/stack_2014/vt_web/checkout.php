@@ -51,17 +51,17 @@
   
     <h3>Shipping Info</h3>
     <label>First name</label><br />
-    <input name="shipping_first_name" size="30" type="text" value="Andri"><br /><br />
+    <input name="shipping_first_name" size="30" type="text" value="Ismail"><br /><br />
     <label>Last name</label><br />
-    <input name="shipping_last_name" size="30" type="text" value="Setiawan"><br /><br />
+    <input name="shipping_last_name" size="30" type="text" value="Faruqi"><br /><br />
     <label>Address 1</label><br />
-    <input name="shipping_address1" size="30" type="text" value="Bakerstreet 221B"><br /><br />
+    <input name="shipping_address1" size="30" type="text" value="Upper Street 21"><br /><br />
     <label>Address 2</label><br />
-    <input name="shipping_address2" size="30" type="text" value="Setiabudi"><br /><br />
+    <input name="shipping_address2" size="30" type="text" value="Pejaten"><br /><br />
     <label>City</label><br />
     <input name="shipping_city" size="30" type="text" value="Jakarta"><br /><br />
     <label>Postal code</label><br />
-    <input name="shipping_postal_code" size="30" type="text" value="12345"><br /><br />
+    <input name="shipping_postal_code" size="30" type="text" value="54321"><br /><br />
     <label>Phone</label><br />
     <input name="shipping_phone" size="30" type="text" value="08112312312312"><br /><br />
     
