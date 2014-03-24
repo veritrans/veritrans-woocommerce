@@ -1,4 +1,5 @@
 <?php
+
 if(empty($_POST)) 
 {
 	echo "Empty data.";
@@ -48,16 +49,16 @@ $veritrans->unfinish_payment_return_url	= "http://yahoo.com/unfinish_payment";
 $veritrans->error_payment_return_url	= "http://apple.com/error_payment";
 
 // Payment options
-$veritrans->enable_3d_secure	= 1;
-$veritrans->bank 				= "bni";
-$veritrans->installment_banks 	= ["bni", "cimb"];
-$veritrans->promo_bins			= ["411111", "444444"];
-$veritrans->point_banks			= ["bni", "cimb"];
-$veritrans->payment_methods		= ["credit_card", "mandiri_clickpay"];
-$veritrans->installment_terms   = array(
-	'bni' => [3,12],
-	'cimb' => [3, 6, 12]
-	);
+// $veritrans->enable_3d_secure	= 1;
+// $veritrans->bank 				= "bni";
+// $veritrans->installment_banks 	= array("bni", "cimb");
+// $veritrans->promo_bins			= array("411111", "444444");
+// $veritrans->point_banks			= array("bni", "cimb");
+// $veritrans->payment_methods		= array("credit_card", "mandiri_clickpay");
+// $veritrans->installment_terms   = array(
+// 	'bni' => array(3,12),
+// 	'cimb' => array(3, 6, 12)
+// 	);
 
 // Set commodity items. This is just sample items.
 // TODO: Change with your actual items.
