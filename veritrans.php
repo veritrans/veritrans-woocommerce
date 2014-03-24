@@ -10,8 +10,7 @@ class Veritrans
   const REQUEST_KEY_URL       = 'https://vtweb.veritrans.co.id/v1/tokens.json';
   const PAYMENT_REDIRECT_URL  = 'https://vtweb.veritrans.co.id/v1/payments.json';
 
-  const STACK_2013 = 1;
-  const STACK_2014 = 2;
+  const VERSION_STABLE = 1;
 
   const ENVIRONMENT_DEVELOPMENT = 0;
   const ENVIRONMENT_PRODUCTION = 1;
@@ -89,7 +88,7 @@ class Veritrans
   public function __construct($params = null) 
   {
     // maintain compatibility with vt-web2 branch by setting default variables.
-    $this->version = self::STACK_2013;
+    $this->version = self::VERSION_STABLE;
     $this->environment = self::ENVIRONMENT_DEVELOPMENT;
     $this->veritrans_method = self::VT_WEB;
     $this->veritrans_factory = new Veritrans\Factory($this);

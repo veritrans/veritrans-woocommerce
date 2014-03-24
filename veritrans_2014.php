@@ -100,6 +100,7 @@ class Veritrans2014 {
       $data['customer_details']['last_name'] = $this->veritrans->last_name;
     $data['customer_details']['email'] = $this->veritrans->email;
     $data['customer_details']['phone'] = $this->veritrans->phone;
+    $data['customer_details']['country'] = $this->veritrans->country_code;
 
     $data['customer_details']['billing_address'] = array();
     $data['customer_details']['billing_address']['first_name'] = $this->veritrans->first_name;
@@ -108,7 +109,7 @@ class Veritrans2014 {
     $data['customer_details']['billing_address']['city'] = $this->veritrans->city;
     $data['customer_details']['billing_address']['postal_code'] = $this->veritrans->postal_code;
     $data['customer_details']['billing_address']['phone'] = $this->veritrans->phone;
-
+    $data['customer_details']['billing_address']['country_code'] = $this->veritrans->country_code;
 
     return $data;
         

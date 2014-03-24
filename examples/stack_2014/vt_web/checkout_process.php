@@ -10,7 +10,7 @@ require '../../../veritrans.php';
 
 $veritrans = new Veritrans();
 $veritrans->server_key = 'eebadfec-fa3a-496a-8ea0-bb5795179ce6'; // change with your development/production server key
-$veritrans->version = Veritrans::STACK_2014; // since 2014's stack is currently not the default one, we need to set it explicitly
+$veritrans->version = 2; // since 2014's stack is currently not the default one, we need to set it explicitly
 
 //TODO: Change with your actual order_id.
 $veritrans->order_id          = 'order'.rand();

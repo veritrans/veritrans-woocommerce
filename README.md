@@ -29,33 +29,30 @@ Given you have a cart ready for checkout, the first step you have to do to inter
 
 ```php
 
-// Create a new Veritrans instance. It will default to 2013 stack and VT-Web payment method.
+// Create a new Veritrans instance. It will default to V1 API and VT-Web payment method.
 $veritrans = new Veritrans();
 
 $veritrans->order_id = 'XDF1AA5'; // change the order_id property with your actual order ID.
 ```
 
-### About Veritrans stack
+### About Veritrans API version
 
-Veritrans API is always evolving. As a result, there are several stacks that is improved in each subsequent version.
-Veritrans stack is transparent to the API. Veritrans defined the stacks inside the `veritrans.php` file, and the code fragment below displays the available stacks of the current Veritrans API:
+Veritrans API is always evolving. As a result, there are several versions which are improved in each subsequent version. Veritrans defines the default version, which is defined by the version which is used most by the client.
 
 ```php
 class Veritrans {
 	// ...
-	const STACK_2013 = 1;
-	const STACK_2014 = 2;
-	const STACK_STABLE = self::STACK_2013;
+	const VERSION_STABLE = 1;
 	// ...	
 }
 ```
 
-At initialization, the stack will be always initialized to `STACK_STABLE`, which points to `STACK_2013` in this case.
-You can set the stack you want to use by manipulating the `version` property.
+At initialization, the version will be always initialized to `VERSION_STABLE`, which points to `1` in this case.
+You can set the version you want to use by manipulating the `version` property.
 
 ```php
-// Set the stack to STACK_2014 instead of the STACK_STABLE
-$veritrans->version = Veritrans::STACK_2014;
+// Set the API version to v2 instead of the VERSION_STABLE (v1)
+$veritrans->version = 2;
 ```
 
 ### Environment
@@ -74,7 +71,7 @@ $veritrans->environment = Veritrans::ENVIRONMENT_PRODUCTION;
 
 ### Payment types
 
-Independently from the stacks, you may define the payment type which will be used by the library. The available payment types are also defined in the `veritrans.php` file.
+Independently from the versions, you may define the payment type which will be used by the library. The available payment types are also defined in the `veritrans.php` file.
 
 ```php
 class Veritrans {
@@ -104,25 +101,25 @@ $veritrans->payment_type = Veritrans::VT_DIRECT;
 
 ### Setting up customer's billing information
 
-The handling of customer information is different in each stack.
+The handling of customer information is different in each version.
 
-- __2013 Stack:__ It is optional to set-up the customer information, but if you are developing plugins using this library, it is __highly__ recommended to set it up to give the best user experience. Otherwise, your customer have to fill them in the VT-Web page.
+- __V.1:__ It is optional to set-up the customer information, but if you are developing plugins using this library, it is __highly__ recommended to set it up to give the best user experience. Otherwise, your customer have to fill them in the VT-Web page.
 
-- __2014 Stack:__ Some of the customer information fields become obligatory in the 2014 stack, which will be displayed in the example below.
+- __V.2:__ Some of the customer information fields become obligatory in the API V2, which will be displayed in the example below.
 
 To set up your customer information, you can manipulate the following properties:
 
 ```php
-$veritrans->first_name = "Andri"; // obligatory in 2014 stack
+$veritrans->first_name = "Andri"; // obligatory in V2 API
 $veritrans->last_name = "Setiawan";
-$veritrans->email = "customer@email.com"; // obligatory in 2014 stack
-$veritrans->city = "Jakarta"; // obligatory in 2014 stack
+$veritrans->email = "customer@email.com"; // obligatory in V2 API
+$veritrans->city = "Jakarta"; // obligatory in V2 API
 $veritrans->country_code = "IDN";
-$veritrans->postal_code = "12345"; // obligatory in 2014 stack
+$veritrans->postal_code = "12345"; // obligatory in V2 API
 $veritrans->phone = "08123123123123";
 
 // To define the customer's billing address, you can either set the address1 and address2 properties...
-$veritrans->address1 = "Karet Belakang"; // obligatory in 2014 stack
+$veritrans->address1 = "Karet Belakang"; // obligatory in V2 API
 $veritrans->address2 = "Setiabudi";
 
 // ...or by setting the address property
@@ -177,14 +174,14 @@ $items = array(
 				"price" => 250000,
 				"quantity"   => 1,
 				"item_name1" => 'sepatu',
-				"item_name2" => 'Shoes' // item_name2 is only obligatory in 2013 Stack's VT-Web method
+				"item_name2" => 'Shoes' // item_name2 is only obligatory in V1 API's VT-Web method
 			),
 			array(
 				"item_id" => 'itemdua',
 				"price" => 500000,
 				"quantity"   => 2,
 				"item_name1" => 'Tas',
-				"item_name2" => 'Bag' // item_name2 is only obligatory in 2013 Stack's VT-Web method
+				"item_name2" => 'Bag' // item_name2 is only obligatory in V1 API's VT-Web method
 			),
 		);
 $veritrans->items = $items;
@@ -235,21 +232,21 @@ There are myriads of options to be set with Veritrans. Please consult [this page
 
 ## Step 2: Setting up your API keys
 
-As a final step, you have to set your API keys in order to let yourself get authenticated by Veritrans API. The methods to set the keys are different for each stack.
+As a final step, you have to set your API keys in order to let yourself get authenticated by Veritrans API. The methods to set the keys are different for each API version.
 
-### Current Stack
+### V1 API
 
-In the current stack (2013), set the `merchant_id` property with your Merchant ID and `merchant_hash_key` with your Merchant Hash Key. Both of them are available [here](https://payments.veritrans.co.id/map).
+In the current version (2013), set the `merchant_id` property with your Merchant ID and `merchant_hash_key` with your Merchant Hash Key. Both of them are available [here](https://payments.veritrans.co.id/map).
 
 ```php
 //TODO: Change with your actual merchant id and merchant hash key
-$veritrans->merchant_id 		= 'T100000000000001000001';
-$veritrans->merchant_hash_key 	= '305e0328a366cbce8e17a385435bb7eb3f0cbcfbfc0f1c3ef56b658';
+$veritrans->merchant_id = 'T100000000000001000001';
+$veritrans->merchant_hash_key = '305e0328a366cbce8e17a385435bb7eb3f0cbcfbfc0f1c3ef56b658';
 ```
 
-### 2014 Stack
+### V2 API
 
-If you set the `version` to `Veritrans::STACK_2014`, you have to set your keys by setting the `server_key` property with the Server Key from your account. The server key can be obtained [here](https://my.sandbox.veritrans.co.id/settings/config_info)
+If you set the `version` to `2`, you have to set your keys by setting the `server_key` property with the Server Key from your account. The server key can be obtained [here](https://my.sandbox.veritrans.co.id/settings/config_info)
 
 ```php
 //TODO: Change with your actual server key
@@ -349,6 +346,6 @@ else
 
 ### Developing e-commerce plug-ins
 
-### New Veritrans stack
+### Developing API for new API versions
 
 ## Credits

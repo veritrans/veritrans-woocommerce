@@ -13,18 +13,18 @@ class Factory {
   public function __construct($veritrans)
   {
     $this->veritrans = $veritrans;
-    $this->engines['2014'] = new Veritrans2014($this->veritrans);
-    $this->engines['2013'] = new Veritrans2013($this->veritrans);
+    $this->engines[2] = new Veritrans2014($this->veritrans);
+    $this->engines[1] = new Veritrans2013($this->veritrans);
   }
 
   public function get()
   {
-    if ($this->veritrans->version == \Veritrans::STACK_2014)
+    if ($this->veritrans->version == 2)
     {
-      return $this->engines['2014'];
+      return $this->engines[2];
     } else
     {
-      return $this->engines['2013'];
+      return $this->engines[1];
     }
   }
 }
