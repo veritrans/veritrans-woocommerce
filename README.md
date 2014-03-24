@@ -230,9 +230,9 @@ There are myriads of options to be set with Veritrans. Please consult [this page
 	$veritrans->payment_methods	= array("credit_card", "mandiri_clickpay");
 	```
 
-## Step 2: Setting up your API keys
+## Step 2: Using the API
 
-As a final step, you have to set your API keys in order to let yourself get authenticated by Veritrans API. The methods to set the keys are different for each API version.
+Before you can start using the wrapper, you have to set your API keys in order to let yourself get authenticated by Veritrans API. The methods to set the keys and the response are different for each API version.
 
 ### V1 API
 
@@ -244,22 +244,14 @@ $veritrans->merchant_id = 'T100000000000001000001';
 $veritrans->merchant_hash_key = '305e0328a366cbce8e17a385435bb7eb3f0cbcfbfc0f1c3ef56b658';
 ```
 
-### V2 API
+#### V1 VT-Web
 
-If you set the `version` to `2`, you have to set your keys by setting the `server_key` property with the Server Key from your account. The server key can be obtained [here](https://my.sandbox.veritrans.co.id/settings/config_info)
-
-```php
-//TODO: Change with your actual server key
-$veritrans->server_key 		= 'eebadfec-fa3a-496a-8ea0-bb5795179ce6';
-```
-
-## Step 3: Authenticate with Veritrans API
-
-### VT-Web
+In V1 API, you have to call the `getTokens()` method to obtain `token_merchant` and `token_browser` first, and use them in a `POST` request to enter the VT-Web page. The example below illustrates their usage.
 
 ```php
-//Call Veritrans VT-Web API Get Token
 try {
+	
+	// Call Veritrans VT-Web API Get Token
 	$keys = $veritrans->getTokens();
 
 	if(!$keys) {
@@ -277,14 +269,8 @@ try {
 }
 ```
 
-### VT-Direct
+Soon after the PHP code above, add the following form:
 
-TODO
-
-## STEP 4:  Redirecting user to Veritrans payment page
-
-**Prepare the FORM to redirect the customer**
-	
 ```html
 <!DOCTYPE html>
 <html>
@@ -308,6 +294,49 @@ TODO
 
 </body>
 ```
+
+### V2 API
+
+If you set the `version` to `2`, you have to set your keys by setting the `server_key` property with the Server Key from your account. The server key can be obtained [here](https://my.sandbox.veritrans.co.id/settings/config_info)
+
+```php
+//TODO: Change with your actual server key
+$veritrans->server_key 		= 'eebadfec-fa3a-496a-8ea0-bb5795179ce6';
+```
+
+#### V2 VT-Web
+
+The method to enter the VT-Web page is a little different in V2 API. Instead of sending a POST request, you can simply redirect your request to the page obtained from the `getTokens()` method.
+
+```php
+try {
+
+	// Call Veritrans VT-Web API Get Token
+	$keys = $veritrans->getTokens();
+  
+	if(!in_array($keys['status_code'], array(201, 202, 203))) 
+	{
+	  // print the error
+	  print_r($veritrans->errors);
+	  
+	  exit();
+
+	} else {
+
+		// redirect the request if getTokens() is successful
+	  header('Location: ' . $keys['redirect_url']);
+
+	}
+} catch (Exception $e) {
+  var_dump($e);
+}
+```
+
+## STEP 4:  Redirecting user to Veritrans payment page
+
+**Prepare the FORM to redirect the customer**
+	
+
 
 ### STEP 3 : Responding Veritrans payment notification
 After the payment process is completed, Veritrans will send HTTP(S) POST notification to merchant's web server.
