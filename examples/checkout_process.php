@@ -44,9 +44,9 @@ $veritrans->shipping_phone 			= $_POST['shipping_phone'];
 $veritrans->email 					= $_POST['email'];
 
 // Configure redirect url. [Optional. Can also be set at Merchant Administration Portal(MAP)]
-$veritrans->finish_payment_return_url 	= "http://yoursite.com/finish_payment";
-$veritrans->unfinish_payment_return_url	= "http://yahoo.com/unfinish_payment";
-$veritrans->error_payment_return_url	= "http://apple.com/error_payment";
+$veritrans->finish_payment_return_url 	= "http://lvh.me/finish_payment";
+$veritrans->unfinish_payment_return_url	= "http://lvh.me/unfinish_payment";
+$veritrans->error_payment_return_url	= "http://lvh.me/error_payment";
 
 // Payment options
 // $veritrans->enable_3d_secure	= 1;
