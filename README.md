@@ -295,6 +295,40 @@ Soon after the PHP code above, add the following form:
 </body>
 ```
 
+#### Responding to V1 VT-Web payment notification
+
+After the payment process is completed, Veritrans will send HTTP(S) POST notification to merchant's web server.
+As a merchant, you need to process this POST paramters to update order status in your database server. Veritrans will send 3 POST parameters: `orderId`, `mStatus`, and `TOKEN_MERCHANT`.
+
+```php
+$notification = new VeritransNotification();
+
+if($notification->mStatus == "fatal")
+{
+	// Veritrans internal system error. Please contact Veritrans Support if this occurs.
+}
+else
+{
+	// TODO: Retrieve order info from your database to check the token_merchant for security purpose.
+	// The token_merchant that you get from this http(s) POST notification must be the same as token_merchant that you get previously when requesting token (before redirecting customer to Veritrans payment page.)
+
+	//$order = Order::find('order_id' => $notification->orderId);
+
+	if($order['TOKEN_MERCHANT'] == $notification->TOKEN_MERCHANT )
+	{
+		// TODO: update order payment status on your database. 3 possibilities $notification->mStatus responses from Veritrans: 'success', 'failure', and 'challenge'
+		// $order['payment_status'] = $notification->mStatus; 
+		// $order->save();
+	}
+	else
+	{
+		// If token_merchant that you get from this http(s) POST request is different with token_merchant that you get previously when requesting token (before redirecting customer to Veritrans payment page.), there is a possibility that the http(s) POST request is not coming from Veritrans. 
+		// Don't update your payment status. 
+		// To make sure, check your Merchant Administration Portal (MAP) at https://payments.veritrans.co.id/map/
+	}
+}
+```
+
 ### V2 API
 
 If you set the `version` to `2`, you have to set your keys by setting the `server_key` property with the Server Key from your account. The server key can be obtained [here](https://my.sandbox.veritrans.co.id/settings/config_info)
@@ -332,48 +366,13 @@ try {
 }
 ```
 
-## STEP 4:  Redirecting user to Veritrans payment page
-
-**Prepare the FORM to redirect the customer**
-	
-
-
-### STEP 3 : Responding Veritrans payment notification
-After the payment process is completed, Veritrans will send HTTP(S) POST notification to merchant's web server.
-As a merchant, you need to process this POST paramters to update order status in your database server. Veritrans will send 3 POST parameters: `orderId`, `mStatus`, and `TOKEN_MERCHANT`.
-
-```php
-$notification = new VeritransNotification();
-
-if($notification->mStatus == "fatal")
-{
-	// Veritrans internal system error. Please contact Veritrans Support if this occurs.
-}
-else
-{
-	// TODO: Retrieve order info from your database to check the token_merchant for security purpose.
-	// The token_merchant that you get from this http(s) POST notification must be the same as token_merchant that you get previously when requesting token (before redirecting customer to Veritrans payment page.)
-
-	//$order = Order::find('order_id' => $notification->orderId);
-
-	if($order['TOKEN_MERCHANT'] == $notification->TOKEN_MERCHANT )
-	{
-		// TODO: update order payment status on your database. 3 possibilities $notification->mStatus responses from Veritrans: 'success', 'failure', and 'challenge'
-		// $order['payment_status'] = $notification->mStatus; 
-		// $order->save();
-	}
-	else
-	{
-		// If token_merchant that you get from this http(s) POST request is different with token_merchant that you get previously when requesting token (before redirecting customer to Veritrans payment page.), there is a possibility that the http(s) POST request is not coming from Veritrans. 
-		// Don't update your payment status. 
-		// To make sure, check your Merchant Administration Portal (MAP) at https://payments.veritrans.co.id/map/
-	}
-}
-```
-
 ## Contributing
 
 ### Developing e-commerce plug-ins
+
+There are several guides that must be taken care of when you develop new plugins.
+
+1. __Handling currency other than IDR.__ Veritrans `v1` and `v2` currently accepts payments in Indonesian Rupiah only. As a corrolary, there is a validation on the server to check whether the item prices are in integer or not. As much as you are tempted to round-off the price, DO NOT do that! Always prepare when your system uses currencies other than IDR, convert them to IDR accordingly, and only round the price AFTER that.
 
 ### Developing API for new API versions
 
