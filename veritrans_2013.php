@@ -112,7 +112,7 @@ class Veritrans2013 {
     }
     else {
       // Veritrans doesn't return tokens
-      $this->errors = $result['errors'];
+      $this->veritrans->errors = $result['errors'];
       return false;
     }
   }
