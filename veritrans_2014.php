@@ -116,6 +116,6 @@ class Veritrans2014 {
   }
 
   protected function _getBaseUrl() {
-    return ($this->environment == \Veritrans::ENVIRONMENT_PRODUCTION ? self::PRODUCTION_ENDPOINT_URL : self::DEV_ENDPOINT_URL);
+    return ($this->veritrans->environment == \Veritrans::ENVIRONMENT_PRODUCTION ? self::PRODUCTION_ENDPOINT_URL : self::DEV_ENDPOINT_URL);
   }
 }

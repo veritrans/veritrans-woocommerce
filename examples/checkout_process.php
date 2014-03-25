@@ -51,14 +51,13 @@ $veritrans->error_payment_return_url	= "http://apple.com/error_payment";
 // Payment options
 // $veritrans->enable_3d_secure	= 1;
 // $veritrans->bank 				= "bni";
-// $veritrans->installment_banks 	= array("bni", "cimb");
+$veritrans->installment_banks 	= array("bni");
 // $veritrans->promo_bins			= array("411111", "444444");
 // $veritrans->point_banks			= array("bni", "cimb");
 // $veritrans->payment_methods		= array("credit_card", "mandiri_clickpay");
-// $veritrans->installment_terms   = array(
-// 	'bni' => array(3,12),
-// 	'cimb' => array(3, 6, 12)
-// 	);
+$veritrans->installment_terms   = array(
+	'bni' => array(3)
+	);
 
 // Set commodity items. This is just sample items.
 // TODO: Change with your actual items.
