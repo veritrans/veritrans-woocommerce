@@ -76,7 +76,12 @@ class Veritrans
 
   public function __get($property) 
   {
-    return $this->data[$property];
+    if (array_key_exists($property, $this->data)) {
+      return $this->data[$property];
+    } else
+    {
+      return NULL;
+    }
   }
 
   public function __set($property, $value) 
@@ -92,6 +97,7 @@ class Veritrans
     $this->environment = self::ENVIRONMENT_DEVELOPMENT;
     $this->veritrans_method = self::VT_WEB;
     $this->veritrans_factory = new Veritrans\Factory($this);
+    $this->enable_3d_secure = FALSE;
   }
 
   public function getTokens()

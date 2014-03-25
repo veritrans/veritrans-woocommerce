@@ -55,14 +55,29 @@ class Veritrans2013 {
       'unfinish_payment_return_url' => $this->veritrans->unfinish_payment_return_url,
       'error_payment_return_url'    => $this->veritrans->error_payment_return_url,
 
-      'enable_3d_secure'            => $this->veritrans->enable_3d_secure, 
-      'bank'                        => $this->veritrans->bank,
-      'installment_banks'           => $this->veritrans->installment_banks, //array ["bni", "cimb"]
-      'promo_bins'                  => $this->veritrans->promo_bins,
-      'point_banks'                 => $this->veritrans->point_banks,
-      'payment_methods'             => $this->veritrans->payment_methods, //array ["credit_card", "mandiri_clickpay"]
-      'installment_terms'           => $this->veritrans->installment_terms
+      // 'enable_3d_secure'            => $this->veritrans->enable_3d_secure, 
+      // 'bank'                        => $this->veritrans->bank,
+      // 'installment_banks'           => $this->veritrans->installment_banks, //array ["bni", "cimb"]
+      // 'promo_bins'                  => $this->veritrans->promo_bins,
+      // 'point_banks'                 => $this->veritrans->point_banks,
+      // 'payment_methods'             => $this->veritrans->payment_methods, //array ["credit_card", "mandiri_clickpay"]
+      // 'installment_terms'           => $this->veritrans->installment_terms
       );
+
+    $optional_features =  array(
+      'enable_3d_secure',
+      'bank',
+      'installment_terms',
+      'promo_bins',
+      'point_banks',
+      'payment_methods',
+      'installment_terms'
+      );
+
+    foreach ($optional_features as $feature) {
+      if (!is_null($this->veritrans->{$feature}))
+        $data[$feature] = $this->veritrans->{$feature};
+    }
 
     // Populate items
     $data['repeat_line'] = 0;
