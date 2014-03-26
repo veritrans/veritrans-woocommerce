@@ -71,7 +71,7 @@ class Veritrans2013 {
       'promo_bins',
       'point_banks',
       'payment_methods',
-      'installment_terms'
+      'installment_banks'
       );
 
     foreach ($optional_features as $feature) {

@@ -64,6 +64,9 @@
 		<input name="shipping_postal_code" size="30" type="text" value="12345"><br /><br />
 		<label>Phone</label><br />
 		<input name="shipping_phone" size="30" type="text" value="08112312312312"><br /><br />
+
+		<input type="text" name="installment_banks[]" value="bni">
+		<input type="text" name="installment_terms[bni][]" value="3">
 		
 		<input id="submit_btn" type="submit" value="Pay with Veritrans VT-Web" />
 	</form>
