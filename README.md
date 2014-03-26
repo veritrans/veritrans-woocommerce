@@ -225,7 +225,7 @@ There are myriads of options to be set with Veritrans. Please consult [this page
 	$veritrans->point_banks	= array("bni", "cimb");
 	```
 
-- __Setting the available payment methods for the VT-Web:__
+- __Setting the available payment methods:__
 	```php
 	$veritrans->payment_methods	= array("credit_card", "mandiri_clickpay");
 	```
@@ -295,7 +295,7 @@ Soon after the PHP code above, add the following form:
 </body>
 ```
 
-#### Responding to V1 VT-Web payment notification
+#### Responding to V1 payment notification
 
 After the payment process is completed, Veritrans will send HTTP(S) POST notification to merchant's web server.
 As a merchant, you need to process this POST paramters to update order status in your database server. Veritrans will send 3 POST parameters: `orderId`, `mStatus`, and `TOKEN_MERCHANT`.

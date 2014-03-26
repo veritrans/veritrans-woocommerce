@@ -1,5 +1,11 @@
 <?php
-require '../veritrans_notification.php';
+require '../../../veritrans_notification.php';
+
+$json_result = file_get_contents('php://input');
+error_log($json_result);
+var_dump($json_result);
+var_dump($_GET);
+var_dump($_POST);
 
 $notification = new VeritransNotification();
 

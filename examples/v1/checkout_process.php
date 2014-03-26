@@ -6,7 +6,7 @@ if(empty($_POST))
 	exit;
 }
 
-require '../veritrans.php';
+require '../../veritrans.php';
 
 //TODO: Change with your actual merchant id and merchant hash key
 $MERCHANT_ID = 'T100000000000001001862';
@@ -44,20 +44,20 @@ $veritrans->shipping_phone 			= $_POST['shipping_phone'];
 $veritrans->email 					= $_POST['email'];
 
 // Configure redirect url. [Optional. Can also be set at Merchant Administration Portal(MAP)]
-$veritrans->finish_payment_return_url 	= "http://lvh.me/finish_payment";
-$veritrans->unfinish_payment_return_url	= "http://lvh.me/unfinish_payment";
-$veritrans->error_payment_return_url	= "http://lvh.me/error_payment";
+$veritrans->finish_payment_return_url 	= "http://lvh.me/veritrans-php/v1/notification_handler.php";
+$veritrans->unfinish_payment_return_url	= "http://lvh.me/veritrans-php/v1/notification_handler.php";
+$veritrans->error_payment_return_url	= "http://lvh.me/veritrans-php/v1/notification_handler.php";
 
 // Payment options
 // $veritrans->enable_3d_secure	= 1;
 // $veritrans->bank 				= "bni";
-$veritrans->installment_banks 	= array("bni");
+// $veritrans->installment_banks 	= array("bni");
 // $veritrans->promo_bins			= array("411111", "444444");
 // $veritrans->point_banks			= array("bni", "cimb");
 // $veritrans->payment_methods		= array("credit_card", "mandiri_clickpay");
-$veritrans->installment_terms   = array(
-	'bni' => array(3)
-	);
+// $veritrans->installment_terms   = array(
+// 	'bni' => array(3)
+// 	);
 
 // Set commodity items. This is just sample items.
 // TODO: Change with your actual items.

@@ -16,7 +16,7 @@ class Veritrans2014 {
     $this->veritrans = $veritrans;
   }
 
-  public function getTokens()
+  public function getTokens($options)
   {
     $ch = curl_init();
     
@@ -43,7 +43,7 @@ class Veritrans2014 {
 
   protected function _getPaymentType()
   {
-    return ($this->veritrans->payment_type == \Veritrans::VT_DIRECT ? 'CREDIT_CARD' : 'VTWEB');
+    return ($this->veritrans->payment_type == \Veritrans::VT_DIRECT ? 'credit_cart' : 'vtweb');
   }
 
   protected function _getAddress()
@@ -85,8 +85,11 @@ class Veritrans2014 {
     $data['payment_type'] = $this->_getPaymentType();
     $payment_type_str = strtolower($this->_getPaymentType());
     $data[$payment_type_str] = array();
-    $data[$payment_type_str]['enabled_payments'] = array();
-    $data[$payment_type_str]['enabled_payments'][] = 'credit_card';
+    $data[$payment_type_str]['enabled_payments'] = $this->veritrans->payment_methods;
+    if ($payment_type_str == 'credit_card')
+    {
+      $data[$payment_type_str]['token_id'] = $this->veritrans->token_id;
+    }
     
     $data['transaction_details'] = array();
     $data['transaction_details']['order_id'] = $this->veritrans->order_id;
@@ -110,6 +113,9 @@ class Veritrans2014 {
     $data['customer_details']['billing_address']['postal_code'] = $this->veritrans->postal_code;
     $data['customer_details']['billing_address']['phone'] = $this->veritrans->phone;
     $data['customer_details']['billing_address']['country_code'] = $this->veritrans->country_code;
+
+    if ($this->veritrans->enable_3d_secure)
+      $data['secure'] = TRUE;
 
     return $data;
         

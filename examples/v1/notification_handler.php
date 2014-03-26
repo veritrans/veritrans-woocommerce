@@ -1,14 +1,18 @@
 <?php
-require '../veritrans_notification.php';
+require '../../veritrans_notification.php';
 
 $notification = new VeritransNotification();
 
 if($notification->mStatus == "fatal")
 {
 	// Veritrans internal system error. Please contact Veritrans Support if this occurs.
+	echo 'order failed!';
 }
 else
 {
+	
+	var_dump($notification);
+
 	// TODO: Retrieve order info from your database to check the token_merchant for security purpose.
 	// The token_merchant that you get from this http(s) POST notification must be the same as token_merchant that you get previously when requesting token (before redirecting customer to Veritrans payment page.)
 

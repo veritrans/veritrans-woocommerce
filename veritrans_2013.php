@@ -15,7 +15,7 @@ class Veritrans2013 {
     $this->veritrans = $veritrans;
   }
 
-  public function getTokens()
+  public function getTokens($options)
   {    
     // Generate merchant hash code
 

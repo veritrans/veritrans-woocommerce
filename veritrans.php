@@ -100,9 +100,9 @@ class Veritrans
     $this->enable_3d_secure = FALSE;
   }
 
-  public function getTokens()
+  public function getTokens($options = array())
   {
-    return $this->veritrans_factory->get()->getTokens();
+    return $this->veritrans_factory->get()->getTokens($options);
   }
 
   public function getData()
