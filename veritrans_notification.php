@@ -5,34 +5,37 @@
 class VeritransNotification
 {
 
-  private $mStatus; 
-  private $orderId;
-  private $TOKEN_MERCHANT;
+  private $data = array();
+
+  // private $mStatus; 
+  // private $orderId;
+  // private $TOKEN_MERCHANT;
   
 
   public function __get($property) 
   {
-    if (property_exists($this, $property))
+    if (array_key_exists($property, $this->data)) {
+      return $this->data[$property];
+    } else
     {
-      return $this->$property;
+      return NULL;
     }
   }
 
   public function __set($property, $value) 
   {
-    if (property_exists($this, $property)) 
-    {
-      $this->$property = $value;
-    }
-
-    return $this;
+    $this->data[$property] = $value;
+    return $value;
   }
 
   function __construct($params = null) 
   {
     if(is_null($params)) {
-      $params = json_decode(file_get_contents('php://input')); 
+      $params = json_decode(file_get_contents('php://input'));
     }
+
+    var_dump($_GET);
+    var_dump($_POST);
 
     foreach($params as $key => $value){
       $this->$key = $value;
