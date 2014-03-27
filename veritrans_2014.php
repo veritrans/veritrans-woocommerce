@@ -16,6 +16,11 @@ class Veritrans2014 {
     $this->veritrans = $veritrans;
   }
 
+  public function charge($options)
+  {
+    
+  }
+
   public function getTokens($options)
   {
     $ch = curl_init();

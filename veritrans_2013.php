@@ -5,6 +5,7 @@ namespace Veritrans;
 require_once 'lib/hash_generator.php';
 require_once 'lib/Pest.php';
 require_once 'lib/PestJSON.php';
+require_once 'veritrans_utility.php';
 
 class Veritrans2013 {
 
@@ -15,10 +16,70 @@ class Veritrans2013 {
     $this->veritrans = $veritrans;
   }
 
-  public function getTokens($options)
-  {    
-    // Generate merchant hash code
+  public function charge($options)
+  {
+    $data = array(
+      'token_id' => $this->veritrans->token_id,
+      'order_id' => $this->veritrans->order_id,
+      'email' => $this->veritrans->email
+      );
+    if ($this->veritrans->required_shipping_address)
+    {
+      if ($this->veritrans->billing_different_with_shipping)
+      {
+        $data['shipping_address'] = array(
+          'first_name' => $this->veritrans->shipping_first_name,
+          'last_name' => $this->veritrans->shipping_last_name,
+          'address1' => $this->veritrans->shipping_address1,
+          'address2' => $this->veritrans->shipping_address2,
+          'city' => $this->veritrans->shipping_city,
+          'postal_code' => $this->veritrans->shipping_postal_code,
+          'phone' => $this->veritrans->shipping_phone
+          );
+      } else
+      {
+        $data['shipping_address'] = array(
+          'first_name' => $this->veritrans->first_name,
+          'last_name' => $this->veritrans->last_name,
+          'address1' => $this->veritrans->address1,
+          'address2' => $this->veritrans->address2,
+          'city' => $this->veritrans->city,
+          'postal_code' => $this->veritrans->postal_code,
+          'phone' => $this->veritrans->phone
+          );
+      }
+    }
+    $data['billing_address'] = array(
+      'first_name' => $this->veritrans->first_name,
+      'last_name' => $this->veritrans->last_name,
+      'address1' => $this->veritrans->address1,
+      'address2' => $this->veritrans->address2,
+      'city' => $this->veritrans->city,
+      'postal_code' => $this->veritrans->postal_code,
+      'phone' => $this->veritrans->phone
+      );
+    $items = array();
+    foreach ($this->veritrans->items as $item) {
+      $new_item = array(
+        'id' => $item['item_id'],
+        'price' => $item['price'],
+        'qty' => $item['quantity'],
+        'name' => $item['item_name1']
+        );
+      $items[] = $new_item;
+    }
+    $data['order_items'] = $items;
+    $subtotal = 0;
+    foreach ($data['order_items'] as $item) {
+      $subtotal += $item['price'] * $item['qty'];
+    }
+    $data['gross_amount'] = $subtotal;
+    return Utility::remoteCall('https://payments.veritrans.co.id/vtdirect/v1/charges', $this->veritrans->server_key, $data);
+  }
 
+  public function getTokens($options)
+  {
+    // Generate merchant hash code
     $hash = \HashGenerator::generate($this->veritrans->merchant_id, $this->veritrans->merchant_hash_key, $this->veritrans->order_id);
 
     // populate parameters for the post request

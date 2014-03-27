@@ -20,58 +20,6 @@ class Veritrans
 
   private $data = array();
 
-  //// Required parameters
-  // private $version = 1;
-  // private $merchant_id;
-  // private $merchant_hash_key;
-
-  //// private $order_id;
-  // private $billing_different_with_shipping;
-  // private $required_shipping_address;
-  
-  //// Shipping info [Required field if required_shipping_address = 1]
-  // private $shipping_first_name;
-  // private $shipping_last_name;
-  // private $shipping_address1;
-  // private $shipping_address2;
-  // private $shipping_city;
-  // private $shipping_country_code;
-  // private $shipping_postal_code;
-  // private $shipping_phone;
-  // private $email;
-  
-  //// Billing info [optional]
-  // private $first_name;
-  // private $last_name;
-  // private $address1;
-  // private $address2;
-  // private $city;
-  // private $country_code;
-  // private $postal_code;
-  // private $phone; 
-
-  //// Payment options [optional]
-  // private $payment_methods;
-  // private $promo_bins;
-  // private $enable_3d_secure;
-  // private $point_banks;
-  // private $installment_banks; 
-  // private $installment_terms;   
-
-  // private $bank;
-
-  //// Redirect url configuration [optional. Can also be set at Merchant Administration Portal(MAP)]
-  // private $finish_payment_return_url;
-  // private $unfinish_payment_return_url;
-  // private $error_payment_return_url;
-  
-  /*
-    Sample of array of commodity items
-    array (
-      array("item_id" => 'sku1', "price" => 10000, "quantity" => 2, "item_name1" => 'Kaos', "item_name2" => 'T-Shirt'),
-      array("item_id" => 'sku2', "price" => 20000, "quantity" => 1, "item_name1" => 'Celana', "item_name2" => 'Pants')
-      )
-  */
   private $items;
 
   public function __get($property) 
@@ -103,6 +51,11 @@ class Veritrans
   public function getTokens($options = array())
   {
     return $this->veritrans_factory->get()->getTokens($options);
+  }
+
+  public function charge($options = array())
+  {
+    return $this->veritrans_factory->get()->charge($options);
   }
 
   public function getData()
