@@ -18,7 +18,7 @@ class Veritrans2014 {
 
   public function charge($options)
   {
-    
+    return $this->getTokens($options);
   }
 
   public function getTokens($options)
@@ -48,7 +48,7 @@ class Veritrans2014 {
 
   protected function _getPaymentType()
   {
-    return ($this->veritrans->payment_type == \Veritrans::VT_DIRECT ? 'credit_cart' : 'vtweb');
+    return ($this->veritrans->payment_type == \Veritrans::VT_DIRECT ? 'credit_card' : 'vtweb');
   }
 
   protected function _getAddress()
