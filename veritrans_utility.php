@@ -8,10 +8,12 @@ class Utility {
   {
     $ch = curl_init();
     
-    $body = json_encode($data_hash);
-
+    if ($data_hash) {
+      $body = json_encode($data_hash);
+      curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
+    }
+    
     curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
     curl_setopt($ch, CURLOPT_HTTPHEADER, array(
       'Content-Type: application/json',
       'Accept: application/json',

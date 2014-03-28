@@ -3,6 +3,7 @@
 namespace Veritrans;
 
 require_once 'veritrans.php';
+require_once 'veritrans_utility.php';
 
 class Veritrans2014 {
 
@@ -14,6 +15,12 @@ class Veritrans2014 {
   public function __construct($veritrans)
   {
     $this->veritrans = $veritrans;
+  }
+
+  public function confirm($transaction_id)
+  {
+    $uri = "/$transaction_id/status";
+    return Utilily::remoteCall($this->_getBaseUrl() . $uri, $this->veritrans->server_key, NULL);
   }
 
   public function charge($options)
