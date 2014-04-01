@@ -129,9 +129,6 @@ class Veritrans2014 {
     if ($this->veritrans->enable_3d_secure)
       $data['secure'] = TRUE;
 
-    if ($this->veritrans->enforce_sanitization)
-      $this->_sanitize();
-
     return $data;
         
   }
