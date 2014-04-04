@@ -11,7 +11,8 @@ class Veritrans2014 {
   const PRODUCTION_ENDPOINT_URL = 'https://api.veritrans.co.id/v2';
 
   private $veritrans;
-  
+  private $sanitizers;
+
   public function __construct($veritrans)
   {
     $this->veritrans = $veritrans;
@@ -128,6 +129,9 @@ class Veritrans2014 {
 
     if ($this->veritrans->enable_3d_secure)
       $data['secure'] = TRUE;
+
+    if ($this->veritrans->enforce_sanitization)
+      $this->_sanitize();
 
     return $data;
         
