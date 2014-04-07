@@ -232,6 +232,14 @@ There are myriads of options to be set with Veritrans. Please consult [this page
 	$veritrans->payment_methods	= array("credit_card", "mandiri_clickpay");
 	```
 
+### Forcing sanitization
+
+If you don't want to sanitize the parameters above yourself based on rules [here](http://docs.veritrans.co.id/vtweb/api.html) and [here](http://docs.veritrans.co.id/vtdirect/integrating_vtdirect.html), it is HIGHLY recommended to turn on the auto-sanitization feature.
+
+```php
+$veritrans->force_sanitization = TRUE; // defaults to FALSE
+```
+
 ## Step 2: Using the API
 
 Before you can start using the wrapper, you have to set your API keys in order to let yourself get authenticated by Veritrans API. The methods to set the keys and the response are different for each API version.
@@ -411,6 +419,8 @@ try {
 There are several guides that must be taken care of when you develop new plugins.
 
 1. __Handling currency other than IDR.__ Veritrans `v1` and `v2` currently accepts payments in Indonesian Rupiah only. As a corrolary, there is a validation on the server to check whether the item prices are in integer or not. As much as you are tempted to round-off the price, DO NOT do that! Always prepare when your system uses currencies other than IDR, convert them to IDR accordingly, and only round the price AFTER that.
+
+2. Consider using the __auto-sanitization__ feature.
 
 ### Developing API for new API versions
 
