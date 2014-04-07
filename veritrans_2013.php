@@ -86,33 +86,83 @@ class Veritrans2013 {
 
     // populate parameters for the post request
     $data = array(
-      'version'                     => $this->veritrans->version,
-      'merchant_id'                 => $this->veritrans->merchant_id,
-      'merchanthash'                => $hash,
-    
-      'order_id'                        => $this->veritrans->order_id,
-      'billing_different_with_shipping' => $this->veritrans->billing_different_with_shipping,
-      'required_shipping_address'       => $this->veritrans->required_shipping_address,
-    
-      'shipping_first_name'         => $this->veritrans->shipping_first_name,
-      'shipping_last_name'          => $this->veritrans->shipping_last_name,
-      'shipping_address1'           => $this->veritrans->shipping_address1,
-      'shipping_address2'           => $this->veritrans->shipping_address2,
-      'shipping_city'               => $this->veritrans->shipping_city,
-      'shipping_country_code'       => $this->veritrans->shipping_country_code,
-      'shipping_postal_code'        => $this->veritrans->shipping_postal_code,
-      'shipping_phone'              => $this->veritrans->shipping_phone,
-
-      'email'                       => $this->veritrans->email, 
+      'version' => $this->veritrans->version,
       
-      'first_name'                  => $this->veritrans->first_name,
-      'last_name'                   => $this->veritrans->last_name,
-      'postal_code'                 => $this->veritrans->postal_code,
-      'address1'                    => $this->veritrans->address1,
-      'address2'                    => $this->veritrans->address2,
-      'city'                        => $this->veritrans->city,
-      'country_code'                => $this->veritrans->country_code,
-      'phone'                       => $this->veritrans->phone,      
+      'merchant_id' => $this->veritrans->merchant_id,
+      
+      'merchanthash' => $hash,
+    
+      'order_id' => $this->veritrans->order_id,
+      
+      'billing_different_with_shipping' => $this->veritrans->billing_different_with_shipping,
+      
+      'required_shipping_address' => $this->veritrans->required_shipping_address,
+    
+      'shipping_first_name' => $this->_sanitize($this->veritrans->shipping_first_name, function($string) {
+        return Sanitizer::create($string)->whitelist('a-z A-Z')->length(20)->run();
+        }),
+      
+      'shipping_last_name' => $this->_sanitize($this->veritrans->shipping_last_name, function($string) {
+        return Sanitizer::create($string)->whitelist('a-z A-Z')->length(20)->run();
+        }),
+      
+      'shipping_address1' => $this->_sanitize($this->veritrans->shipping_address1, function($string) {
+        return Sanitizer::create($string)->whitelist('a-zA-Z0-9-_\',.@()\/ \\\\')->length(100)->run();
+        }),
+      
+      'shipping_address2' => $this->_sanitize($this->veritrans->shipping_address2, function($string) {
+        return Sanitizer::create($string)->whitelist('a-zA-Z0-9-_\',.@()\/ \\\\')->length(100)->run();
+        }),
+      
+      'shipping_city' => $this->_sanitize($this->veritrans->shipping_city, function($string) {
+        return Sanitizer::create($string)->whitelist('a-zA-Z-_\', .@')->length(20)->run();
+        }),
+
+      'shipping_country_code' => $this->_sanitize($this->veritrans->shipping_country_code, function($string) {
+        return Sanitizer::create($string)->to_iso_3166_1_alpha_3()->run();
+        }),
+
+      'shipping_postal_code' => $this->_sanitize($this->veritrans->shipping_postal_code, function($string) {
+        return Sanitizer::create($string)->whitelist('0-9')->length(9)->run();
+        }),
+
+      'shipping_phone' => $this->_sanitize($this->veritrans->shipping_phone, function($string) {
+        return Sanitizer::create($string)->whitelist('+0-9 -')->length(19)->run();
+        }),
+
+      'email' => $this->veritrans->email, 
+      
+      'first_name' => $this->_sanitize($this->veritrans->first_name, function($string) {
+        return Sanitizer::create($string)->whitelist('a-z A-Z')->length(20)->run();
+        }),
+
+      'last_name' => $this->_sanitize($this->veritrans->last_name, function($string) {
+        return Sanitizer::create($string)->whitelist('a-z A-Z')->length(20)->run();
+        }),
+
+      'postal_code' => $this->_sanitize($this->veritrans->postal_code, function($string) {
+        return Sanitizer::create($string)->whitelist('0-9')->length(9)->run();
+        }),
+
+      'address1' => $this->_sanitize($this->veritrans->address1, function($string) {
+        return Sanitizer::create($string)->whitelist('a-zA-Z0-9-_\',.@()\/ \\\\')->length(100)->run();
+        }),
+
+      'address2' => $this->_sanitize($this->veritrans->address2, function($string) {
+        return Sanitizer::create($string)->whitelist('a-zA-Z0-9-_\',.@()\/ \\\\')->length(100)->run();
+        }),
+
+      'city' => $this->_sanitize($this->veritrans->city, function($string) {
+        return Sanitizer::create($string)->whitelist('a-zA-Z-_\', .@')->length(20)->run();
+        }),
+
+      'country_code' => $this->_sanitize($this->veritrans->country_code, function($string) {
+        return Sanitizer::create($string)->to_iso_3166_1_alpha_3()->run();
+        }),
+
+      'phone' => $this->_sanitize($this->veritrans->phone, function($string) {
+        return Sanitizer::create($string)->whitelist('+0-9 -')->length(19)->run();
+        }),
       
       'finish_payment_return_url'   => $this->veritrans->finish_payment_return_url,
       'unfinish_payment_return_url' => $this->veritrans->unfinish_payment_return_url,
@@ -137,13 +187,24 @@ class Veritrans2013 {
     // Populate items
     $data['repeat_line'] = 0;
     foreach ($this->veritrans->items as $item) {
-      $item_id[]    = $item['item_id'];
-      $item_name1[] = $item['item_name1'];
-      $item_name2[] = $item['item_name2'];
+      
+      $item_id[] = $this->_sanitize($item['item_id'], function($string) {
+        return Sanitizer::create($string)->whitelist('a-zA-Z0-9')->length(12)->run();
+        });
+
+      $item_name1[] = $this->_sanitize($item['item_name1'], function($string) {
+        return Sanitizer::create($string)->whitelist('a-zA-Z0-9 -_\',.@&+\/')->length(20)->run();
+        });
+
+      $item_name2[] = $this->_sanitize($item['item_name2'], function($string) {
+        return Sanitizer::create($string)->whitelist('a-zA-Z0-9 -_\',.@&+\/')->length(20)->run();
+        });
+
       $price[]      = $item['price'];
+
       $quantity[]   = $item['quantity'];
       
-      $data['repeat_line'] ++;
+      $data['repeat_line']++;
     }
 
     $data['item_id']    = $item_id;
@@ -174,20 +235,15 @@ class Veritrans2013 {
     }
   }
 
-  public function getSanitizers()
+  protected function _sanitize($string, $function)
   {
-    return array(
-      1 => array(
-        \Veritrans::VT_WEB => array(
-          'first_name' => function($string) { return Sanitizer::create($string)->whitelist('a-z A-Z')->length(20)->run(); },
-          'last_name' => function($string) { return Sanitizer::create($string)->whitelist('a-z A-Z')->length(20)->run(); },
-          'item_id' => function($string) { return Sanitizer::create($string)->whitelist('a-zA-Z0-9')->length(12)->run(); },
-          'item_name1' => function($string) { return Sanitizer::create($string)->whitelist('a-zA-Z0-9 -_,.@&+/ ')->length(20)->run(); },
-          'item_name2' => function($string) { return Sanitizer::create($string)->whitelist('a-zA-Z0-9 -_,.@&+/ ')->length(20)->run(); },
-          ),
-        \Veritrans::VT_DIRECT => array(
-          )
-        )
-      );
+    if ($this->veritrans->force_sanitization)
+    {
+      return call_user_func($function, $string);
+    } else
+    {
+      return $string;
+    }
   }
+
 }

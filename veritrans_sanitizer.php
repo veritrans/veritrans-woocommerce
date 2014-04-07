@@ -3,6 +3,8 @@
 // usage: $fname = new Sanitizer($string)->length(20)->whitelist("0-9")->run();
 namespace Veritrans;
 
+require 'isocountry.php';
+
 class Sanitizer {
 
   public $string;
@@ -44,7 +46,14 @@ class Sanitizer {
   public function to_iso_3166_1_alpha_3()
   {
     array_push($this->order, function($string) {
-      return $string;
+      $isoCountry = new \ISOCountry();
+      if (array_key_exists(strtoupper($string), $isoCountry->isoA3))
+      {
+        return $isoCountry->isoA3[strtoupper($string)];
+      } else
+      {
+        return 'IDN';
+      }
     });
     return $this;
   }
