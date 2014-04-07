@@ -9,8 +9,8 @@ if(empty($_POST))
 require '../../veritrans.php';
 
 //TODO: Change with your actual merchant id and merchant hash key
-$MERCHANT_ID = 'A100000000000001000012';
-$MERCHANT_HASH_KEY = 'd1832e368b101a814dd3f44b4b6305d50bb0bcca910b6055e406404e0ed33634';
+$MERCHANT_ID = 'T100000000000001002793';
+$MERCHANT_HASH_KEY = '38576e0919d02d342cab80b968be50c6c1467be63a5e30453efea0739fc09b16';
 
 $veritrans = new Veritrans();
 
@@ -90,8 +90,6 @@ $veritrans->force_sanitization = TRUE;
 if ($_POST['payment_type'] == 'vtdirect')
 {
 	$keys = $veritrans->charge();
-
-	var_dump($charge);
 	
 } else {
 	//Call Veritrans VT-Web API Get Token

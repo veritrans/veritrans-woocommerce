@@ -30,43 +30,43 @@ class Veritrans2013 {
       if ($this->veritrans->billing_different_with_shipping)
       {
         $data['shipping_address'] = array(
-          'first_name' => $this->veritrans->shipping_first_name,
-          'last_name' => $this->veritrans->shipping_last_name,
-          'address1' => $this->veritrans->shipping_address1,
-          'address2' => $this->veritrans->shipping_address2,
-          'city' => $this->veritrans->shipping_city,
-          'postal_code' => $this->veritrans->shipping_postal_code,
-          'phone' => $this->veritrans->shipping_phone
+          'first_name' => $this->_sanitize($this->veritrans->shipping_first_name, 'nameVTDirect'),
+          'last_name' => $this->_sanitize($this->veritrans->shipping_last_name, 'nameVTDirect'),
+          'address1' => $this->_sanitize($this->veritrans->shipping_address1, 'addressVTDirect'),
+          'address2' => $this->_sanitize($this->veritrans->shipping_address2, 'addressVTDirect'),
+          'city' => $this->_sanitize($this->veritrans->shipping_city, 'cityVTDirect'),
+          'postal_code' => $this->_sanitize($this->veritrans->shipping_postal_code, 'postalCodeVTDirect'),
+          'phone' => $this->_sanitize($this->veritrans->shipping_phone, 'phoneVTDirect')
           );
       } else
       {
         $data['shipping_address'] = array(
-          'first_name' => $this->veritrans->first_name,
-          'last_name' => $this->veritrans->last_name,
-          'address1' => $this->veritrans->address1,
-          'address2' => $this->veritrans->address2,
-          'city' => $this->veritrans->city,
-          'postal_code' => $this->veritrans->postal_code,
-          'phone' => $this->veritrans->phone
+          'first_name' => $this->_sanitize($this->veritrans->first_name, 'nameVTDirect'),
+          'last_name' => $this->_sanitize($this->veritrans->last_name, 'nameVTDirect'),
+          'address1' => $this->_sanitize($this->veritrans->address1, 'addressVTDirect'),
+          'address2' => $this->_sanitize($this->veritrans->address2, 'addressVTDirect'),
+          'city' => $this->_sanitize($this->veritrans->city, 'cityVTDirect'),
+          'postal_code' => $this->_sanitize($this->veritrans->postal_code, 'postalCodeVTDirect'),
+          'phone' => $this->_sanitize($this->veritrans->phone, 'phoneVTDirect')
           );
       }
     }
     $data['billing_address'] = array(
-      'first_name' => $this->veritrans->first_name,
-      'last_name' => $this->veritrans->last_name,
-      'address1' => $this->veritrans->address1,
-      'address2' => $this->veritrans->address2,
-      'city' => $this->veritrans->city,
-      'postal_code' => $this->veritrans->postal_code,
-      'phone' => $this->veritrans->phone
+      'first_name' => $this->_sanitize($this->veritrans->first_name, 'nameVTDirect'),
+      'last_name' => $this->_sanitize($this->veritrans->last_name, 'nameVTDirect'),
+      'address1' => $this->_sanitize($this->veritrans->address1, 'addressVTDirect'),
+      'address2' => $this->_sanitize($this->veritrans->address2, 'addressVTDirect'),
+      'city' => $this->_sanitize($this->veritrans->city, 'cityVTDirect'),
+      'postal_code' => $this->_sanitize($this->veritrans->postal_code, 'postalCodeVTDirect'),
+      'phone' => $this->_sanitize($this->veritrans->phone, 'phoneVTDirect')
       );
     $items = array();
     foreach ($this->veritrans->items as $item) {
       $new_item = array(
-        'id' => $item['item_id'],
+        'id' => $this->_sanitize($item['item_id'], 'itemIdVTDirect'),
         'price' => $item['price'],
         'qty' => $item['quantity'],
-        'name' => $item['item_name1']
+        'name' => $this->_sanitize($item['item_name1'], 'itemNameVTDirect')
         );
       $items[] = $new_item;
     }
@@ -161,8 +161,6 @@ class Veritrans2013 {
       throw $e;
     }
 
-    var_dump($data);
-
     // Check result
     if(!empty($result['token_merchant'])) {
       // OK
@@ -191,14 +189,29 @@ class Veritrans2013 {
     return Sanitizer::create($string)->whitelist('a-z A-Z')->length(20)->run();
   }
 
+  protected function _sanitizeNameVTDirect($string)
+  {
+    return Sanitizer::create($string)->whitelist('a-zA-Z')->length(20)->run();
+  }
+
   protected function _sanitizeAddress($string)
   {
     return Sanitizer::create($string)->whitelist('a-zA-Z0-9-_\',.@()\/ \\\\')->length(100)->run();
   }
 
+  protected function _sanitizeAddressVTDirect($string)
+  {
+    return Sanitizer::create($string)->whitelist('a-zA-Z0-9-_\',.@()\/# \\\\')->length(100)->run();
+  }
+
   protected function _sanitizeCity($string)
   {
     return Sanitizer::create($string)->whitelist('a-zA-Z-_\', .@')->length(20)->run();
+  }
+
+  protected function _sanitizeCityVTDirect($string)
+  {
+    return Sanitizer::create($string)->whitelist('a-zA-Z')->length(20)->run();
   }
 
   protected function _sanitizeCountryCode($string)
@@ -211,9 +224,19 @@ class Veritrans2013 {
     return Sanitizer::create($string)->whitelist('0-9')->length(9)->run();
   }
 
+  protected function _sanitizePostalCodeVTDirect($string)
+  {
+    return Sanitizer::create($string)->whitelist('0-9')->length(10)->run();
+  }
+
   protected function _sanitizePhone($string)
   {
     return Sanitizer::create($string)->whitelist('+0-9 -')->length(19)->run();
+  }
+
+  protected function _sanitizePhoneVTDirect($string)
+  {
+    return Sanitizer::create($string)->whitelist('0-9')->length(10)->run();
   }
 
   protected function _sanitizeItemId($string)
@@ -221,9 +244,19 @@ class Veritrans2013 {
     return Sanitizer::create($string)->whitelist('a-zA-Z0-9')->length(12)->run();
   }
 
+  protected function _sanitizeItemIdVTDirect($string)
+  {
+    return Sanitizer::create($string)->whitelist('a-zA-Z0-9')->length(20)->run();
+  }
+
   protected function _sanitizeItemName($string)
   {
     return Sanitizer::create($string)->whitelist('a-zA-Z0-9 -_\',.@&+\/')->length(20)->run();
+  }
+
+  protected function _sanitizeItemNameVTDirect($string)
+  {
+    return Sanitizer::create($string)->whitelist('a-zA-Z0-9')->length(20)->run();
   }
 
 }
