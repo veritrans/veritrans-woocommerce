@@ -11,6 +11,10 @@
         {
             "name": "Alvin Litani",
             "email": "alvin.litani@veritrans.co.id"
+        },
+        {
+            "name": "Ismail Faruqi",
+            "email": "ismail.faruqi@veritrans.co.id"
         }
     ],
     "require": {

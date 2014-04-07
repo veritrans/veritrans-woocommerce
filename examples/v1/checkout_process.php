@@ -9,8 +9,8 @@ if(empty($_POST))
 require '../../veritrans.php';
 
 //TODO: Change with your actual merchant id and merchant hash key
-$MERCHANT_ID = 'T100000000000001001862';
-$MERCHANT_HASH_KEY = '21565170a5a85543b98b0e34071656c104f31266ff436be07edb2d5a33983f97';
+$MERCHANT_ID = 'A100000000000001000012';
+$MERCHANT_HASH_KEY = 'd1832e368b101a814dd3f44b4b6305d50bb0bcca910b6055e406404e0ed33634';
 
 $veritrans = new Veritrans();
 
@@ -60,7 +60,7 @@ $veritrans->error_payment_return_url	= "http://lvh.me/veritrans-php/v1/notificat
 // $veritrans->installment_banks 	= array("bni");
 // $veritrans->promo_bins			= array("411111", "444444");
 // $veritrans->point_banks			= array("bni", "cimb");
-// $veritrans->payment_methods		= array("credit_card", "mandiri_clickpay");
+$veritrans->payment_methods		= array("credit_card", "mandiri_clickpay");
 // $veritrans->installment_terms   = array(
 // 	'bni' => array(3)
 // 	);
