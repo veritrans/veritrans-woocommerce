@@ -6,6 +6,8 @@ require_once 'lib/hash_generator.php';
 require_once 'lib/Pest.php';
 require_once 'lib/PestJSON.php';
 require_once 'veritrans_utility.php';
+require_once 'veritrans_sanitizer.php';
+require_once 'veritrans.php';
 
 class Veritrans2013 {
 
@@ -115,24 +117,16 @@ class Veritrans2013 {
       'finish_payment_return_url'   => $this->veritrans->finish_payment_return_url,
       'unfinish_payment_return_url' => $this->veritrans->unfinish_payment_return_url,
       'error_payment_return_url'    => $this->veritrans->error_payment_return_url,
-
-      // 'enable_3d_secure'            => $this->veritrans->enable_3d_secure, 
-      // 'bank'                        => $this->veritrans->bank,
-      // 'installment_banks'           => $this->veritrans->installment_banks, //array ["bni", "cimb"]
-      // 'promo_bins'                  => $this->veritrans->promo_bins,
-      // 'point_banks'                 => $this->veritrans->point_banks,
-      // 'payment_methods'             => $this->veritrans->payment_methods, //array ["credit_card", "mandiri_clickpay"]
-      // 'installment_terms'           => $this->veritrans->installment_terms
       );
 
     $optional_features =  array(
       'enable_3d_secure',
       'bank',
-      'installment_terms',
+      'installment_terms', // array ["bni", "cimb"]
       'promo_bins',
       'point_banks',
       'payment_methods',
-      'installment_banks'
+      'installment_banks' // array ["credit_card", "mandiri_clickpay"]
       );
 
     foreach ($optional_features as $feature) {
@@ -166,6 +160,8 @@ class Veritrans2013 {
       throw $e;
     }
 
+    var_dump($data);
+
     // Check result
     if(!empty($result['token_merchant'])) {
       // OK
@@ -176,5 +172,22 @@ class Veritrans2013 {
       $this->veritrans->errors = $result['errors'];
       return false;
     }
+  }
+
+  public function getSanitizers()
+  {
+    return array(
+      1 => array(
+        \Veritrans::VT_WEB => array(
+          'first_name' => function($string) { return Sanitizer::create($string)->whitelist('a-z A-Z')->length(20)->run(); },
+          'last_name' => function($string) { return Sanitizer::create($string)->whitelist('a-z A-Z')->length(20)->run(); },
+          'item_id' => function($string) { return Sanitizer::create($string)->whitelist('a-zA-Z0-9')->length(12)->run(); },
+          'item_name1' => function($string) { return Sanitizer::create($string)->whitelist('a-zA-Z0-9 -_,.@&+/ ')->length(20)->run(); },
+          'item_name2' => function($string) { return Sanitizer::create($string)->whitelist('a-zA-Z0-9 -_,.@&+/ ')->length(20)->run(); },
+          ),
+        \Veritrans::VT_DIRECT => array(
+          )
+        )
+      );
   }
 }

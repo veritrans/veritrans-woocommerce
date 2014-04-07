@@ -85,6 +85,7 @@ $items = array(
 		);
 
 $veritrans->items = $items;
+$veritrans->force_sanitization = TRUE;
 
 if ($_POST['payment_type'] == 'vtdirect')
 {

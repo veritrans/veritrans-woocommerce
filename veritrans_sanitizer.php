@@ -1,11 +1,11 @@
 <?php 
 
-// usage: $fname = new Sanitizer($string).length(20).whitelist("0-9").run();
+// usage: $fname = new Sanitizer($string)->length(20)->whitelist("0-9")->run();
 namespace Veritrans;
 
 class Sanitizer {
 
-  private $string;
+  public $string;
   private $order;
 
   public function __construct($string)
@@ -14,15 +14,20 @@ class Sanitizer {
     $this->order = array();
   }
 
+  public static function create($string)
+  {
+    return new self($string);
+  }
+
   public function length($max_length)
   {
-    array_push($this->order, function($max_length) { 
-      if (strlen($this->string) > $max_length)
+    array_push($this->order, function($string) use ($max_length) { 
+      if (strlen($string) > $max_length)
       {
-        return substr($this->string, 0, $max_length);
+        return substr($string, 0, $max_length);
       } else
       {
-        return $this->string;
+        return $string;
       }
     });
     return $this;
@@ -30,30 +35,36 @@ class Sanitizer {
 
   public function whitelist($whitelist_regex)
   {
-    array_push($this->order, function($whitelist_regex) {
-      return preg_replace('/whitelist_regex/', '', $this->string);
+    array_push($this->order, function($string) use ($whitelist_regex) {
+      return preg_replace('/[^' . $whitelist_regex . ']/', '', $string);
     });
+    return $this;
   }
 
-  public function country()
+  public function to_iso_3166_1_alpha_3()
   {
-    array_push($this->order, function() {
-      return $this->string;
+    array_push($this->order, function($string) {
+      return $string;
     });
+    return $this;
   }
 
-  public function null_fallback($string)
+  public function null_fallback($fallback_string)
   {
-    array_push($this->order, function() {
-      if ($this->string)
-        return $this->string;
-    }); 
+    array_push($this->order, function($string) use ($fallback_string) {
+      if (strlen($string) > 0)
+        return $string;
+      else
+        return $fallback_string;
+    });
+    return $this;
   }
 
   public function run() {
+    $result = $this->string;
     foreach ($this->order as $func) {
-      call_user_func($func);
+      $result = call_user_func($func, $result);
     }
-    return $this->string;
+    return $result;
   }
 }
