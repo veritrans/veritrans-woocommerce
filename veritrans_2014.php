@@ -3,6 +3,7 @@
 namespace Veritrans;
 
 require_once 'veritrans.php';
+require_once 'veritrans_utility.php';
 
 class Veritrans2014 {
 
@@ -10,10 +11,17 @@ class Veritrans2014 {
   const PRODUCTION_ENDPOINT_URL = 'https://api.veritrans.co.id/v2';
 
   private $veritrans;
+  private $sanitizers;
 
   public function __construct($veritrans)
   {
     $this->veritrans = $veritrans;
+  }
+
+  public function confirm($transaction_id)
+  {
+    $uri = "/$transaction_id/status";
+    return Utilily::remoteCall($this->_getBaseUrl() . $uri, $this->veritrans->server_key, NULL);
   }
 
   public function charge($options)
@@ -122,6 +130,9 @@ class Veritrans2014 {
     if ($this->veritrans->enable_3d_secure)
       $data['secure'] = TRUE;
 
+    if ($this->veritrans->enforce_sanitization)
+      $this->_sanitize();
+
     return $data;
         
   }
@@ -129,4 +140,5 @@ class Veritrans2014 {
   protected function _getBaseUrl() {
     return ($this->veritrans->environment == \Veritrans::ENVIRONMENT_PRODUCTION ? self::PRODUCTION_ENDPOINT_URL : self::DEV_ENDPOINT_URL);
   }
+
 }

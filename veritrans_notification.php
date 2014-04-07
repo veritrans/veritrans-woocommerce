@@ -34,9 +34,6 @@ class VeritransNotification
       $params = json_decode(file_get_contents('php://input'));
     }
 
-    var_dump($_GET);
-    var_dump($_POST);
-
     foreach($params as $key => $value){
       $this->$key = $value;
     }

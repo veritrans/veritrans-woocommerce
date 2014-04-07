@@ -232,11 +232,19 @@ There are myriads of options to be set with Veritrans. Please consult [this page
 	$veritrans->payment_methods	= array("credit_card", "mandiri_clickpay");
 	```
 
+### Forcing sanitization
+
+If you don't want to sanitize the parameters above yourself based on rules [here](http://docs.veritrans.co.id/vtweb/api.html) and [here](http://docs.veritrans.co.id/vtdirect/integrating_vtdirect.html), it is HIGHLY recommended to turn on the auto-sanitization feature.
+
+```php
+$veritrans->force_sanitization = TRUE; // defaults to FALSE
+```
+
 ## Step 2: Using the API
 
 Before you can start using the wrapper, you have to set your API keys in order to let yourself get authenticated by Veritrans API. The methods to set the keys and the response are different for each API version.
 
-### V1 API
+#### V1 VT-Web
 
 In the current version (2013), set the `merchant_id` property with your Merchant ID and `merchant_hash_key` with your Merchant Hash Key. Both of them are available [here](https://payments.veritrans.co.id/map).
 
@@ -246,9 +254,7 @@ $veritrans->merchant_id = 'T100000000000001000001';
 $veritrans->merchant_hash_key = '305e0328a366cbce8e17a385435bb7eb3f0cbcfbfc0f1c3ef56b658';
 ```
 
-#### V1 VT-Web
-
-In V1 API, you have to call the `getTokens()` method to obtain `token_merchant` and `token_browser` first, and use them in a `POST` request to enter the VT-Web page. The example below illustrates their usage.
+Next, you have to call the `getTokens()` method to obtain `token_merchant` and `token_browser` first, and use them in a `POST` request to enter the VT-Web page. The example below illustrates their usage.
 
 ```php
 try {
@@ -297,9 +303,9 @@ Soon after the PHP code above, add the following form:
 </body>
 ```
 
-#### Responding to V1 payment notification
+#### Responding to V1 VT-Web payment notification
 
-After the payment process is completed, Veritrans will send HTTP(S) POST notification to merchant's web server.
+After the payment process is completed, Veritrans will __asynchronously__ send HTTP(S) POST notification to merchant's web server.
 As a merchant, you need to process this POST paramters to update order status in your database server. Veritrans will send 3 POST parameters: `orderId`, `mStatus`, and `TOKEN_MERCHANT`.
 
 ```php
@@ -331,13 +337,35 @@ else
 }
 ```
 
+#### V1 VT-Direct
+
+1. Create a HTML form first to obtain a `token_id` from Veritrans. The steps are described [here](http://docs.veritrans.co.id/vtdirect/integrating_vtdirect.html).
+
+2. Next, assign your server key to the Veritrans instance AFTER you obtained the `token_id` from Veritrans.
+	 ```php
+	 // TODO: Change with your actual server key
+	 $veritrans->server_key = 'eebadfec-fa3a-496a-8ea0-bb5795179ce6';
+	 ```
+
+3. Next, charge using the `charge()` method.
+   ```php
+   $status = $veritrans->charge();
+   if ($status['status'] == 'success')
+   {
+     // mark the order as success.
+   } else
+   {
+     // mark the order as failed.
+   }
+   ```
+
 ### V2 API
 
-If you set the `version` to `2`, you have to set your keys by setting the `server_key` property with the Server Key from your account. The server key can be obtained [here](https://my.sandbox.veritrans.co.id/settings/config_info)
+If you set the `version` to `2`, you have to set your keys by setting the `server_key` property with the Server Key from your account. The server key can be obtained [here](https://my.sandbox.veritrans.co.id/settings/config_info).
 
 ```php
 //TODO: Change with your actual server key
-$veritrans->server_key 		= 'eebadfec-fa3a-496a-8ea0-bb5795179ce6';
+$veritrans->server_key = 'eebadfec-fa3a-496a-8ea0-bb5795179ce6';
 ```
 
 #### V2 VT-Web
@@ -352,21 +380,37 @@ try {
   
 	if(!in_array($keys['status_code'], array(201, 202, 203))) 
 	{
-	  // print the error
-	  print_r($veritrans->errors);
-	  
-	  exit();
+		// print the error
+		print_r($veritrans->errors);
+		exit();
 
 	} else {
 
 		// redirect the request if getTokens() is successful
-	  header('Location: ' . $keys['redirect_url']);
+		header('Location: ' . $keys['redirect_url']);
 
 	}
 } catch (Exception $e) {
   var_dump($e);
 }
 ```
+
+#### Responding to V2 VT-Web payment notification
+
+#### V2 VT-Direct
+
+1. Create a HTML form first to obtain a `token_id` from Veritrans.
+
+2. Next, assign your server key to the Veritrans instance AFTER you obtained the `token_id` from Veritrans.
+	 ```php
+	 // TODO: Change with your actual server key
+	 $veritrans->server_key = 'eebadfec-fa3a-496a-8ea0-bb5795179ce6';
+	 ```
+
+3. Next, charge using the `charge()` method.
+   ```php
+   // TODO
+   ```
 
 ## Contributing
 
@@ -375,6 +419,8 @@ try {
 There are several guides that must be taken care of when you develop new plugins.
 
 1. __Handling currency other than IDR.__ Veritrans `v1` and `v2` currently accepts payments in Indonesian Rupiah only. As a corrolary, there is a validation on the server to check whether the item prices are in integer or not. As much as you are tempted to round-off the price, DO NOT do that! Always prepare when your system uses currencies other than IDR, convert them to IDR accordingly, and only round the price AFTER that.
+
+2. Consider using the __auto-sanitization__ feature.
 
 ### Developing API for new API versions
 

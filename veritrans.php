@@ -44,18 +44,23 @@ class Veritrans
     $this->version = self::VERSION_STABLE;
     $this->environment = self::ENVIRONMENT_DEVELOPMENT;
     $this->veritrans_method = self::VT_WEB;
-    $this->veritrans_factory = new Veritrans\Factory($this);
+    $this->veritrans_engine = new Veritrans\Factory($this);
     $this->enable_3d_secure = FALSE;
   }
 
   public function getTokens($options = array())
   {
-    return $this->veritrans_factory->get()->getTokens($options);
+    return $this->veritrans_engine->get()->getTokens($options);
   }
 
   public function charge($options = array())
   {
-    return $this->veritrans_factory->get()->charge($options);
+    return $this->veritrans_engine->get()->charge($options);
+  }
+
+  public function confirm($transaction_id)
+  {
+    return $this->veritrans_engine->get()->confirm($transaction_id);
   }
 
   public function getData()
