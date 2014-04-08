@@ -14,7 +14,7 @@
 					<td>Total</td>
 				</thead>
 				<tr>
-					<td>Sepatu Adidas F30</td>
+					<td>Sepatu Adidas F30 Super Sangat Sehat Sekali $^%</td>
 					<td>1</td>
 					<td>Rp 850.000</td>
 					<td>Rp 850.000</td>
@@ -39,7 +39,7 @@
 			<label>Email</label><br />
 			<input name="email" size="30" type="text" value="vt-testing@veritrans.co.id"><br /><br />
 			<label>First name</label><br />
-			<input name="billing_first_name" size="30" type="text" value="Andri"><br /><br />
+			<input name="billing_first_name" size="30" type="text" value="Andri jksdnfjksdnf ejkndjwknjkewdjk@#$%^ewndjknewjkdnejkwndjkewndjkwed @#$%^"><br /><br />
 			<label>Last name</label><br />
 			<input name="billing_last_name" size="30" type="text" value="Setiawan"><br /><br />
 			<label>Address 1</label><br />

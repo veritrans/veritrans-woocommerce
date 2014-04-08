@@ -11,11 +11,18 @@
         {
             "name": "Alvin Litani",
             "email": "alvin.litani@veritrans.co.id"
+        },
+        {
+            "name": "Ismail Faruqi",
+            "email": "ismail.faruqi@veritrans.co.id"
         }
     ],
     "require": {
         "php": ">=5.3.0"
     },
+    "require-dev": {
+        "phpunit/phpunit": "4.0.*"
+        },
     "autoload": {
         "classmap": [""]
     }
