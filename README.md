@@ -53,8 +53,9 @@ At initialization, the version will be always initialized to `VERSION_STABLE`, w
 You can set the version you want to use by manipulating the `version` property.
 
 ```php
-// Set the API version to v2 instead of the VERSION_STABLE (v1)
-$veritrans->version = 2;
+$veritrans->version = 1; // Please use v1 at the moment...
+// $veritrans->version = 2; // ...because Veritrans v2 is still experimental
+$veritrans->version = Veritrans::VERSION_STABLE; // or use VERSION_STABLE constant
 ```
 
 ### Environment
@@ -68,7 +69,7 @@ Veritrans PHP will default to the __Development__ environment. You can set the e
 
 ```php
 // Set the environment to production
-$veritrans->environment = Veritrans::ENVIRONMENT_PRODUCTION;
+$veritrans->environment = Veritrans::ENVIRONMENT_DEVELOPMENT; // change to ENVIRONMENT_PRODUCTION in your production server
 ```
 
 ### Payment types
@@ -98,7 +99,7 @@ class Veritrans {
 At initialization, Veritrans defaults to `VT_WEB` type. You can change the payment method by accessing the `payment_type` method.
 
 ```php
-$veritrans->payment_type = Veritrans::VT_DIRECT;
+$veritrans->payment_type = Veritrans::VT_WEB; // change to VT_DIRECT if you wish to use VT-Direct payment type
 ```
 
 ### Setting up customer's billing information
