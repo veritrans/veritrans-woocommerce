@@ -173,8 +173,8 @@ Next, you need to tell Veritrans the detail of the order. The following code ill
 // Set commodity items
 $items = array(
 			array(
-				"item_id" => 'itemsatu',
-				"price" => 250000,
+				"item_id" => 'SHIPPING_COST', // please also include the shipping cost here, if available.
+				"price" => 250000, // price must be in IDR. If you have discounts, please do it before you assign it here.
 				"quantity"   => 1,
 				"item_name1" => 'sepatu',
 				"item_name2" => 'Shoes' // item_name2 is only obligatory in V1 API's VT-Web method
@@ -184,7 +184,7 @@ $items = array(
 				"price" => 500000,
 				"quantity"   => 2,
 				"item_name1" => 'Tas',
-				"item_name2" => 'Bag' // item_name2 is only obligatory in V1 API's VT-Web method
+				"item_name2" => 'Bag'
 			),
 		);
 $veritrans->items = $items;
