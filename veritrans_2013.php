@@ -94,15 +94,6 @@ class Veritrans2013 {
       
       'billing_different_with_shipping' => $this->veritrans->billing_different_with_shipping,
       'required_shipping_address' => $this->veritrans->required_shipping_address,
-    
-      'shipping_first_name' => $this->_sanitize($this->veritrans->shipping_first_name, 'name'),
-      'shipping_last_name' => $this->_sanitize($this->veritrans->shipping_last_name, 'name'),
-      'shipping_address1' => $this->_sanitize($this->veritrans->shipping_address1, 'address'),
-      'shipping_address2' => $this->_sanitize($this->veritrans->shipping_address2, 'address'),
-      'shipping_city' => $this->_sanitize($this->veritrans->shipping_city, 'city'),
-      'shipping_country_code' => $this->_sanitize($this->veritrans->shipping_country_code, 'countryCode'),
-      'shipping_postal_code' => $this->_sanitize($this->veritrans->shipping_postal_code, 'postalCode'),
-      'shipping_phone' => $this->_sanitize($this->veritrans->shipping_phone, 'phone'),
 
       'email' => $this->veritrans->email, 
       
@@ -114,11 +105,37 @@ class Veritrans2013 {
       'city' => $this->_sanitize($this->veritrans->city, 'city'),
       'country_code' => $this->_sanitize($this->veritrans->country_code, 'countryCode'),
       'phone' => $this->_sanitize($this->veritrans->phone, 'phone'),
-      
+    
       'finish_payment_return_url'   => $this->veritrans->finish_payment_return_url,
       'unfinish_payment_return_url' => $this->veritrans->unfinish_payment_return_url,
       'error_payment_return_url'    => $this->veritrans->error_payment_return_url,
       );
+    
+    if ($this->veritrans->required_shipping_address && $this->veritrans->billing_different_with_shipping)
+    {
+      $data = array_merge($data, array(
+        'shipping_first_name' => $this->_sanitize($this->veritrans->shipping_first_name, 'name'),
+        'shipping_last_name' => $this->_sanitize($this->veritrans->shipping_last_name, 'name'),
+        'shipping_address1' => $this->_sanitize($this->veritrans->shipping_address1, 'address'),
+        'shipping_address2' => $this->_sanitize($this->veritrans->shipping_address2, 'address'),
+        'shipping_city' => $this->_sanitize($this->veritrans->shipping_city, 'city'),
+        'shipping_country_code' => $this->_sanitize($this->veritrans->shipping_country_code, 'countryCode'),
+        'shipping_postal_code' => $this->_sanitize($this->veritrans->shipping_postal_code, 'postalCode'),
+        'shipping_phone' => $this->_sanitize($this->veritrans->shipping_phone, 'phone'),
+        ));
+    } else if ($this->veritrans->required_shipping_address && !$this->veritrans->billing_different_with_shipping)
+    {
+      $data = array_merge($data, array(
+        'shipping_first_name' => $this->_sanitize($this->veritrans->first_name, 'name'),
+        'shipping_last_name' => $this->_sanitize($this->veritrans->last_name, 'name'),
+        'shipping_address1' => $this->_sanitize($this->veritrans->address1, 'address'),
+        'shipping_address2' => $this->_sanitize($this->veritrans->address2, 'address'),
+        'shipping_city' => $this->_sanitize($this->veritrans->city, 'city'),
+        'shipping_country_code' => $this->_sanitize($this->veritrans->country_code, 'countryCode'),
+        'shipping_postal_code' => $this->_sanitize($this->veritrans->postal_code, 'postalCode'),
+        'shipping_phone' => $this->_sanitize($this->veritrans->phone, 'phone'),
+        ));
+    }
 
     $optional_features =  array(
       'enable_3d_secure',
