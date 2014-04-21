@@ -69,6 +69,14 @@ class Sanitizer {
     return $this;
   }
 
+  public function ensure_integer()
+  {
+    array_push($this->order, function($string) {
+      return (int)round($string);
+    });
+    return $this;
+  }
+
   public function run() {
     $result = $this->string;
     foreach ($this->order as $func) {
