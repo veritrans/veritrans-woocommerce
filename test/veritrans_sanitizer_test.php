@@ -45,4 +45,11 @@ class VeritransSanitizerTest extends PHPUnit_Framework_TestCase
     $sanitized_string = \Veritrans\Sanitizer::create($string)->null_fallback('blah')->run();
     $this->assertEquals('blah', $sanitized_string);
   }
+
+  public function testEnsureIntegerSanitizer()
+  {
+    $string = '2234324.23423';
+    $sanitized_string = \Veritrans\Sanitizer::create($string)->ensure_integer()->run();
+    $this->assertEquals(2234324, $sanitized_string);
+  }
 }

@@ -64,7 +64,7 @@ class Veritrans2013 {
     foreach ($this->veritrans->items as $item) {
       $new_item = array(
         'id' => $this->_sanitize($item['item_id'], 'itemIdVTDirect'),
-        'price' => $item['price'],
+        'price' => $this->_sanitize($item['price'], 'price'),
         'qty' => $item['quantity'],
         'name' => $this->_sanitize($item['item_name1'], 'itemNameVTDirect')
         );
@@ -158,7 +158,7 @@ class Veritrans2013 {
       $item_id[] = $this->_sanitize($item['item_id'], 'itemId');
       $item_name1[] = $this->_sanitize($item['item_name1'], 'itemName');
       $item_name2[] = $this->_sanitize($item['item_name2'], 'itemName');
-      $price[]      = $item['price'];
+      $price[]      = $this->_sanitize($item['price'], 'price');
       $quantity[]   = $item['quantity'];
       
       $data['repeat_line']++;
@@ -274,6 +274,11 @@ class Veritrans2013 {
   protected function _sanitizeItemNameVTDirect($string)
   {
     return Sanitizer::create($string)->whitelist('a-zA-Z0-9')->length(20)->run();
+  }
+
+  protected function _sanitizePrice($string)
+  {
+    return Sanitizer::create($string)->ensure_integer()->run();
   }
 
 }
