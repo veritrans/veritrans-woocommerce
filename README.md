@@ -235,11 +235,21 @@ There are myriads of options to be set with Veritrans. Please consult [this page
 
 ### Forcing sanitization
 
-If you don't want to sanitize the parameters above yourself based on rules [here](http://docs.veritrans.co.id/vtweb/api.html) and [here](http://docs.veritrans.co.id/vtdirect/integrating_vtdirect.html), it is HIGHLY recommended to turn on the auto-sanitization feature.
+If you don't want to sanitize the parameters above yourself based on rules [here](http://docs.veritrans.co.id/vtweb/api.html) and [here](http://docs.veritrans.co.id/vtdirect/integrating_vtdirect.html), it is HIGHLY recommended to turn on the auto-sanitization feature to avoid headache and keep the Veritrans server happy :smile:
 
 ```php
 $veritrans->force_sanitization = TRUE; // defaults to FALSE
 ```
+
+It will:
+
+1. Trim the strings whose length exceed the maximum length.
+
+2. Take out all blacklisted characters from the parameters.
+
+3. Convert all prices to integer format.
+
+4. Convert country code to ISO 3166-1 alpha-3 format.
 
 ## Step 2: Using the API
 

@@ -213,17 +213,17 @@ class Veritrans2013 {
 
   protected function _sanitizeAddress($string)
   {
-    return Sanitizer::create($string)->whitelist('a-zA-Z0-9-_\',.@()\/ \\\\')->length(100)->run();
+    return Sanitizer::create($string)->whitelist('a-zA-Z0-9\-_\',\.@\(\)\/ \\\\')->length(100)->run();
   }
 
   protected function _sanitizeAddressVTDirect($string)
   {
-    return Sanitizer::create($string)->whitelist('a-zA-Z0-9-_\',.@()\/# \\\\')->length(100)->run();
+    return Sanitizer::create($string)->whitelist('a-zA-Z0-9\-_\',\.@\(\)\/# \\\\')->length(100)->run();
   }
 
   protected function _sanitizeCity($string)
   {
-    return Sanitizer::create($string)->whitelist('a-zA-Z-_\', .@')->length(20)->run();
+    return Sanitizer::create($string)->whitelist('a-zA-Z-_\', \.@')->length(20)->run();
   }
 
   protected function _sanitizeCityVTDirect($string)
@@ -268,7 +268,7 @@ class Veritrans2013 {
 
   protected function _sanitizeItemName($string)
   {
-    return Sanitizer::create($string)->whitelist('a-zA-Z0-9 -_\',.@&+\/')->length(20)->run();
+    return Sanitizer::create($string)->whitelist('a-zA-Z0-9 \-_\',\.@&\+\/')->length(20)->run();
   }
 
   protected function _sanitizeItemNameVTDirect($string)
