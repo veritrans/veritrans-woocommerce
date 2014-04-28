@@ -225,9 +225,7 @@ You have to set your keys by setting the `server_key` property with the Server K
 $veritrans->server_key = 'eebadfec-fa3a-496a-8ea0-bb5795179ce6';
 ```
 
-#### V2 VT-Web
-
-The method to enter the VT-Web page is a little different in V2 API. Instead of sending a POST request, you can simply redirect your request to the page obtained from the `getTokens()` method.
+Next, obtain a token by calling `getTokens()` method.
 
 ```php
 try {
@@ -252,9 +250,7 @@ try {
 }
 ```
 
-#### Responding to V2 VT-Web payment notification
-
-#### V2 VT-Direct
+### Responding to the payment notification
 
 1. Create a HTML form first to obtain a `token_id` from Veritrans.
 
@@ -271,7 +267,7 @@ try {
 
    } else
    {
-   
+
    }
    ```
 

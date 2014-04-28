@@ -2,7 +2,7 @@
 
 namespace Veritrans;
 
-require 'veritrans_2013.php';
+// require 'veritrans_2013.php';
 require 'veritrans_2014.php';
 
 class Factory {
@@ -14,7 +14,7 @@ class Factory {
   {
     $this->veritrans = $veritrans;
     $this->engines[2] = new Veritrans2014($this->veritrans);
-    $this->engines[1] = new Veritrans2013($this->veritrans);
+    // $this->engines[1] = new Veritrans2013($this->veritrans);
   }
 
   public function get()

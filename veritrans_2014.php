@@ -129,7 +129,7 @@ class Veritrans2014 {
 
     if ($this->veritrans->enable_3d_secure)
       $data['secure'] = TRUE;
-
+    
     return $data;
         
   }

@@ -6,6 +6,9 @@ if(empty($_POST))
   exit;
 }
 
+var_dump($_POST);
+exit;
+
 require '../../../veritrans.php';
 
 $veritrans = new Veritrans();
@@ -13,36 +16,31 @@ $veritrans->server_key = 'eebadfec-fa3a-496a-8ea0-bb5795179ce6'; // change with 
 $veritrans->version = 2; // since 2014's stack is currently not the default one, we need to set it explicitly
 
 //TODO: Change with your actual order_id.
-$veritrans->order_id          = 'order'.rand();
+$veritrans->order_id = 'order'.rand();
 
 $veritrans->billing_different_with_shipping = 1;
 $veritrans->required_shipping_address = 1;
 
 // Billing info. [Optional]
-$veritrans->first_name  = $_POST['billing_first_name'];
-$veritrans->last_name   = $_POST['billing_last_name'];
-$veritrans->address1  = $_POST['billing_address1'];
-$veritrans->address2  = $_POST['billing_address2'];
-$veritrans->city    = $_POST['billing_city'];
-$veritrans->country_code= "IDN";
+$veritrans->first_name = $_POST['billing_first_name'];
+$veritrans->last_name = $_POST['billing_last_name'];
+$veritrans->address1 = $_POST['billing_address1'];
+$veritrans->address2 = $_POST['billing_address2'];
+$veritrans->city = $_POST['billing_city'];
+$veritrans->country_code = "IDN";
 $veritrans->postal_code = $_POST['billing_postal_code'];
-$veritrans->phone     = $_POST['billing_phone'];
+$veritrans->phone = $_POST['billing_phone'];
 
 // Shipping info. [Required if required_shipping_address = '1']
-$veritrans->shipping_first_name   = $_POST['shipping_first_name'];
-$veritrans->shipping_last_name    = $_POST['shipping_last_name'];
-$veritrans->shipping_address1     = $_POST['shipping_address1'];
-$veritrans->shipping_address2     = $_POST['shipping_address2'];
-$veritrans->shipping_city       = $_POST['shipping_city'];
-$veritrans->shipping_country_code   = "IDN";
-$veritrans->shipping_postal_code  = $_POST['shipping_postal_code'];
-$veritrans->shipping_phone      = $_POST['shipping_phone'];
-$veritrans->email           = $_POST['email'];
-
-// Configure redirect url. [Optional. Can also be set at Merchant Administration Portal(MAP)]
-$veritrans->finish_payment_return_url   = "http://lvh.me/veritrans-php/v2/vt_web/notification_handler.php";
-$veritrans->unfinish_payment_return_url = "http://lvh.me/veritrans-php/v2/vt_web/notification_handler.php";
-$veritrans->error_payment_return_url  = "http://lvh.me/veritrans-php/v2/vt_web/notification_handler.php";
+$veritrans->shipping_first_name = $_POST['shipping_first_name'];
+$veritrans->shipping_last_name = $_POST['shipping_last_name'];
+$veritrans->shipping_address1 = $_POST['shipping_address1'];
+$veritrans->shipping_address2 = $_POST['shipping_address2'];
+$veritrans->shipping_city = $_POST['shipping_city'];
+$veritrans->shipping_country_code = "IDN";
+$veritrans->shipping_postal_code = $_POST['shipping_postal_code'];
+$veritrans->shipping_phone = $_POST['shipping_phone'];
+$veritrans->email = $_POST['email'];
 
 // Payment options
 // $veritrans->enable_3d_secure = 1;
@@ -78,22 +76,29 @@ $items = array(
 $veritrans->items = $items;
 
 //Call Veritrans VT-Web API Get Token
-try {
+if ($_POST['payment_type'] == 'vtdirect') {
+  $result = $veritrans->charge();
+  var_dump($result);
+  exit;
+} else
+{
+  try {
 
-  $keys = $veritrans->getTokens();
-  if(!in_array($keys['status_code'], array(201, 202, 203))) 
-  {
-    // print the error
-    print_r($veritrans->errors);
-    
-    exit();
+    $keys = $veritrans->getTokens();
+    if(!in_array($keys['status_code'], array(201, 202, 203))) 
+    {
+      // print the error
+      print_r($veritrans->errors);
+      
+      exit();
 
-  } else {
+    } else {
 
-    header('Location: ' . $keys['redirect_url']);
+      header('Location: ' . $keys['redirect_url']);
+    }
+  } catch (Exception $e) {
+    var_dump($e);
   }
-} catch (Exception $e) {
-  var_dump($e);
 }
 
 //Redirect customer to Veritrans payment page.
