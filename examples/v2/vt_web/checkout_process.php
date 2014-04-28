@@ -6,9 +6,6 @@ if(empty($_POST))
   exit;
 }
 
-var_dump($_POST);
-exit;
-
 require '../../../veritrans.php';
 
 $veritrans = new Veritrans();

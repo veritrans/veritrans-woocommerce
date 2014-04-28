@@ -162,6 +162,7 @@
       }
 
       $('.submit-button').click(function(event){
+        debugger;
         event.preventDefault();
         $(this).attr("disabled", "disabled"); 
         Veritrans.token(card, callback);
