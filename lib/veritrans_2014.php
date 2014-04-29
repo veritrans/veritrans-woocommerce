@@ -2,7 +2,7 @@
 
 namespace Veritrans;
 
-require_once 'veritrans.php';
+require_once(dirname(__FILE__) . '/../veritrans.php');
 require_once 'veritrans_utility.php';
 
 class Veritrans2014 {

@@ -2,7 +2,7 @@
 
 // PHP Wrapper for Veritrans VT-Web Payment API.
 
-require_once 'veritrans_factory.php';
+require_once 'lib/veritrans_factory.php';
 
 class Veritrans
 {
