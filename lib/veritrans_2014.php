@@ -102,6 +102,7 @@ class Veritrans2014 {
     if ($payment_type_str == 'credit_card')
     {
       $data[$payment_type_str]['token_id'] = $this->veritrans->token_id;
+      $data[$payment_type_str]['bank'] = $this->veritrans->bank;
     }
     
     $data['transaction_details'] = array();
@@ -129,9 +130,8 @@ class Veritrans2014 {
 
     if ($this->veritrans->enable_3d_secure)
       $data['secure'] = TRUE;
-    
-    return $data;
-        
+
+    return $data;        
   }
 
   protected function _getBaseUrl() {
