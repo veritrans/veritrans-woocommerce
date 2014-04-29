@@ -27,7 +27,7 @@ If you are not using Composer, just copy all files in this repository into your 
 
 ### VT-Web
 
-1. Set up basic information as is explained [here](#user-content-setting-up-basic-information).
+1. Edit the file which process your order by setting up basic information as is explained [here](#user-content-setting-up-basic-information).
 
 2. Set the payment type to `VT_WEB`.
    ```php
@@ -196,7 +196,7 @@ If you are not using Composer, just copy all files in this repository into your 
 		</html>
    ```
 
-2. Set up basic information as is explained [here](#user-content-setting-up-basic-information).
+2. Edit the file which become the target of the form (the `checkout_process.php` in the case above) by setting up basic information as is explained [here](#user-content-setting-up-basic-information).
 
 3. Set the payment type to `VT_DIRECT`, and include additional payment informations.
  	 
@@ -206,8 +206,7 @@ If you are not using Composer, just copy all files in this repository into your 
  	$veritrans->bank = 'bni';
  	```
 
-4. If you wish to enable the Veritrans One-Click feature to let your customers place orders without entering 
-   the credit card number in the next time, set the `save_token_id` property to `true`.
+4. If you wish to enable the [Veritrans One-Click](#user-content-the-veritrans-one-click-feature) feature to let your customers place orders without entering the credit card number in the next time, set the `save_token_id` property to `true`.
    
    ```php
    $veritrans->save_token_id = true;
@@ -434,6 +433,26 @@ If you don't want to sanitize the parameters above yourself based on rules [here
 
 ```php
 $veritrans->force_sanitization = TRUE; // defaults to FALSE
+```
+
+## The Veritrans One-Click feature
+
+With this feature, you can let your customer order from your website without entering the credit card information after they placed the first order. To enable this feature:
+
+1. You have to use the VT-Direct payment method.
+
+2. You have to enable the 3D Secure option.
+
+3. You have to enable the `save_token_id` property when your customer order at the first time.
+
+Then, after you invoke the `charge()` method, you can save the `saved_token_id` and `saved_token_id_expired_at` properties in your database.
+
+```php
+$response = $veritrans->charge();
+$customer = new Customer($_GET['customer_id']); // let the Customer be the class which holds the customer information.
+$customer->saved_veritrans_token_id = $response['saved_token_id'];
+$customer->saved_veritrans_token_id_expired_at = $response['saved_token_id_expired_at'];
+$customer->save();
 ```
 
 ## Contributing
