@@ -1,0 +1,46 @@
+<html>
+<head>
+	<title>Checkout</title>
+	<!-- Include PaymentAPI (MANDATORY)-->
+	<script type="text/javascript" src="https://api.veritrans.co.id/v2/assets/js/all.js"></script>
+	
+	<!-- 
+	Include JQuery & JQuery Fancy Box.
+	In this sample, we use JQuery & JQuery Fancy to simplify the process when showing 3D Secure dialog. Feel free to use your own implementation or your prefered JS framework. 
+	-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<script type="text/javascript" src="js/jquery.fancybox.pack.js"></script>
+	<link rel="stylesheet" href="css/jquery.fancybox.css" type="text/css" media="screen" />
+
+	<!-- JS for handling vt-direct form interactions -->
+	<script type="text/javascript" src="js/application.js"></script>	
+
+</head>
+
+<body>
+	<h1>Checkout</h1>
+	
+	<span id="message"></span>
+
+	<form action="checkout_process.php" method="POST" id="payment-form">
+		<p>
+			<label>Card Number</label>
+			<input class="card-number" value="4111111111111111" size="20" type="text" autocomplete="off"/>
+		</p>
+		<p>
+			<label>Expiration (MM/YYYY)</label>
+			<input class="card-expiry-month" value="12" placeholder="MM" size="2" type="text" />
+	    	<span> / </span>
+	    	<input class="card-expiry-year" value="2018" placeholder="YYYY" size="4" type="text" />
+		</p>
+		<p>
+	    	<label>CVV</label>
+	    	<input class="card-cvv" value="123" size="4" type="password" autocomplete="off"/>
+		</p>
+		<input id="token_id" name="token_id" type="hidden" />
+		<button class="submit-button" type="submit">Pay</button>
+	</form>
+
+	
+</body>
+</html>
