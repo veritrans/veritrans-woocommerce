@@ -25,7 +25,222 @@ If you are not using Composer, just copy all files in this repository into your 
 
 ## How to use
 
-### Setting up basic information
+### VT-Web
+
+1. Set up basic information as is explained [here](#user-content-setting-up-basic-information).
+
+2. Set the payment type to `VT_WEB`.
+   ```php
+   $veritrans->payment_type = Veritrans::VT_WEB;
+   ```
+
+2. Call `getTokens()` to obtain the URL to redirect your customer to the Veritrans VT-Web page.
+
+	 ```php
+	 try {
+
+		// Call Veritrans VT-Web API Get Token
+		$keys = $veritrans->getTokens();
+	  
+		if(!in_array($keys['status_code'], array(201, 202, 203))) 
+		{
+			// print the error
+			print_r($veritrans->errors);
+			exit();
+
+		} else {
+
+			// redirect the request if getTokens() is successful
+			header('Location: ' . $keys['redirect_url']);
+
+		}
+	 } catch (Exception $e) {
+	  var_dump($e);
+	 }
+	 ```
+
+3. After your customer finish the payment, Veritrans will send a payment notification **asynchronously** to the URL
+   defined in the `Payment Notification URL` field in your Merchant Administration Portal. You have to handle the notification in order to finish the transaction. The code example is explained below.
+
+  ```php
+	require 'lib/veritrans_notification.php';
+
+	$notification = new VeritransNotification();
+
+	if($notification->transaction_status == "capture")
+	{
+	  error_log('payment success!');
+	}
+	else if ($notification->transaction_status == 'deny')
+	{
+	 error_log('payment denied!'); 
+	} else if ($notification->transaction_status == 'challenge')
+	{
+	  error_log('payment challenged!');
+	} else
+	{
+	  error_log('system error!');
+	}
+  ```
+
+### VT-Direct
+
+1. Create a HTML page containing a link to the `veritrans.js` script. An example of the script is described below.
+   ```html
+   <html>
+		<head>
+			<title>Checkout</title>
+			<!-- Include PaymentAPI  -->
+			<link rel="stylesheet" href="css/jquery.fancybox.css">
+		</head>
+		<body>
+			<script type="text/javascript" src="https://api.sandbox.veritrans.co.id/v2/assets/js/veritrans.js"></script>
+			<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+			<script type="text/javascript" src="js/jquery.fancybox.pack.js"></script>
+
+			<h1>Checkout</h1>
+			<form action="checkout_process.php" method="POST" id="payment-form">
+				<fieldset>
+					<legend>Checkout</legend>
+					<p>
+						<label>Card Number</label>
+						<input class="card-number" value="4111111111111111" size="20" type="text" autocomplete="off"/>
+					</p>
+					<p>
+						<label>Expiration (MM/YYYY)</label>
+						<input class="card-expiry-month" value="12" placeholder="MM" size="2" type="text" />
+				    	<span> / </span>
+				    	<input class="card-expiry-year" value="2018" placeholder="YYYY" size="4" type="text" />
+					</p>
+					<p>
+				    	<label>CVV</label>
+				    	<input class="card-cvv" value="123" size="4" type="password" autocomplete="off"/>
+					</p>
+
+					<p>
+				    	<label>Save credit card</label>
+				    	<input type="checkbox" name="save_cc" value="true">
+					</p>
+
+					<input id="token_id" name="token_id" type="hidden" />
+					<button class="submit-button" type="submit">Submit Payment</button>
+				</fieldset>
+			</form>
+
+			<!-- Javascript for token generation -->
+			<script type="text/javascript">
+			$(function(){
+				// Sandbox URL
+				Veritrans.url = "https://api.sandbox.veritrans.co.id/v2/token";
+				// TODO: Change with your client key.
+				Veritrans.client_key = "1587765e-defa-4064-8b95-807dba85d551";
+				var card = function(){
+					return { 	'card_number'		: $(".card-number").val(),
+								'card_exp_month'	: $(".card-expiry-month").val(),
+								'card_exp_year'		: $(".card-expiry-year").val(),
+								'card_cvv'			: $(".card-cvv").val(),
+								'secure'			: true,
+								'bank'				: 'bni',
+								'gross_amount'		: 200000
+								 }
+				};
+
+				function callback(response) {
+					if (response.redirect_url) {
+						// 3dsecure transaction, please open this popup
+						openDialog(response.redirect_url);
+
+					} else if (response.status_code == '200') {
+						// success 3d secure or success normal
+						closeDialog();
+						// submit form
+						$("#token_id").val(response.token_id);
+						$("#payment-form").submit();
+					} else {
+						// failed request token
+						console.log('Close Dialog - failed');
+						//closeDialog();
+						//$('#purchase').removeAttr('disabled');
+						// $('#message').show(FADE_DELAY);
+						// $('#message').text(response.status_message);
+						alert(response.status_message);
+					}
+				}
+
+				function openDialog(url) {
+					$.fancybox.open({
+				        href: url,
+				        type: 'iframe',
+				        autoSize: false,
+				        width: 700,
+				        height: 500,
+				        closeBtn: false,
+				        modal: true
+				    });
+				}
+
+				function closeDialog() {
+					$.fancybox.close();
+				}
+
+				$('.submit-button').click(function(event){
+					event.preventDefault();
+					$(this).attr("disabled", "disabled"); 
+					Veritrans.token(card, callback);
+					return false;
+				});
+			});
+
+			</script>
+		</body>
+		</html>
+   ```
+
+2. Set up basic information as is explained [here](#user-content-setting-up-basic-information).
+
+3. Set the payment type to `VT_DIRECT`, and include additional payment informations.
+ 	 
+ 	```php
+ 	$veritrans->payment_type = Veritrans::VT_WEB;
+ 	$veritrans->token_id = $_POST['token_id']; // the token_id is obtained by using the veritrans.js script.
+ 	$veritrans->bank = 'bni';
+ 	```
+
+4. If you wish to enable the Veritrans One-Click feature to let your customers place orders without entering 
+   the credit card number in the next time, set the `save_token_id` property to `true`.
+   
+   ```php
+   $veritrans->save_token_id = true;
+   ```
+
+5. Call the `charge()` method and handle the `$response` array appropriately.
+
+	```php
+ 	$response = $veritrans->charge();
+
+ 	if (in_array($response['status_code'], array(200, 201, 202))) {
+		if($response['transaction_status'] == "capture")
+		{
+			// the transaction is successfully processed. Insert additional logic here.
+		}
+		else if ($response['transaction_status'] == "deny")
+		{
+			// the transaction is denied by the bank. Insert additional logic here.
+		}
+		else if($response['transaction_status'] == "challenge")
+		{
+			// the transaction is challenged by the Veritrans Fraud Detection System. Insert additional logic here.
+		}
+		echo "The transaction status for order ID " . $response['order_id'] . ": is " . $response['transaction_status'];
+	} 
+	else
+	{
+		// there is some error happened. Insert additional logic here.
+		echo "Status message: [" . $response['status_code'] . "] is " . $response['status_message'];
+	}
+	```
+ 
+## Setting up basic information
 
 Given you have a cart ready for checkout, the first step you have to do to interact with Veritrans is to create a Veritrans instance and populating it with basic information.
 
@@ -35,6 +250,13 @@ Given you have a cart ready for checkout, the first step you have to do to inter
 $veritrans = new Veritrans();
 
 $veritrans->order_id = 'XDF1AA5'; // change the order_id property with your actual order ID.
+```
+
+Before you can start using the wrapper, you have to set your API keys in order to let yourself get authenticated by Veritrans API. You have to set your keys by setting the `server_key` property with the Server Key from your account [here](https://my.sandbox.veritrans.co.id/settings/config_info).
+
+```php
+//TODO: Change with your actual server key
+$veritrans->server_key = 'eebadfec-fa3a-496a-8ea0-bb5795179ce6';
 ```
 
 ### Environment
@@ -213,63 +435,6 @@ If you don't want to sanitize the parameters above yourself based on rules [here
 ```php
 $veritrans->force_sanitization = TRUE; // defaults to FALSE
 ```
-
-## Step 2: Using the API
-
-Before you can start using the wrapper, you have to set your API keys in order to let yourself get authenticated by Veritrans API. The methods to set the keys and the response are different for each API version.
-
-You have to set your keys by setting the `server_key` property with the Server Key from your account. The server key can be obtained [here](https://my.sandbox.veritrans.co.id/settings/config_info).
-
-```php
-//TODO: Change with your actual server key
-$veritrans->server_key = 'eebadfec-fa3a-496a-8ea0-bb5795179ce6';
-```
-
-Next, obtain a token by calling `getTokens()` method.
-
-```php
-try {
-
-	// Call Veritrans VT-Web API Get Token
-	$keys = $veritrans->getTokens();
-  
-	if(!in_array($keys['status_code'], array(201, 202, 203))) 
-	{
-		// print the error
-		print_r($veritrans->errors);
-		exit();
-
-	} else {
-
-		// redirect the request if getTokens() is successful
-		header('Location: ' . $keys['redirect_url']);
-
-	}
-} catch (Exception $e) {
-  var_dump($e);
-}
-```
-
-### Responding to the payment notification
-
-1. Create a HTML form first to obtain a `token_id` from Veritrans.
-
-2. Next, assign your server key to the Veritrans instance AFTER you obtained the `token_id` from Veritrans.
-	 ```php
-	 // TODO: Change with your actual server key
-	 $veritrans->server_key = 'eebadfec-fa3a-496a-8ea0-bb5795179ce6';
-	 ```
-
-3. Next, charge using the `charge()` method.
-   ```php
-   if ($veritrans->charge())
-   {
-
-   } else
-   {
-
-   }
-   ```
 
 ## Contributing
 
