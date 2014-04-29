@@ -21,6 +21,10 @@ $veritrans->server_key = "eebadfec-fa3a-496a-8ea0-bb5795179ce6";
 $veritrans->payment_type = Veritrans::VT_DIRECT;
 $veritrans->token_id = $_POST['token_id'];
 $veritrans->bank = 'bni';
+if (isset($_POST['save_cc']))
+{
+	$veritrans->save_token_id = true;
+}
 
 // $transaction_details = array(
 // 	'order_id' 		=> time(),

@@ -103,6 +103,7 @@ class Veritrans2014 {
     {
       $data[$payment_type_str]['token_id'] = $this->veritrans->token_id;
       $data[$payment_type_str]['bank'] = $this->veritrans->bank;
+      $data[$payment_type_str]['save_token_id'] = $this->veritrans->save_token_id;
     }
     
     $data['transaction_details'] = array();
