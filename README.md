@@ -1,7 +1,7 @@
 Veritrans WooCommerce Payment Gateway
 =====================================
 
-Let your WooCommerce store integrated with Veritrans payment gateway.
+Let your WooCommerce store integrated with Veritrans payment gateway. (This plug-in is only for existing technology stack and not for new stack).
 
 ### Description
 
