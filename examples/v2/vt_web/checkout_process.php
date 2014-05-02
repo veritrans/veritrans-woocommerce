@@ -41,9 +41,9 @@ $veritrans->email = $_POST['email'];
 
 // Payment options
 // $veritrans->enable_3d_secure = 1;
-// $veritrans->bank         = "bni";
+$veritrans->bank         = "mandiri";
 // $veritrans->installment_banks  = array("bni", "cimb");
-// $veritrans->promo_bins     = array("411111", "444444");
+$veritrans->promo_bins     = array("4");
 // $veritrans->point_banks      = array("bni", "cimb");
 // $veritrans->payment_methods    = array("credit_card", "mandiri_clickpay");
 // $veritrans->installment_terms   = array(
@@ -73,30 +73,27 @@ $items = array(
 $veritrans->items = $items;
 
 //Call Veritrans VT-Web API Get Token
-if ($_POST['payment_type'] == 'vtdirect') {
-  $result = $veritrans->charge();
-  var_dump($result);
-  exit;
-} else
-{
-  try {
 
-    $keys = $veritrans->getTokens();
-    if(!in_array($keys['status_code'], array(201, 202, 203))) 
-    {
-      // print the error
-      print_r($veritrans->errors);
-      
-      exit();
+try {
 
-    } else {
+  $keys = $veritrans->getTokens();
+  
+  if(!in_array($keys['status_code'], array(201, 202, 203))) 
+  {
 
-      header('Location: ' . $keys['redirect_url']);
-    }
-  } catch (Exception $e) {
-    var_dump($e);
+    // print the error
+    var_dump($veritrans->errors);
+    
+    exit();
+
+  } else {
+
+    header('Location: ' . $keys['redirect_url']);
   }
+} catch (Exception $e) {
+  var_dump($e);
 }
+
 
 //Redirect customer to Veritrans payment page.
 
