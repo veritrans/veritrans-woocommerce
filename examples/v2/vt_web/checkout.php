@@ -1,5 +1,7 @@
 <html>
-<head></head>
+<head>
+  <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css">
+</head>
 <body>
   <h2>Checkout</h2>
   <table>
@@ -29,7 +31,7 @@
       <td>Rp 2.650.000</td>
     </tr>
   </table>
-  <form action="checkout_process.php" method="post">    
+  <form action="checkout_process.php" method="post" id="payment-form">    
     <label>Email</label><br />
     <input name="email" size="30" type="text" value="customer@email.com"><br /><br />
     
@@ -65,7 +67,9 @@
     <label>Phone</label><br />
     <input name="shipping_phone" size="30" type="text" value="08112312312312"><br /><br />
     
-    <input id="submit_btn" type="submit" value="Pay with Veritrans VT-Web" />
+    <legend>Pay with VT-Web</legend>
+    <button id="submit_btn" type="submit" name="payment_type" value="vtweb">Pay with VT-Web</button>
+
   </form>
 </body>
 </html>
