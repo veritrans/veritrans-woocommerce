@@ -2,14 +2,16 @@
 
 namespace Veritrans;
 
-require_once 'lib/hash_generator.php';
-require_once 'lib/Pest.php';
-require_once 'lib/PestJSON.php';
+require_once 'hash_generator.php';
+require_once 'Pest.php';
+require_once 'PestJSON.php';
 require_once 'veritrans_utility.php';
 require_once 'veritrans_sanitizer.php';
-require_once 'veritrans.php';
 
 class Veritrans2013 {
+
+  const REQUEST_KEY_URL       = 'https://vtweb.veritrans.co.id/v1/tokens.json';
+  const PAYMENT_REDIRECT_URL  = 'https://vtweb.veritrans.co.id/v1/payments.json';
 
   private $veritrans;
 
@@ -173,7 +175,7 @@ class Veritrans2013 {
     // Call Veritrans API
     try {
       $pest = new \PestJSON('');
-      $result = $pest->post(\Veritrans::REQUEST_KEY_URL, $data);
+      $result = $pest->post(self::REQUEST_KEY_URL, $data);
     } catch (Exception $e) {
       throw $e;
     }
