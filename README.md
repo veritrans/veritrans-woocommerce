@@ -27,4 +27,4 @@ The manual installation method involves downloading our feature-rich plugin and 
 1. Download the plugin file to your computer and unzip it
 2. Using an FTP program, or your hosting control panel, upload the unzipped plugin folder to your WordPress installation's wp-content/plugins/ directory.
 3. Activate the plugin from the Plugins menu within the WordPress admin.
-4. Insert http://[your web]/vt_payment_handling/ as your Payment Notification URL in your MAP
+4. Insert http://[your web]/?wc-api=WC_Gateway_Veritrans/ as your Payment Notification URL in your MAP
