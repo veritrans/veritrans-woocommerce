@@ -64,13 +64,16 @@ class Veritrans2013 {
       );
     $items = array();
     foreach ($this->veritrans->items as $item) {
-      $new_item = array(
-        'id' => $this->_sanitize($item['item_id'], 'itemIdVTDirect'),
-        'price' => $this->_sanitize($item['price'], 'price'),
-        'qty' => $item['quantity'],
-        'name' => $this->_sanitize($item['item_name1'], 'itemNameVTDirect')
-        );
-      $items[] = $new_item;
+      if ($item['price'] > 0)
+      {
+        $new_item = array(
+          'id' => $this->_sanitize($item['item_id'], 'itemIdVTDirect'),
+          'price' => $this->_sanitize($item['price'], 'price'),
+          'qty' => $item['quantity'],
+          'name' => $this->_sanitize($item['item_name1'], 'itemNameVTDirect')
+          );
+        $items[] = $new_item;
+      }
     }
     $data['order_items'] = $items;
     $subtotal = 0;
