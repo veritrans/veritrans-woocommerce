@@ -13,7 +13,7 @@ If you are using [Composer](https://getcomposer.org), add this require line to y
 
 ```json
 "require": {
-	"veritrans/veritrans-php": "dev-veritrans-2"
+	"veritrans/veritrans-php": "dev-vtweb-2"
 }
 ```
 
