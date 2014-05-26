@@ -1,12 +1,9 @@
 <?php
-/**
- * @package Veritrans Payment 
- */
 /*
 Plugin Name: Veritrans - WooCommerce Payment Gateway
 Plugin URI: http://colorlabsproject.com/plugins/veritrans/
 Description: Accept all payment directly on your WooCommerce site in a seamless and secure checkout environment with <a href="http://veritrans.co.id" target="_blank">Veritrans.co.id</a>
-Version: 1.0.0
+Version: 1.1.0
 Author: ColorLabs & Company
 Author URI: http://colorlabsproject.com
 License: GPLv2 or later
@@ -33,18 +30,18 @@ add_action( 'plugins_loaded', 'veritrans_gateway_init', 0 );
 
 function veritrans_gateway_init() {
 
-	if ( ! class_exists( 'WC_Payment_Gateway' ) ) {
+  if ( ! class_exists( 'WC_Payment_Gateway' ) ) {
     return;
   }
-	
-	DEFINE ('VT_PLUGIN_DIR', plugins_url( basename( plugin_dir_path( __FILE__ ) ), basename( __FILE__ ) ) . '/' );
-	
-	require_once dirname( __FILE__ ) . '/class/class.veritrans-gateway.php';
-	
-	add_filter( 'woocommerce_payment_gateways', 'add_veritrans_payment_gateway' );
+  
+  DEFINE ('VT_PLUGIN_DIR', plugins_url( basename( plugin_dir_path( __FILE__ ) ), basename( __FILE__ ) ) . '/' );
+  
+  require_once dirname( __FILE__ ) . '/class/class.veritrans-gateway.php';
+  
+  add_filter( 'woocommerce_payment_gateways', 'add_veritrans_payment_gateway' );
+}
 
-}	
 function add_veritrans_payment_gateway( $methods ) {
-		$methods[] = 'WC_Gateway_Veritrans';
-		return $methods;
+  $methods[] = 'WC_Gateway_Veritrans';
+  return $methods;
 }
