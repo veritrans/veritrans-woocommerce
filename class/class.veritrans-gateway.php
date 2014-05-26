@@ -1,4 +1,7 @@
 <?php
+
+require_once(dirname(__FILE__) . '/../lib/veritrans/veritrans.php');
+
 /**
 	 * Veritrans Payment Gateway Class
 	 */
@@ -38,6 +41,7 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
     $this->server_key     		= $this->get_option( 'server_key' );
 		$this->merchant_id     		= $this->get_option( 'merchant_id' );
     $this->merchant_hash_key 	= $this->get_option( 'merchant_hash_key' );
+    $this->api_version        = $this->get_option( 'select_veritrans_api_version' );
 
     $this->log = new WC_Logger(); 
 
@@ -203,6 +207,16 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
         'type' => 'textarea',
 				'description' => __( 'This controls the description which the user sees during checkout', 'woocommerce' ),
         'default' => ''
+      ),
+      'select_veritrans_api_version' => array(
+        'title' => __( 'API Version', 'woocommerce' ),
+        'type' => 'select',
+        'default' => 2,
+        'description' => __( 'Select the Veritrans API version', 'woocommerce' ),
+        'options'   => array(
+                1    => __( 'v1', 'woocommerce' ),
+                2   => __( 'v2', 'woocommerce' ),
+              ),
       ),
 			'select_veritrans_payment' => array(
         'title' => __( 'Payment Method', 'woocommerce' ),
