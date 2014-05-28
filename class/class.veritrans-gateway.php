@@ -43,6 +43,7 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
     $this->merchant_hash_key 	= $this->get_option( 'merchant_hash_key' );
     $this->api_version        = $this->get_option( 'select_veritrans_api_version' );
     $this->environment        = $this->get_option( 'select_veritrans_environment' );
+    $this->to_idr_rate        = $this->get_option( 'to_idr_rate' );
 
     $this->log = new WC_Logger(); 
 
@@ -244,34 +245,42 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 			'merchant_id' => array(
         'title' => __( 'Merchant ID', 'woocommerce' ),
         'type' => 'text',
-				'class'			=> 'veritrans_web',
-        'description' => sprintf(__( 'Enter your Veritrans Merchant ID. Get the ID <a href="%s" target="_blank">here</a>', 'woocommerce' ),$key_url),
+				'description' => sprintf(__( 'Enter your Veritrans Merchant ID. Get the ID <a href="%s" target="_blank">here</a>', 'woocommerce' ),$key_url),
         'class' => 'v1_vtweb_settings sensitive',
       ),
 			'merchant_hash_key' => array(
         'title' => __( 'Merchant Hash Key', 'woocommerce' ),
         'type' => 'text',
-				'class'			=> 'veritrans_web',
-        'description' => sprintf(__( 'Enter your Veritrans Merchant hash key. Get the key <a href="%s" target="_blank">here</a>', 'woocommerce' ),$key_url),
+				'description' => sprintf(__( 'Enter your Veritrans Merchant hash key. Get the key <a href="%s" target="_blank">here</a>', 'woocommerce' ),$key_url),
         'class' => 'v1_vtweb_settings sensitive',
       ),
       'client_key' => array(
         'title' => __("Client Key", 'woocommerce'),
         'type' => 'text',
-				'class'			=> 'veritrans_direct',
-        'description' => sprintf(__('Input your Veritrans Client Key. Get the key <a href="%s" target="_blank">here</a>', 'woocommerce' ),$key_url),
+				'description' => sprintf(__('Input your Veritrans Client Key. Get the key <a href="%s" target="_blank">here</a>', 'woocommerce' ),$key_url),
         'default' => '',
         'class' => 'v1_vtdirect_settings',
       ),
       'server_key' => array(
         'title' => __("Server Key", 'woocommerce'),
         'type' => 'text',
-				'class'			=> 'veritrans_direct',
-        'description' => sprintf(__('Input your Veritrans Server Key. Get the key <a href="%s" target="_blank">here</a>', 'woocommerce' ),$key_url),
+				'description' => sprintf(__('Input your Veritrans Server Key. Get the key <a href="%s" target="_blank">here</a>', 'woocommerce' ),$key_url),
         'default' => '',
         'class' => 'v1_vtdirect_settings'
       ),
     );
+
+    if (get_woocommerce_currency() != 'IDR')
+    {
+      $this->form_fields['to_idr_rate'] = array(
+        'title' => __("Current Currency to IDR Rate", 'woocommerce'),
+        'type' => 'text',
+        'class'     => 'veritrans_direct',
+        'description' => 'The current currency to IDR rate',
+        'default' => '10000',
+        'class' => 'v1_vtdirect_settings'
+      );
+    }
   }
 
   /**
@@ -425,6 +434,14 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
           'price' => $item['line_total'],
           'quantity' => 1,
           ); 
+      }
+    }
+
+    // sift through the entire item to ensure that currency conversion is applied
+    if (get_woocommerce_currency() != 'IDR')
+    {
+      foreach ($items as &$item) {
+        $item['price'] = $item['price'] * $this->to_idr_rate;
       }
     }
 
