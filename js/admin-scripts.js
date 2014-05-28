@@ -17,8 +17,6 @@
     } else{
       $('#woocommerce_veritrans_select_veritrans_payment').closest('tr').show();
     }
-
-    debugger;
     
   }
 

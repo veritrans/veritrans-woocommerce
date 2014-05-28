@@ -53,17 +53,10 @@ var wc_veritrans = {
    */
   _cardset: function() {
     return {
-<<<<<<< HEAD
-      card_number: $('[name="veritrans_credit_card"]').val(),
-      card_exp_month: $('[name="veritrans_card_exp_month"]').val(),
-      card_exp_year: $('[name="veritrans_card_exp_year"]').val(),
-      card_cvv: $('[name="veritrans_security"]').val()
-=======
       card_number: $('.veritrans_credit_card').val(),
       card_exp_month: $('.veritrans_card_exp_month').val(),
       card_exp_year: $('.veritrans_card_exp_year').val(),
       card_cvv: $('.veritrans_security').val()
->>>>>>> 91949d1bd0bde6a286483f48add16e9f058be743
     }
   },
 
