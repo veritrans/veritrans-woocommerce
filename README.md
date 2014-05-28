@@ -26,9 +26,5 @@ The manual installation method involves downloading our feature-rich plugin and 
 
 1. Download the plugin file to your computer and unzip it
 2. Using an FTP program, or your hosting control panel, upload the unzipped plugin folder to your WordPress installation's wp-content/plugins/ directory.
-<<<<<<< HEAD
 3. Activate the plugin from the Plugins menu within the WordPress admin.
 4. Insert http://[your web]/vt_payment_handling/ as your Payment Notification URL in your MAP
-=======
-3. Activate the plugin from the Plugins menu within the WordPress admin.
->>>>>>> 91949d1bd0bde6a286483f48add16e9f058be743
