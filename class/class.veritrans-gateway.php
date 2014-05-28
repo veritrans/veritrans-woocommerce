@@ -1,6 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__) . '/../lib/veritrans/veritrans.php');
+require_once(dirname(__FILE__) . '/../lib/veritrans/lib/veritrans_notification.php');
 
 /**
 	 * Veritrans Payment Gateway Class
@@ -49,7 +50,6 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 
 		// Payment listener/API hook
 		add_action( 'woocommerce_api_wc_gateway_veritrans', array( &$this, 'veritrans_vtweb_response' ) );
-		
     add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( &$this, 'process_admin_options' ) ); 
     add_action( 'wp_enqueue_scripts', array( &$this, 'veritrans_scripts' ) );
     add_action( 'admin_print_scripts-woocommerce_page_woocommerce_settings', array( &$this, 'veritrans_admin_scripts' ));
@@ -837,37 +837,73 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 	 * @return void
 	 */
 	function veritrans_vtweb_response() {
+    global $woocommerce;
 		@ob_clean();
 
     $params = json_decode( file_get_contents('php://input'), true );
 
-    if( $params ) {
+    if (2 == $this->api_version)
+    {
 
-      if( ('' != $params['orderId']) && ('success' == $params['mStatus']) ){
-        $token_merchant = get_post_meta( $params['orderId'], '_token_merchant', true );
-        
-        $this->log->add('veritrans', 'Receiving notif for order with ID: ' . $params['orderId']);
-        $this->log->add('veritrans', 'Matching token merchant: ' . $token_merchant . ' = ' . $params['TOKEN_MERCHANT'] );
+      $veritrans_notification = new VeritransNotification();
 
-        if( $params['TOKEN_MERCHANT'] == $token_merchant ) {
-          header( 'HTTP/1.1 200 OK' );
-          $this->log->add( 'veritrans', 'Token Merchant match' );
-          do_action( "valid-veritrans-web-request", $params );
+      if (in_array($veritrans_notification->status_code, array(200, 201, 202)))
+      {
+
+        $veritrans = new Veritrans();
+        $veritrans->server_key = $this->server_key;
+        $veritrans_confirmation = $veritrans->confirm($veritrans_notification->order_id);
+
+        if ($veritrans_confirmation)
+        {
+          $order = new WC_Order( $veritrans_confirmation['order_id'] );
+          if ($veritrans_confirmation['transaction_status'] == 'capture')
+          {
+            $order->payment_complete();
+            $order->reduce_order_stock();
+          } else if ($veritrans_confirmation['transaction_status'] == 'challenge') 
+          {
+            $order->update_status('on-hold');
+          } else if ($veritrans_confirmation['transaction_status'] == 'deny')
+          {
+            $order->update_status('failed');
+          }
+          $woocommerce->cart->empty_cart();
         }
+        
       }
 
-      elseif( 'failure' == $params['mStatus'] ) {
-        global $woocommerce;
-        // Remove cart
-        $woocommerce->cart->empty_cart();
-      }
+    } else
+    {
+      if( $params ) {
 
-      else {
-        wp_die( "Veritrans Request Failure" );
+        if( ('' != $params['orderId']) && ('success' == $params['mStatus']) ){
+          $token_merchant = get_post_meta( $params['orderId'], '_token_merchant', true );
+          
+          $this->log->add('veritrans', 'Receiving notif for order with ID: ' . $params['orderId']);
+          $this->log->add('veritrans', 'Matching token merchant: ' . $token_merchant . ' = ' . $params['TOKEN_MERCHANT'] );
+
+          if( $params['TOKEN_MERCHANT'] == $token_merchant ) {
+            header( 'HTTP/1.1 200 OK' );
+            $this->log->add( 'veritrans', 'Token Merchant match' );
+            do_action( "valid-veritrans-web-request", $params );
+          }
+        }
+
+        elseif( 'failure' == $params['mStatus'] ) {
+          global $woocommerce;
+          // Remove cart
+          $woocommerce->cart->empty_cart();
+        }
+
+        else {
+          wp_die( "Veritrans Request Failure" );
+        }
       }
     }
 	}
 	
+
 	function successful_request( $posted ) {
 		global $woocommerce;
 

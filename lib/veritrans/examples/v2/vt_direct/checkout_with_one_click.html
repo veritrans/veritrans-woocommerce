@@ -1,0 +1,24 @@
+<html>
+<head>
+	<title>ONE Click</title>
+	<!-- Include PaymentAPI  -->
+	<link rel="stylesheet" href="css/jquery.fancybox.css">
+</head>
+<body>
+	<script type="text/javascript" src="https://api.sandbox.veritrans.co.id/v2/assets/js/veritrans.js"></script>
+
+	<h1>ONE Click - Checkout</h1>
+	<form action="checkout_process.php" method="POST" id="payment-form">
+		<fieldset>
+			<legend>Checkout</legend>
+			
+			<p>
+				<label>Saved Token ID (demo purpose, it should be on the backend)</label>
+				<input name="token_id" size="20" type="text" autocomplete="off"/>
+			</p>
+						<button class="submit-button" type="submit">Submit Payment</button>
+		</fieldset>
+	</form>
+
+</body>
+</html>
