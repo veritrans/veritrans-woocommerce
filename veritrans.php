@@ -2,7 +2,7 @@
 
 // PHP Wrapper for Veritrans VT-Web Payment API.
 
-require_once 'veritrans_factory.php';
+require_once 'lib/veritrans_factory.php';
 
 class Veritrans
 {
@@ -41,7 +41,8 @@ class Veritrans
   public function __construct($params = null) 
   {
     // maintain compatibility with vt-web2 branch by setting default variables.
-    $this->version = self::VERSION_STABLE;
+    // $this->version = self::VERSION_STABLE;
+    $this->version = 2;
     $this->environment = self::ENVIRONMENT_DEVELOPMENT;
     $this->veritrans_method = self::VT_WEB;
     $this->veritrans_engine = new Veritrans\Factory($this);

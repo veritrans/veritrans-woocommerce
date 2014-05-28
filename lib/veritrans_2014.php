@@ -2,8 +2,8 @@
 
 namespace Veritrans;
 
-require_once 'veritrans.php';
-require_once 'veritrans_utility.php';
+require_once(dirname(__FILE__) . '/../veritrans.php');
+require_once(dirname(__FILE__) . '/veritrans_utility.php');
 
 class Veritrans2014 {
 
@@ -21,7 +21,7 @@ class Veritrans2014 {
   public function confirm($transaction_id)
   {
     $uri = "/$transaction_id/status";
-    return Utilily::remoteCall($this->_getBaseUrl() . $uri, $this->veritrans->server_key, NULL);
+    return Utility::get($this->_getBaseUrl() . $uri, $this->veritrans->server_key, NULL);
   }
 
   public function charge($options)
@@ -102,6 +102,8 @@ class Veritrans2014 {
     if ($payment_type_str == 'credit_card')
     {
       $data[$payment_type_str]['token_id'] = $this->veritrans->token_id;
+      $data[$payment_type_str]['bank'] = $this->veritrans->bank;
+      $data[$payment_type_str]['save_token_id'] = $this->veritrans->save_token_id;
     }
     
     $data['transaction_details'] = array();
@@ -130,11 +132,7 @@ class Veritrans2014 {
     if ($this->veritrans->enable_3d_secure)
       $data['secure'] = TRUE;
 
-    if ($this->veritrans->enforce_sanitization)
-      $this->_sanitize();
-
-    return $data;
-        
+    return $data;        
   }
 
   protected function _getBaseUrl() {

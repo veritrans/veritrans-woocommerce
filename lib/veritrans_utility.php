@@ -4,7 +4,12 @@ namespace Veritrans;
 
 class Utility {
 
-  public static function remoteCall($url, $server_key, $data_hash)
+  public static function get($url, $server_key, $data_hash)
+  {
+    return Utility::remoteCall($url, $server_key, $data_hash, false);
+  }
+
+  public static function remoteCall($url, $server_key, $data_hash, $post = true)
   {
     $ch = curl_init();
     
@@ -19,7 +24,9 @@ class Utility {
       'Accept: application/json',
       'Authorization: Basic ' . base64_encode($server_key . ':')
       ));
-    curl_setopt($ch, CURLOPT_POST, 1);
+
+    if ($post)
+      curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
     $result = curl_exec($ch);
