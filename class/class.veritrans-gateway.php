@@ -214,9 +214,9 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
         'default' => 2,
         'description' => __( 'Select the Veritrans API version', 'woocommerce' ),
         'options'   => array(
-                1    => __( 'v1', 'woocommerce' ),
-                2   => __( 'v2', 'woocommerce' ),
-              ),
+          1    => __( 'v1', 'woocommerce' ),
+          2   => __( 'v2', 'woocommerce' ),
+        ),
       ),
 			'select_veritrans_payment' => array(
         'title' => __( 'Payment Method', 'woocommerce' ),
@@ -227,32 +227,37 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 								'veritrans_direct' 		=> __( 'Direct', 'woocommerce' ),
 								'veritrans_web' 	=> __( 'Web', 'woocommerce' ),
 							),
+        'class' => 'v1_settings sensitive',
       ),
 			'merchant_id' => array(
         'title' => __( 'Merchant ID', 'woocommerce' ),
         'type' => 'text',
 				'class'			=> 'veritrans_web',
         'description' => sprintf(__( 'Enter your Veritrans Merchant ID. Get the ID <a href="%s" target="_blank">here</a>', 'woocommerce' ),$key_url),
+        'class' => 'v1_vtweb_settings sensitive',
       ),
 			'merchant_hash_key' => array(
         'title' => __( 'Merchant Hash Key', 'woocommerce' ),
         'type' => 'text',
 				'class'			=> 'veritrans_web',
         'description' => sprintf(__( 'Enter your Veritrans Merchant hash key. Get the key <a href="%s" target="_blank">here</a>', 'woocommerce' ),$key_url),
+        'class' => 'v1_vtweb_settings sensitive',
       ),
       'client_key' => array(
         'title' => __("Client Key", 'woocommerce'),
         'type' => 'text',
 				'class'			=> 'veritrans_direct',
         'description' => sprintf(__('Input your Veritrans Client Key. Get the key <a href="%s" target="_blank">here</a>', 'woocommerce' ),$key_url),
-        'default' => ''
+        'default' => '',
+        'class' => 'v1_vtdirect_settings',
       ),
       'server_key' => array(
         'title' => __("Server Key", 'woocommerce'),
         'type' => 'text',
 				'class'			=> 'veritrans_direct',
         'description' => sprintf(__('Input your Veritrans Server Key. Get the key <a href="%s" target="_blank">here</a>', 'woocommerce' ),$key_url),
-        'default' => ''
+        'default' => '',
+        'class' => 'v1_vtdirect_settings'
       ),
     );
   }
