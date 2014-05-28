@@ -44,13 +44,25 @@ class Veritrans2014 {
       ));
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
-    $result = curl_exec($ch);
+    try {
+      $result = curl_exec($ch);
+      if (FALSE === $result)
+        throw new \Exception(curl_error($ch), curl_errno($ch));
 
-    curl_close($ch);
+      curl_close($ch);
 
-    // convert the result into an associative array
-    return json_decode($result, true);
+      // convert the result into an associative array
+      return json_decode($result, true);  
+    } catch {
+      trigger_error(sprintf(
+        'Curl failed with error #%d: %s',
+        $e->getCode(), $e->getMessage()),
+        E_USER_ERROR);
+      exit;
+    }
+    
 
   }
 
@@ -86,7 +98,7 @@ class Veritrans2014 {
   {
     $total = 0;
     foreach ($this->veritrans->items as $item) {
-      $total += intval($item['price']) * intval($item['quantity']);
+      $total += $item['price'] * intval($item['quantity']);
     }
     return $total;
   }
