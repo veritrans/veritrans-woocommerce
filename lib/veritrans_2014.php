@@ -63,7 +63,6 @@ class Veritrans2014 {
       exit;
     }
     
-
   }
 
   protected function _getPaymentType()
@@ -142,7 +141,26 @@ class Veritrans2014 {
     $data['customer_details']['billing_address']['country_code'] = $this->veritrans->country_code;
 
     if ($this->veritrans->enable_3d_secure)
-      $data['secure'] = TRUE;
+    {
+      if ($this->veritrans->payment_type == \Veritrans::VT_WEB)
+      {
+        if (is_array($this->veritrans->enable_3d_secure))
+        {
+          foreach ($this->veritrans->enable_3d_secure as $method) {
+            $data[$payment_type_str][$method . '_3d_secure'] = true ;
+          }
+        } else
+        {
+          foreach (array("credit_card", "mandiri_clickpay", "cimb_clicks", "permata") as $method) {
+            $data[$payment_type_str][$method . '_3d_secure'] = true ;
+          }
+        }
+      } else
+      {
+        $data['secure'] = TRUE;
+      }
+    }
+      
 
     return $data;        
   }

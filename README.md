@@ -388,10 +388,16 @@ $veritrans->items = $items;
 
 There are myriads of options to be set with Veritrans. Please consult [this page](http://docs.veritrans.co.id/vtweb/other_features.html) to see the optional features that can be set with Veritrans.
 
+- __Setting the available payment methods:__
+	```php
+	$veritrans->payment_methods	= array("credit_card", "mandiri_clickpay");
+	```
+
 - __3-D Secure:__ Enable a more powerful authentication for your customer. You (or your merchant) must sign additional documents with Veritrans though to activate it. 
   
   ```php
-  $veritrans->enable_3d_secure = TRUE;
+  $veritrans->enable_3d_secure = TRUE; // enable 3d secure for ALL payment methods
+  $veritrans->enable_3d_secure = array("credit_card", "mandiri_clickpay"); // enable 3d secure for only "credit_card" and "mandiri_clickpay" methods
 	```
 
 - __Promo:__ Set promotion.
@@ -420,11 +426,6 @@ There are myriads of options to be set with Veritrans. Please consult [this page
 - __Transaction with shopping points:__
 	```php
 	$veritrans->point_banks	= array("bni", "cimb");
-	```
-
-- __Setting the available payment methods:__
-	```php
-	$veritrans->payment_methods	= array("credit_card", "mandiri_clickpay");
 	```
 
 ### Forcing sanitization
