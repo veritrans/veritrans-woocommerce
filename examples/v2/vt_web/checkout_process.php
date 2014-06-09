@@ -40,12 +40,12 @@ $veritrans->shipping_phone = $_POST['shipping_phone'];
 $veritrans->email = $_POST['email'];
 
 // Payment options
-// $veritrans->enable_3d_secure = 1;
-$veritrans->bank         = "mandiri";
+$veritrans->enable_3d_secure = 1;
+// $veritrans->bank         = "mandiri";
 // $veritrans->installment_banks  = array("bni", "cimb");
-$veritrans->promo_bins     = array("4");
+// $veritrans->promo_bins     = array("4");
 // $veritrans->point_banks      = array("bni", "cimb");
-// $veritrans->payment_methods    = array("credit_card", "mandiri_clickpay");
+// $veritrans->payment_methods    = array("credit_card");
 // $veritrans->installment_terms   = array(
 //  'bni' => array(3,12),
 //  'cimb' => array(3, 6, 12)
@@ -82,8 +82,7 @@ try {
   {
 
     // print the error
-    var_dump($veritrans->errors);
-    
+    var_dump($keys);
     exit();
 
   } else {
