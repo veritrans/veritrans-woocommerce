@@ -48,9 +48,13 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 
 		$this->merchant_id     		= $this->get_option( 'merchant_id' );
     $this->merchant_hash_key 	= $this->get_option( 'merchant_hash_key' );
+    
     $this->api_version        = $this->get_option( 'select_veritrans_api_version' );
     $this->environment        = $this->get_option( 'select_veritrans_environment' );
+    
     $this->to_idr_rate        = $this->get_option( 'to_idr_rate' );
+
+    $this->enable_3d_secure   = $this->get_option( 'enable_3d_secure' );
 
     $this->log = new WC_Logger(); 
 
@@ -306,6 +310,12 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
         'default' => '',
         'class' => 'v2_production_settings sensitive'
       ),
+      'enable_3d_secure' => array(
+        'title' => __( 'Enable 3D Secure', 'woocommerce' ),
+        'type' => 'checkbox',
+        'label' => __( 'Enable 3D Secure?', 'woocommerce' ),
+        'default' => 'no'
+      ),
     );
 
     if (get_woocommerce_currency() != 'IDR')
@@ -394,6 +404,8 @@ class WC_Gateway_Veritrans extends WC_Payment_Gateway {
     {
       $veritrans->server_key = $this->server_key_v2_sandbox;
     }
+    if ($this->enable_3d_secure == 'yes')
+      $veritrans->enable_3d_secure = TRUE;
     
     $veritrans->order_id = $order_id;
 
