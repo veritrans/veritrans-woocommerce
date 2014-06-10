@@ -3,7 +3,7 @@
 Plugin Name: Veritrans - WooCommerce Payment Gateway
 Plugin URI: http://colorlabsproject.com/plugins/veritrans/
 Description: Accept all payment directly on your WooCommerce site in a seamless and secure checkout environment with <a href="http://veritrans.co.id" target="_blank">Veritrans.co.id</a>
-Version: 1.1.0
+Version: 1.3.0
 Author: ColorLabs & Company
 Author URI: http://colorlabsproject.com
 License: GPLv2 or later
