@@ -54,6 +54,8 @@
       $this->to_idr_rate        = $this->get_option( 'to_idr_rate' );
 
       $this->enable_3d_secure   = $this->get_option( 'enable_3d_secure' );
+      $this->enable_mandiri_clickpay = $this->get_option( 'mandiri_clickpay' );
+      $this->enable_cimb_clicks = $this->get_option( 'cimb_clicks' );
 
       $this->log = new WC_Logger(); 
 
@@ -180,7 +182,7 @@
       $key_url = 'https://payments.veritrans.co.id/map/settings/config_info';
       $v2_sandbox_key_url = 'https://my.sandbox.veritrans.co.id';
       $v2_production_key_url = 'https://my.veritrans.co.id';
-      
+
       $this->form_fields = array(
         'enabled' => array(
           'title' => __( 'Enable/Disable', 'woocommerce' ),
@@ -245,6 +247,18 @@
           'label' => __( 'Enable 3D Secure?', 'woocommerce' ),
           'default' => 'no'
         ),
+        'mandiri_clickpay' => array(
+          'title' => __( 'Enable Mandiri Clickpay', 'woocommerce' ),
+          'type' => 'checkbox',
+          'label' => __( 'Enable Mandiri Clickpay?', 'woocommerce' ),
+          'default' => 'no'
+        ),
+        'cimb_clicks' => array(
+          'title' => __( 'Enable CIMB Clicks', 'woocommerce' ),
+          'type' => 'checkbox',
+          'label' => __( 'Enable CIMB Clicks?', 'woocommerce' ),
+          'default' => 'no'
+        )
       );
 
       if (get_woocommerce_currency() != 'IDR')
@@ -293,72 +307,74 @@
      * Charge Payment 
      */
     function charge_payment( $order_id ) {
-      $this->charge_v2_vtweb_payment( $order_id );
-    }
-
-    /**
-     * Routine for charging v2 VT-WEB
-     */
-    function charge_v2_vtweb_payment( $order_id )
-    {
       global $woocommerce;
       $order_items = array();
 
       $order = new WC_Order( $order_id );     
-  	
-    	Veritrans::$isProduction = ($this->environment == 'production' ? true : false);
+    
+      Veritrans_Config::$isProduction = ($this->environment == 'production' ? true : false);
         
-    	if (Veritrans::$isProduction) {
-        Veritrans::$serverKey = $this->server_key_v2_production;
+      if (Veritrans_Config::$isProduction) {
+        Veritrans_Config::$serverKey = $this->server_key_v2_production;
       }
       else {
-        Veritrans::$serverKey = $this->server_key_v2_sandbox;
+        Veritrans_Config::$serverKey = $this->server_key_v2_sandbox;
       }
 
       if ($this->enable_3d_secure == 'yes') {
-        Veritrans::$is3ds = TRUE;
+        Veritrans_Config::$is3ds = TRUE;
       }
       
       $params = array(
-  		  'transaction_details' => array(
-    			'order_id' => $order_id,
-    			'gross_amount' => 0,
-  		  ),
-  		  'vtweb' => array()
+        'transaction_details' => array(
+          'order_id' => $order_id,
+          'gross_amount' => 0,
+        ),
+        'vtweb' => array()
       );
-  	
-    	$customer_details = array();
-    	$customer_details['first_name'] = $_POST['billing_first_name'];
-    	$customer_details['last_name'] = $_POST['billing_last_name'];
-    	$customer_details['email'] = $_POST['billing_email'];
-    	$customer_details['phone'] = $_POST['billing_phone'];
-    	
-    	$billing_address = array();
-    	$billing_address['first_name'] = $_POST['billing_first_name'];
-    	$billing_address['last_name'] = $_POST['billing_last_name'];
-    	$billing_address['address'] = $_POST['billing_address_1'];
-    	$billing_address['city'] = $_POST['billing_city'];
-    	$billing_address['postal_code'] = $_POST['billing_postcode'];
+
+      $enabled_payments = array('credit_card');
+      
+      if ($this->enable_mandiri_clickpay)
+        $enabled_payments[] = 'mandiri_clickpay';
+
+      if ($this->enable_cimb_clicks)
+        $enabled_payments[] = 'cimb_clicks';
+
+      $params['vtweb']['enabled_payments'] = $enabled_payments;
+
+      $customer_details = array();
+      $customer_details['first_name'] = $_POST['billing_first_name'];
+      $customer_details['last_name'] = $_POST['billing_last_name'];
+      $customer_details['email'] = $_POST['billing_email'];
+      $customer_details['phone'] = $_POST['billing_phone'];
+      
+      $billing_address = array();
+      $billing_address['first_name'] = $_POST['billing_first_name'];
+      $billing_address['last_name'] = $_POST['billing_last_name'];
+      $billing_address['address'] = $_POST['billing_address_1'];
+      $billing_address['city'] = $_POST['billing_city'];
+      $billing_address['postal_code'] = $_POST['billing_postcode'];
       $billing_address['phone'] = $_POST['billing_phone'];
-    	$billing_address['country_code'] = $_POST['billing_country'];
-    	
-    	$customer_details['billing_address'] = $billing_address;
-  	
-    	if ($_POST['ship_to_different_address']) {
-    	  $shipping_address = array();
+      $billing_address['country_code'] = $_POST['billing_country'];
+      
+      $customer_details['billing_address'] = $billing_address;
+    
+      if ($_POST['ship_to_different_address']) {
+        $shipping_address = array();
         $shipping_address['first_name'] = $_POST['shipping_first_name'];
         $shipping_address['last_name'] = $_POST['shipping_last_name'];
-    	  $shipping_address['address'] = $_POST['shipping_address_1'];
+        $shipping_address['address'] = $_POST['shipping_address_1'];
         $shipping_address['city'] = $_POST['shipping_city'];
-    	  $shipping_address['postal_code'] = $_POST['shipping_postcode'];
+        $shipping_address['postal_code'] = $_POST['shipping_postcode'];
         $shipping_address['phone'] = $_POST['billing_phone'];
-    	  $shipping_address['country_code'] = $_POST['shipping_country'];
-    	  
-    	  $customer_details['shipping_address'] = $shipping_address;
-    	}
-    	
-    	$params['customer_details'] = $customer_details;
-    	
+        $shipping_address['country_code'] = $_POST['shipping_country'];
+        
+        $customer_details['shipping_address'] = $shipping_address;
+      }
+      
+      $params['customer_details'] = $customer_details;
+      
       // Populate Items
       $items = array();
 
@@ -372,7 +388,7 @@
             $veritrans_item['id']    = $item['product_id'];
             $veritrans_item['price']      = $order->get_item_subtotal( $item, false );
             $veritrans_item['quantity']   = $item['qty'];
-    	      $veritrans_item['name'] = $item['name'];
+            $veritrans_item['name'] = $item['name'];
             
             $items[] = $veritrans_item;
           }
@@ -421,24 +437,24 @@
 
         unset($item);
       }
-    	
-    	$params['item_details'] = $items;
-    	
-    	foreach ($items as $item) {
-    		$params['transaction_details']['gross_amount'] += $item['price'] * intval($item['quantity']);
-    	}
+      
+      $params['item_details'] = $items;
+      
+      foreach ($items as $item) {
+        $params['transaction_details']['gross_amount'] += $item['price'] * intval($item['quantity']);
+      }
         
         // $charge_result = $veritrans->getTokens();
-        
-    	try {
-    		// Redirect to Veritrans VTWeb page
-    		header('Location: ' . Veritrans_VtWeb::getRedirectionUrl($params));
-    		exit;
-    	}
-    	catch (Exception $e) {
-    		echo $e->getMessage();
-    	}
-  	
+      
+      try {
+        // Redirect to Veritrans VTWeb page
+        header('Location: ' . Veritrans_VtWeb::getRedirectionUrl($params));
+        exit;
+      }
+      catch (Exception $e) {
+        echo $e->getMessage();
+      }
+    
       // If wp_remote_post failed
       // if( $veritrans->error ) {
         // throw new Exception( $veritrans->error );
@@ -548,14 +564,14 @@
       $params = json_decode( file_get_contents('php://input'), true );
 
       if ($this->environment == 'production') {
-        Veritrans::$serverKey = $this->server_key_v2_production;
+        Veritrans_Config::$serverKey = $this->server_key_v2_production;
       } else {
-        Veritrans::$serverKey = $this->server_key_v2_sandbox;
+        Veritrans_Config::$serverKey = $this->server_key_v2_sandbox;
       }
       
       $veritrans_notification = new Veritrans_Notification();
       
-      if ($veritrans_notification->verified()) {
+      if ($veritrans_notification->isVerified()) {
         if (in_array($veritrans_notification->status_code, array(200, 201, 202))) {
 
           $veritrans_confirmation = Veritrans_Transaction::status($veritrans_notification->order_id);
