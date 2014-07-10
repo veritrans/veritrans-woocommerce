@@ -1,15 +1,11 @@
 <?php
 
-class Veritrans_VtWeb {
+class Veritrans_VtDirect {
 
-  public static function getRedirectionUrl($params)
+  public static function charge($params)
   {
     $payloads = array(
-        'payment_type' => 'vtweb',
-        'vtweb' => array(
-          'enabled_payments' => array('credit_card'),
-          'credit_card_3d_secure' => Veritrans_Config::$is3ds
-        )
+        'payment_type' => 'credit_card'
       );
 
     if (array_key_exists('item_details', $params)) {
@@ -22,11 +18,15 @@ class Veritrans_VtWeb {
 
     $payloads = array_replace_recursive($payloads, $params);
 
+    if (Veritrans_Config::$isSanitized) {
+      Veritrans_Sanitizer::jsonRequest($payloads);
+    }
+
     $result = Veritrans_ApiRequestor::post(
         Veritrans_Config::getBaseUrl() . '/charge',
         Veritrans_Config::$serverKey,
         $payloads);
 
-    return $result->redirect_url;
+    return $result;
   }
 }
