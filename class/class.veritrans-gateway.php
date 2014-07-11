@@ -336,8 +336,7 @@
         $billing_address['city'] = $_POST['billing_city'];
         $billing_address['postal_code'] = $_POST['billing_postcode'];
         $billing_address['phone'] = $_POST['billing_phone'];
-        $billing_address['country_code'] = $_POST['billing_country'];
-        
+        $billing_address['country_code'] = $this->convert_country_code($_POST['billing_country']);
         $customer_details['billing_address'] = $billing_address;
       
         if ($_POST['ship_to_different_address']) {
@@ -348,7 +347,7 @@
           $shipping_address['city'] = $_POST['shipping_city'];
           $shipping_address['postal_code'] = $_POST['shipping_postcode'];
           $shipping_address['phone'] = $_POST['billing_phone'];
-          $shipping_address['country_code'] = $_POST['shipping_country'];
+          $shipping_address['country_code'] = $this->convert_country_code($_POST['shipping_country']);
           
           $customer_details['shipping_address'] = $shipping_address;
         }
