@@ -10,13 +10,13 @@ Veritrans payment gateway is an online payment gateway that is highly concerned 
 Payment Method Feature:
 
 - VT Web
-- VT Direct
 
 ### Installation
 
 #### Minimum Requirements
 
-* WordPress 3.3 or greater
+* WordPress 3.9.1 or greater
+* WooCommerce 2.1.11 or greater
 * PHP version 5.2.4 or greater
 * MySQL version 5.0 or greater
 
