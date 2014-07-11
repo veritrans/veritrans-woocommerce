@@ -7,18 +7,6 @@
     	 */
     class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 
-      // const VT_REQUEST_KEY_URL = 'https://payments.veritrans.co.id/web1/commodityRegist.action';
-      // const VT_PAYMENT_REDIRECT_URL = 'https://payments.veritrans.co.id/web1/paymentStart.action';
-      const VT_REQUEST_KEY_URL = 'https://vtweb.veritrans.co.id/v1/tokens.json';
-      const VT_PAYMENT_REDIRECT_URL = 'https://vtweb.veritrans.co.id/v1/payments.json';
-
-      private $version = 1;
-
-      // Redirect url configuration [optional. Can also be set at Merchant Administration Portal(MAP)]
-      private $finish_payment_return_url;
-      private $unfinish_payment_return_url;
-      private $error_payment_return_url;
-
       /**
        * Constructor
        */
@@ -38,16 +26,11 @@
         $this->description    		= $this->get_option( 'description' );
     		$this->select_veritrans_payment = $this->get_option( 'select_veritrans_payment' );
         
-        $this->client_key     		= $this->get_option( 'client_key' );
-        $this->server_key     		= $this->get_option( 'server_key' );
         $this->client_key_v2_sandbox         = $this->get_option( 'client_key_v2_sandbox' );
         $this->server_key_v2_sandbox         = $this->get_option( 'server_key_v2_sandbox' );
         $this->client_key_v2_production         = $this->get_option( 'client_key_v2_production' );
         $this->server_key_v2_production         = $this->get_option( 'server_key_v2_production' );
 
-    		$this->merchant_id     		= $this->get_option( 'merchant_id' );
-        $this->merchant_hash_key 	= $this->get_option( 'merchant_hash_key' );
-        
         $this->api_version        = 2;
         $this->environment        = $this->get_option( 'select_veritrans_environment' );
         
@@ -58,6 +41,10 @@
         $this->enable_mandiri_clickpay = $this->get_option( 'mandiri_clickpay' );
         $this->enable_cimb_clicks = $this->get_option( 'cimb_clicks' );
 
+        $this->client_key         = ($this->environment == 'production')
+            ? $this->client_key_v2_production
+            : $this->client_key_v2_sandbox;
+
         $this->log = new WC_Logger();
 
     		// Payment listener/API hook
@@ -67,7 +54,6 @@
         add_action( 'admin_print_scripts-woocommerce_page_woocommerce_settings', array( &$this, 'veritrans_admin_scripts' ));
     		add_action( 'admin_print_scripts-woocommerce_page_wc-settings', array( &$this, 'veritrans_admin_scripts' ));
     		add_action( 'valid-veritrans-web-request', array( $this, 'successful_request' ) );
-    		add_action( 'woocommerce_receipt_veritrans', array( $this, 'receipt_page' ) );
       }
 
       /**
@@ -103,77 +89,6 @@
         </table><!--/.form-table-->
         <?php
       }
-
-      /**
-       * Payment Fields
-       *
-       * Show form containing Credit Cards details
-       */
-      function payment_fields() { 
-
-    		if($this->description) echo '<p>'.$this->description.'</p>';
-
-    		if('veritrans_direct'==$this->select_veritrans_payment) : ?>	
-          <p class="form-row validate-required" id="veritrans_credit_card_field">
-            <label for="veritrans_credit_card_field">
-              <?php _e('Credit Card Number'); ?>
-              <abbr class="required" title="required">*</abbr>
-            </label>
-            <input type="text" class="input-text veritrans_credit_card" maxlength="16">
-          </p>
-
-          <p class="form-row" id="veritrans_card_exp_month_field">
-            <label for="veritrans_card_exp_month_field">
-              <?php _e('Expiration Date - Month', 'woocommerce'); ?>
-              <abbr class="required" title="required">*</abbr>
-            </label>
-            <select class="veritrans_card_exp_month">
-              <?php $month_list = array(
-                '01' => '01 - January',
-                '02' => '02 - February',
-                '03' => '03 - March',
-                '04' => '04 - April',
-                '05' => '05 - May',
-                '06' => '06 - June',
-                '07' => '07 - July',
-                '08' => '08 - August',
-                '09' => '09 - September',
-                '10' => '10 - October',
-                '11' => '11 - November',
-                '12' => '12 - December'
-              ); ?>
-              <option value="">--</option>
-              <?php foreach( $month_list as $month => $name ) : ?>
-                <option value="<?php echo $month; ?>"><?php echo $name; ?></option>
-              <?php endforeach; ?>
-            </select>
-          </p>
-
-          <p class="form-row" id="veritrans_card_exp_year_field">
-            <label for="veritrans_card_exp_year_field">
-              <?php _e('Expiration Date - Year', 'woocommerce'); ?>
-              <abbr class="required" title="required">*</abbr>
-            </label>
-            <select class="veritrans_card_exp_year">
-              <option value="">--</option>
-              <?php $years = range( date("Y"), date("Y") + 14 );
-              foreach( $years as $year ) : ?>
-                <option value="<?php echo $year; ?>"><?php echo $year; ?></option>
-              <?php endforeach; ?>
-            </select>
-          </p>
-
-          <p class="form-row validate-required" id="veritrans_security_field" maxlength="3">
-            <label for="veritrans_security_field">
-              <?php _e('Security Code', 'woocommerce'); ?>
-              <abbr class="required" title="required"><a target="_blank" href="https://www.veritrans.co.id/payment-help.html">[?]</a></abbr>
-            </label>
-            <input type="text" class="input-text veritrans_security">
-          </p>
-
-          <input type="text" name="veritrans_token_id" class="hide" style="display:none">
-        <?php endif; ?>
-      <?php }
 
       /**
        * Initialise Gateway Settings Form Fields
@@ -336,7 +251,8 @@
         $billing_address['city'] = $_POST['billing_city'];
         $billing_address['postal_code'] = $_POST['billing_postcode'];
         $billing_address['phone'] = $_POST['billing_phone'];
-        $billing_address['country_code'] = $this->convert_country_code($_POST['billing_country']);
+        $billing_address['country_code'] = $_POST['billing_country'];
+        
         $customer_details['billing_address'] = $billing_address;
       
         if ($_POST['ship_to_different_address']) {
@@ -347,7 +263,7 @@
           $shipping_address['city'] = $_POST['shipping_city'];
           $shipping_address['postal_code'] = $_POST['shipping_postcode'];
           $shipping_address['phone'] = $_POST['billing_phone'];
-          $shipping_address['country_code'] = $this->convert_country_code($_POST['shipping_country']);
+          $shipping_address['country_code'] = $_POST['shipping_country'];
           
           $customer_details['shipping_address'] = $shipping_address;
         }
@@ -426,73 +342,6 @@
         return Veritrans_VtWeb::getRedirectionUrl($params);
       }
 
-      /**
-       * Hook into receipt page, the destination page after checkout redirect
-       */
-    	function receipt_page( $order ) {
-    		echo '<p>'.__( 'Thank you for your order, please click the button below to pay with Veritrans.', 'woocommerce' ).'</p>';
-    		echo $this->generate_veritrans_form( $order );
-    	}
-    	
-      /**
-       * Generate redirect form
-       * @param  Int $order_id Order ID
-       * @return void
-       */
-    	public function generate_veritrans_form($order_id) {
-    		global $woocommerce;
-    		
-    		$order = new WC_Order( $order_id );
-        
-    		$woocommerce->add_inline_js( '
-    			$.blockUI({
-    				message: "' . esc_js( __( 'Thank you for your order. We are now redirecting you to Veritrans to make payment.', 'woocommerce' ) ) . '",
-    				baseZ: 99999,
-    				overlayCSS: {
-    					background: "#fff",
-    					opacity: 0.6
-    				},
-    				css: {
-    	        padding:        "20px",
-    	        zindex:         "9999999",
-    	        textAlign:      "center",
-    	        color:          "#555",
-    	        border:         "3px solid #aaa",
-    	        backgroundColor:"#fff",
-    	        cursor:         "wait",
-    	        lineHeight:		"24px",
-    		    }
-    			});
-    			jQuery("#submit_veritrans_payment_form").click();
-    		' );
-
-    		return '
-          <form action="'.self::VT_PAYMENT_REDIRECT_URL.'" method="post" id="sent_form_token" target="_top">
-      			<input type="hidden" name="merchant_id" value="'.$this->merchant_id.'" />
-      			<input type="hidden" name="order_id" value="'.$order_id.'" />
-      			<input type="hidden" name="token_browser" value="'.get_post_meta( $order_id, '_token_browser', true ).'" />
-      			<input id="submit_veritrans_payment_form" type="submit" class="button alt" value="Confirm Checkout" />
-      			<a class="button cancel" href="'.esc_url( $order->get_cancel_order_url() ).'">'.__( 'Cancel order &amp; restore cart', 'woocommerce' ).'</a>
-      		</form>';
-    	}	
-
-      /**
-       * Generate Merchant Hashs
-       * @param  String $merchantID       Merchant ID
-       * @param  String $merchant_hash    Merchant Hash Key
-       * @param  String $orderID          Order ID
-       * @return String                   Generated Hash Value
-       */
-    	private function generate_merchant_hash($merchantID, $merchant_hash, $orderID) {
-        $ctx  = hash_init('sha512');
-        $str  = $merchant_hash .
-          "," . $merchantID .
-          "," . $orderID;
-        hash_update($ctx, $str);
-        $hash = hash_final($ctx, true);
-        return bin2hex($hash);
-      }
-    	
     	/**
     	 * Check for Veritrans Web Response
     	 *
