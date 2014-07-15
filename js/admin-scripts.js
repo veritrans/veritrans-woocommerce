@@ -1,20 +1,20 @@
 (function($){
-function show_hide_fields( value ) {
-	var $this = $('#woocommerce_veritrans_select_veritrans_payment');
-	
-	$this.closest('tr').nextAll('tr').hide();
-	$('.'+value).closest('tr').show();
-}
+	function sensitiveOptions() {
+        var environment_type = $('#woocommerce_veritrans_select_veritrans_environment').val();
+        
+        var api_environment_string = environment_type + '_settings';
 
-$(document).ready(function(){
-	
-	show_hide_fields( $('#woocommerce_veritrans_select_veritrans_payment').val() );
-	
-	$('#woocommerce_veritrans_select_veritrans_payment').on('change', function(){
-		var $this = $(this),
-				value = $this.val();
-		show_hide_fields( value );
+        $('.sensitive').closest('tr').hide();
+        $('.' + api_environment_string).closest('tr').show();
+    }
+
+	$(document).ready(function(){
+		
+        $("#woocommerce_veritrans_select_veritrans_environment").on('change', function(e, data) {
+            sensitiveOptions();
+        });
+
+        sensitiveOptions();
+		
 	});
-	
-});
 })(jQuery);
