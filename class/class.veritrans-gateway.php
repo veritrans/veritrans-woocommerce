@@ -3,8 +3,8 @@
     require_once(dirname(__FILE__) . '/../lib/veritrans/Veritrans.php');
 
     /**
-    	 * Veritrans Payment Gateway Class
-    	 */
+       * Veritrans Payment Gateway Class
+       */
     class WC_Gateway_Veritrans extends WC_Payment_Gateway {
 
       /**
@@ -15,16 +15,16 @@
         $this->icon         = apply_filters( 'woocommerce_veritrans_icon', '' );
         $this->method_title = __( 'Veritrans', 'colabsthemes' );
         $this->has_fields   = true;
-    		$this->notify_url   = str_replace( 'https:', 'http:', add_query_arg( 'wc-api', 'WC_Gateway_Veritrans', home_url( '/' ) ) );
+        $this->notify_url   = str_replace( 'https:', 'http:', add_query_arg( 'wc-api', 'WC_Gateway_Veritrans', home_url( '/' ) ) );
 
         // Load the settings
         $this->init_form_fields();
         $this->init_settings();
 
         // Get Settings
-        $this->title          		= $this->get_option( 'title' );
-        $this->description    		= $this->get_option( 'description' );
-    		$this->select_veritrans_payment = $this->get_option( 'select_veritrans_payment' );
+        $this->title              = $this->get_option( 'title' );
+        $this->description        = $this->get_option( 'description' );
+        $this->select_veritrans_payment = $this->get_option( 'select_veritrans_payment' );
         
         $this->client_key_v2_sandbox         = $this->get_option( 'client_key_v2_sandbox' );
         $this->server_key_v2_sandbox         = $this->get_option( 'server_key_v2_sandbox' );
@@ -47,21 +47,21 @@
 
         $this->log = new WC_Logger();
 
-    		// Payment listener/API hook
-    		add_action( 'woocommerce_api_wc_gateway_veritrans', array( &$this, 'veritrans_vtweb_response' ) );
+        // Payment listener/API hook
+        add_action( 'woocommerce_api_wc_gateway_veritrans', array( &$this, 'veritrans_vtweb_response' ) );
         add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( &$this, 'process_admin_options' ) ); 
         add_action( 'wp_enqueue_scripts', array( &$this, 'veritrans_scripts' ) );
         add_action( 'admin_print_scripts-woocommerce_page_woocommerce_settings', array( &$this, 'veritrans_admin_scripts' ));
-    		add_action( 'admin_print_scripts-woocommerce_page_wc-settings', array( &$this, 'veritrans_admin_scripts' ));
-    		add_action( 'valid-veritrans-web-request', array( $this, 'successful_request' ) );
+        add_action( 'admin_print_scripts-woocommerce_page_wc-settings', array( &$this, 'veritrans_admin_scripts' ));
+        add_action( 'valid-veritrans-web-request', array( $this, 'successful_request' ) );
       }
 
       /**
        * Enqueue Javascripts
        */
-    	function veritrans_admin_scripts() {
-    		wp_enqueue_script( 'admin-veritrans', VT_PLUGIN_DIR . 'js/admin-scripts.js', array('jquery') );
-    	}
+      function veritrans_admin_scripts() {
+        wp_enqueue_script( 'admin-veritrans', VT_PLUGIN_DIR . 'js/admin-scripts.js', array('jquery') );
+      }
 
       function veritrans_scripts() {
         if( is_checkout() ) {
@@ -94,7 +94,7 @@
        * Initialise Gateway Settings Form Fields
        */
       function init_form_fields() {
-    		
+        
         $v2_sandbox_key_url = 'https://my.sandbox.veritrans.co.id/settings/config_info';
         $v2_production_key_url = 'https://my.veritrans.co.id/settings/config_info';
 
@@ -115,7 +115,7 @@
           'description' => array(
             'title' => __( 'Customer Message', 'woocommerce' ),
             'type' => 'textarea',
-    				'description' => __( 'This controls the description which the user sees during checkout', 'woocommerce' ),
+            'description' => __( 'This controls the description which the user sees during checkout', 'woocommerce' ),
             'default' => ''
           ),
           'select_veritrans_environment' => array(
@@ -199,10 +199,10 @@
       function process_payment( $order_id ) {
         global $woocommerce;
 
-				return array(
-					'result' 	=> 'success',
+        return array(
+          'result'  => 'success',
           'redirect' => $this->charge_payment( $order_id )
-				);
+        );
       }
 
       /**
@@ -251,7 +251,7 @@
         $billing_address['city'] = $_POST['billing_city'];
         $billing_address['postal_code'] = $_POST['billing_postcode'];
         $billing_address['phone'] = $_POST['billing_phone'];
-        $billing_address['country_code'] = $_POST['billing_country'];
+        $billing_address['country_code'] = $this->convert_country_code($_POST['billing_country']);
         
         $customer_details['billing_address'] = $billing_address;
       
@@ -263,7 +263,7 @@
           $shipping_address['city'] = $_POST['shipping_city'];
           $shipping_address['postal_code'] = $_POST['shipping_postcode'];
           $shipping_address['phone'] = $_POST['billing_phone'];
-          $shipping_address['country_code'] = $_POST['shipping_country'];
+          $shipping_address['country_code'] = $this->convert_country_code($_POST['shipping_country']);
           
           $customer_details['shipping_address'] = $shipping_address;
         }
@@ -310,6 +310,16 @@
           );
         }
 
+        // Discount
+        if ( $order->get_order_discount() > 0) {
+          $items[] = array(
+            'id' => 'totaldiscount',
+            'price' => $order->get_total_discount() * -1,
+            'quantity' => 1,
+            'name' => 'Total Discount'
+          );
+        }
+
         // Fees
         if ( sizeof( $order->get_fees() ) > 0 ) {
           $fees = $order->get_fees();
@@ -323,6 +333,8 @@
           }
         }
 
+        $params['transaction_details']['gross_amount'] = $order->get_total();
+
         // sift through the entire item to ensure that currency conversion is applied
         if (get_woocommerce_currency() != 'IDR')
         {
@@ -331,26 +343,29 @@
           }
 
           unset($item);
+
+          $params['transaction_details']['gross_amount'] *= $this->to_idr_rate;
         }
-        
+
         $params['item_details'] = $items;
         
-        foreach ($items as $item) {
-          $params['transaction_details']['gross_amount'] += $item['price'] * intval($item['quantity']);
-        }
+        // foreach ($items as $item) {
+        //   $params['transaction_details']['gross_amount'] += $item['price'] * intval($item['quantity']);
+        // }
+
 
         return Veritrans_VtWeb::getRedirectionUrl($params);
       }
 
-    	/**
-    	 * Check for Veritrans Web Response
-    	 *
-    	 * @access public
-    	 * @return void
-    	 */
-    	function veritrans_vtweb_response() {
+      /**
+       * Check for Veritrans Web Response
+       *
+       * @access public
+       * @return void
+       */
+      function veritrans_vtweb_response() {
         global $woocommerce;
-    		@ob_clean();
+        @ob_clean();
 
         if ($this->environment == 'production') {
           Veritrans_Config::$serverKey = $this->server_key_v2_production;
@@ -372,11 +387,11 @@
             }
           }
         }
-    	}
-    	
+      }
+      
 
-    	function successful_request( $veritrans_notification ) {
-    		global $woocommerce;
+      function successful_request( $veritrans_notification ) {
+        global $woocommerce;
 
         $order = new WC_Order( $veritrans_notification->order_id );
 
@@ -401,7 +416,7 @@
         $woocommerce->cart->empty_cart();
 
         exit;
-    	}
+      }
 
       /**
        * Convert 2 digits coundry code to 3 digit country code
