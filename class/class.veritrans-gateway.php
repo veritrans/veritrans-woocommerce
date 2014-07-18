@@ -92,6 +92,7 @@
 
       /**
        * Initialise Gateway Settings Form Fields
+       * Method ini digunakan untuk mengatur halaman konfigurasi admin
        */
       function init_form_fields() {
         
@@ -195,6 +196,9 @@
 
       /**
        * Process the payment and return the result
+       * Method ini akan dipanggil ketika customer akan melakukan pembayaran
+       * Return value dari method ini adalah link yang akan digunakan untuk
+       * me-redirect customer ke halaman pembayaran Veritrans
        */
       function process_payment( $order_id ) {
         global $woocommerce;
@@ -207,6 +211,8 @@
 
       /**
        * Charge Payment
+       * Method ini digunakan untuk mendapatkan link halaman pembayaran Veritrans
+       * dengan mengirimkan JSON yang berisi data transaksi
        */
       function charge_payment( $order_id ) {
         global $woocommerce;
@@ -348,17 +354,16 @@
         }
 
         $params['item_details'] = $items;
-        
-        // foreach ($items as $item) {
-        //   $params['transaction_details']['gross_amount'] += $item['price'] * intval($item['quantity']);
-        // }
-
 
         return Veritrans_VtWeb::getRedirectionUrl($params);
       }
 
       /**
        * Check for Veritrans Web Response
+       * Method ini akan dipanggil untuk merespon notifikasi yang
+       * diberikan oleh server Veritrans serta melakukan verifikasi
+       * apakah notifikasi tersebut berasal dari Veritrans dan melakukan
+       * konfirmasi transaksi pembayaran yang dilakukan customer
        *
        * @access public
        * @return void
@@ -389,6 +394,12 @@
         }
       }
       
+      /**
+       * Method ini akan dipanggil jika customer telah sukses melakukan
+       * pembayaran. Method ini akan mengubah status order yang tersimpan
+       * di back-end berdasarkan status pembayaran yang dilakukan customer.
+       * 
+       */
 
       function successful_request( $veritrans_notification ) {
         global $woocommerce;
