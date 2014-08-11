@@ -176,7 +176,7 @@
             'type' => 'checkbox',
             'label' => __( 'Enable 3D Secure?', 'woocommerce' ),
             'description' => __( 'You must enable 3D Secure.
-                Please contact us if you wish to enable this feature in the Production environment.', 'woocommerce' ),
+                Please contact us if you wish to disable this feature in the Production environment.', 'woocommerce' ),
             'default' => 'yes'
           ),
           'enable_sanitization' => array(
