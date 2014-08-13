@@ -161,25 +161,29 @@
             'title' => __( 'Enable Mandiri Clickpay', 'woocommerce' ),
             'type' => 'checkbox',
             'label' => __( 'Enable Mandiri Clickpay?', 'woocommerce' ),
+            'description' => __( 'Please contact us if you wish to enable this feature in the Production environment.', 'woocommerce' ),
             'default' => 'no'
           ),
           'cimb_clicks' => array(
             'title' => __( 'Enable CIMB Clicks', 'woocommerce' ),
             'type' => 'checkbox',
             'label' => __( 'Enable CIMB Clicks?', 'woocommerce' ),
+            'description' => __( 'Please contact us if you wish to enable this feature in the Production environment.', 'woocommerce' ),
             'default' => 'no'
           ),
           'enable_3d_secure' => array(
             'title' => __( 'Enable 3D Secure', 'woocommerce' ),
             'type' => 'checkbox',
             'label' => __( 'Enable 3D Secure?', 'woocommerce' ),
-            'default' => 'no'
+            'description' => __( 'You must enable 3D Secure.
+                Please contact us if you wish to disable this feature in the Production environment.', 'woocommerce' ),
+            'default' => 'yes'
           ),
           'enable_sanitization' => array(
             'title' => __( 'Enable Sanitization', 'woocommerce' ),
             'type' => 'checkbox',
             'label' => __( 'Enable Sanitization?', 'woocommerce' ),
-            'default' => 'no'
+            'default' => 'yes'
           )
         );
 
