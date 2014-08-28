@@ -384,16 +384,14 @@
         
         $veritrans_notification = new Veritrans_Notification();
         
-        if ($veritrans_notification->isVerified()) {
-          if (in_array($veritrans_notification->status_code, array(200, 201, 202))) {
+        if (in_array($veritrans_notification->status_code, array(200, 201, 202))) {
 
-            $veritrans_confirmation = Veritrans_Transaction::status($veritrans_notification->order_id);
+          $veritrans_confirmation = Veritrans_Transaction::status($veritrans_notification->order_id);
 
-            if ($veritrans_confirmation) {
-              header( 'HTTP/1.1 200 OK' );
+          if ($veritrans_confirmation) {
+            header( 'HTTP/1.1 200 OK' );
 
-              do_action( "valid-veritrans-web-request", $veritrans_notification );
-            }
+            do_action( "valid-veritrans-web-request", $veritrans_notification );
           }
         }
       }
