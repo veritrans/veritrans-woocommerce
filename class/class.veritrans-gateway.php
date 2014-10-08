@@ -333,13 +333,15 @@
         // Fees
         if ( sizeof( $order->get_fees() ) > 0 ) {
           $fees = $order->get_fees();
-          for ( $i = 0; $i < count($fees); $i++ ) {
+          $i = 0;
+          foreach( $fees as $item ) {
             $items[] = array(
               'id' => 'itemfee' . $i,
               'price' => $item['line_total'],
               'quantity' => 1,
-              'name' => 'Fee ' . $i,
-            ); 
+              'name' => $item['name'],
+            );
+            $i++;
           }
         }
 
