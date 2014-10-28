@@ -40,6 +40,7 @@
         $this->enable_sanitization = $this->get_option( 'enable_sanitization' );
         $this->enable_mandiri_clickpay = $this->get_option( 'mandiri_clickpay' );
         $this->enable_cimb_clicks = $this->get_option( 'cimb_clicks' );
+        $this->enable_permata_va = $this->get_option( 'bank_transfer' );
 
         $this->client_key         = ($this->environment == 'production')
             ? $this->client_key_v2_production
@@ -170,6 +171,13 @@
             'label' => __( 'Enable CIMB Clicks?', 'woocommerce' ),
             'description' => __( 'Please contact us if you wish to enable this feature in the Production environment.', 'woocommerce' ),
             'default' => 'no'
+          ), 
+		  'bank_transfer' => array(
+            'title' => __( 'Enable Permata VA', 'woocommerce' ),
+            'type' => 'checkbox',
+            'label' => __( 'Enable Permata VA?', 'woocommerce' ),
+            'description' => __( 'Please contact us if you wish to enable this feature in the Production environment.', 'woocommerce' ),
+            'default' => 'no'
           ),
           'enable_3d_secure' => array(
             'title' => __( 'Enable 3D Secure', 'woocommerce' ),
@@ -245,6 +253,9 @@
 
         if ($this->enable_cimb_clicks)
           $enabled_payments[] = 'cimb_clicks';
+		  
+        if ($this->enable_permata_va)
+          $enabled_payments[] = 'bank_transfer';
 
         $params['vtweb']['enabled_payments'] = $enabled_payments;
 
@@ -426,6 +437,9 @@
         }
         else if ($veritrans_notification->transaction_status == 'settlement') {
           $order->payment_complete();
+        }
+        else if ($veritrans_notification->transaction_status == 'pending') {
+          $order->update_status('on-hold');
         }
 
         $woocommerce->cart->empty_cart();
