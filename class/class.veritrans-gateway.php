@@ -38,9 +38,11 @@
 
         $this->enable_3d_secure   = $this->get_option( 'enable_3d_secure' );
         $this->enable_sanitization = $this->get_option( 'enable_sanitization' );
+        $this->enable_credit_card = $this->get_option( 'credit_card' );
         $this->enable_mandiri_clickpay = $this->get_option( 'mandiri_clickpay' );
         $this->enable_cimb_clicks = $this->get_option( 'cimb_clicks' );
         $this->enable_permata_va = $this->get_option( 'bank_transfer' );
+        $this->enable_bri_epay = $this->get_option( 'bri_epay' );
 
         $this->client_key         = ($this->environment == 'production')
             ? $this->client_key_v2_production
@@ -158,6 +160,13 @@
             'default' => '',
             'class' => 'production_settings sensitive'
           ),
+          'credit_card' => array(
+            'title' => __( 'Enable credit card', 'woocommerce' ),
+            'type' => 'checkbox',
+            'label' => __( 'Enable Credit card?', 'woocommerce' ),
+            'description' => __( 'Please contact us if you wish to enable this feature in the Production environment.', 'woocommerce' ),
+            'default' => 'no'
+          ),
           'mandiri_clickpay' => array(
             'title' => __( 'Enable Mandiri Clickpay', 'woocommerce' ),
             'type' => 'checkbox',
@@ -172,10 +181,17 @@
             'description' => __( 'Please contact us if you wish to enable this feature in the Production environment.', 'woocommerce' ),
             'default' => 'no'
           ), 
-		  'bank_transfer' => array(
+		      'bank_transfer' => array(
             'title' => __( 'Enable Permata VA', 'woocommerce' ),
             'type' => 'checkbox',
             'label' => __( 'Enable Permata VA?', 'woocommerce' ),
+            'description' => __( 'Please contact us if you wish to enable this feature in the Production environment.', 'woocommerce' ),
+            'default' => 'no'
+          ),
+          'bri_epay' => array(
+            'title' => __( 'Enable Bri e-pay', 'woocommerce' ),
+            'type' => 'checkbox',
+            'label' => __( 'Enable BRI e-pay?', 'woocommerce' ),
             'description' => __( 'Please contact us if you wish to enable this feature in the Production environment.', 'woocommerce' ),
             'default' => 'no'
           ),
@@ -246,16 +262,22 @@
           'vtweb' => array()
         );
 
-        $enabled_payments = array('credit_card');
-        
-        if ($this->enable_mandiri_clickpay)
+        $enabled_payments = array();
+        if ($this->enable_credit_card == 'yes'){
+          $enabled_payments[] = 'credit_card';
+        }
+        if ($this->enable_mandiri_clickpay =='yes'){
           $enabled_payments[] = 'mandiri_clickpay';
-
-        if ($this->enable_cimb_clicks)
+        }
+        if ($this->enable_cimb_clicks =='yes'){
           $enabled_payments[] = 'cimb_clicks';
-		  
-        if ($this->enable_permata_va)
-          $enabled_payments[] = 'bank_transfer';
+		    }
+        if ($this->enable_permata_va =='yes'){
+          $enabled_payments[] = 'bank_transfer';   
+        }
+        if ($this->enable_bri_epay =='yes'){
+          $enabled_payments[] = 'bri_epay';
+        }
 
         $params['vtweb']['enabled_payments'] = $enabled_payments;
 
