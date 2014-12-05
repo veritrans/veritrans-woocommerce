@@ -17,7 +17,7 @@ Payment Method Feature:
 
 * WordPress 3.9.1 or greater
 * WooCommerce 2.1.11 or greater
-* PHP version 5.2.4 or greater
+* PHP version 5.3 or greater
 * MySQL version 5.0 or greater
 
 #### Manual Instalation
