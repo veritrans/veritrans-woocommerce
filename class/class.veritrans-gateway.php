@@ -393,7 +393,8 @@
         }
 
         $params['item_details'] = $items;
-
+        
+        $woocommerce->cart->empty_cart();
         return Veritrans_VtWeb::getRedirectionUrl($params);
       }
 
@@ -463,8 +464,6 @@
         else if ($veritrans_notification->transaction_status == 'pending') {
           $order->update_status('on-hold');
         }
-
-        $woocommerce->cart->empty_cart();
 
         exit;
       }
