@@ -409,8 +409,12 @@
        * @return void
        */
       function veritrans_vtweb_response() {
+//error_log('masuk veritrans vtweb response');
         global $woocommerce;
         @ob_clean();
+
+        global $woocommerce;
+        $order = new WC_Order( $order_id );
 
         if ($this->environment == 'production') {
           Veritrans_Config::$serverKey = $this->server_key_v2_production;
@@ -419,18 +423,35 @@
         }
         
         $veritrans_notification = new Veritrans_Notification();
-        
+     
+          if (in_array($veritrans_notification->status_code, array(200, 201, 202))) {
+              header( 'HTTP/1.1 200 OK' );
+           //$order->get_order($veritrans_notification->order_id)
+            if ($order->get_order($veritrans_notification->order_id) == true) {
+              error_log('masuk if order false');
+              $veritrans_confirmation = Veritrans_Transaction::status($veritrans_notification->order_id);
+              //header( 'HTTP/1.1 200 OK' );
+              do_action( "valid-veritrans-web-request", $veritrans_notification );
+            }
+           
+          }
+
+        }
+
+    
+        /*
         if (in_array($veritrans_notification->status_code, array(200, 201, 202))) {
 
           $veritrans_confirmation = Veritrans_Transaction::status($veritrans_notification->order_id);
-
+         
           if ($veritrans_confirmation) {
             header( 'HTTP/1.1 200 OK' );
 
             do_action( "valid-veritrans-web-request", $veritrans_notification );
           }
+         
         }
-      }
+ */
       
       /**
        * Method ini akan dipanggil jika customer telah sukses melakukan
