@@ -1,3 +1,8 @@
+2.0.0
+-----
+- Fix: Notification handler, selecting payment method.
+- Add: Permata VA, e-pay Bri payment method.
+
 1.3.0
 -----
 - Fix: Proper link for server key and client key between sandbox and production.
