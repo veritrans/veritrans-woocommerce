@@ -419,8 +419,7 @@
         
         
         Veritrans_Config::$isProduction = ($this->environment == 'production') ? true : false;
-        
-        if ($this->environment == 'production') {
+ if ($this->environment == 'production') {
           Veritrans_Config::$serverKey = $this->server_key_v2_production;
         } else {
           Veritrans_Config::$serverKey = $this->server_key_v2_sandbox;
