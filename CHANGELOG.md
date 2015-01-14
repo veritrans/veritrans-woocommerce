@@ -1,3 +1,7 @@
+2.0.1
+-----
+- Fix: Production bug, transaction result on production enviromnent can be recorded
+
 2.0.0
 -----
 - Fix: Notification handler, selecting payment method.
