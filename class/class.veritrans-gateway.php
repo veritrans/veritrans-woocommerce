@@ -249,8 +249,7 @@
         $order = new WC_Order( $order_id );     
       
         Veritrans_Config::$isProduction = ($this->environment == 'production') ? true : false;
-        Veritrans_Config::$serverKey = (Veritrans_Config::$isProduction)
-            ? $this->server_key_v2_production : $this->server_key_v2_sandbox;
+        Veritrans_Config::$serverKey = (Veritrans_Config::$isProduction) ? $this->server_key_v2_production : $this->server_key_v2_sandbox;     
         Veritrans_Config::$is3ds = ($this->enable_3d_secure == 'yes') ? true : false;
         Veritrans_Config::$isSanitized = ($this->enable_sanitization == 'yes') ? true : false;
         
@@ -408,14 +407,18 @@
        * @access public
        * @return void
        */
+
+
       function veritrans_vtweb_response() {
-//error_log('masuk veritrans vtweb response');
+
         global $woocommerce;
         @ob_clean();
 
         global $woocommerce;
         $order = new WC_Order( $order_id );
-
+        
+        Veritrans_Config::$isProduction = ($this->environment == 'production') ? true : false;
+        
         if ($this->environment == 'production') {
           Veritrans_Config::$serverKey = $this->server_key_v2_production;
         } else {
@@ -426,11 +429,10 @@
      
           if (in_array($veritrans_notification->status_code, array(200, 201, 202))) {
               header( 'HTTP/1.1 200 OK' );
-           //$order->get_order($veritrans_notification->order_id)
-            if ($order->get_order($veritrans_notification->order_id) == true) {
-              error_log('masuk if order false');
-              $veritrans_confirmation = Veritrans_Transaction::status($veritrans_notification->order_id);
-              //header( 'HTTP/1.1 200 OK' );
+            
+            if ($order->get_order($veritrans_notification->order_id) == true) 
+            {
+              $veritrans_confirmation = Veritrans_Transaction::status($veritrans_notification->order_id);             
               do_action( "valid-veritrans-web-request", $veritrans_notification );
             }
            
@@ -451,7 +453,8 @@
           }
          
         }
- */
+        */
+ 
       
       /**
        * Method ini akan dipanggil jika customer telah sukses melakukan
@@ -461,10 +464,11 @@
        */
 
       function successful_request( $veritrans_notification ) {
+
         global $woocommerce;
 
         $order = new WC_Order( $veritrans_notification->order_id );
-
+       // error_log(var_dump($order));
         if ($veritrans_notification->transaction_status == 'capture') {
           if ($veritrans_notification->fraud_status == 'accept') {
             $order->payment_complete();
