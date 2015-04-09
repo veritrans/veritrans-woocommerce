@@ -45,6 +45,7 @@
         $this->enable_bri_epay = $this->get_option( 'bri_epay' );
         $this->enable_telkomsel_cash = $this->get_option( 'telkomsel_cash' );
         $this->enable_xl_tunai = $this->get_option( 'xl_tunai' );
+        $this->enable_mandiri_bill = $this->get_option( 'mandiri_bill' );
 
         $this->client_key         = ($this->environment == 'production')
             ? $this->client_key_v2_production
@@ -211,6 +212,13 @@
             'description' => __( 'Please contact us if you wish to enable this feature in the Production environment.', 'woocommerce' ),
             'default' => 'no'
           ),
+          'mandiri_bill' => array(
+            'title' => __( 'Enable Mandiri Bill', 'woocommerce' ),
+            'type' => 'checkbox',
+            'label' => __( 'Enable Mandiri Bill?', 'woocommerce' ),
+            'description' => __( 'Please contact us if you wish to enable this feature in the Production environment.', 'woocommerce' ),
+            'default' => 'no'
+          ),
           'enable_3d_secure' => array(
             'title' => __( 'Enable 3D Secure', 'woocommerce' ),
             'type' => 'checkbox',
@@ -298,6 +306,9 @@
         }
         if ($this->enable_xl_tunai =='yes'){
           $enabled_payments[] = 'xl_tunai';
+        }
+        if ($this->enable_mandiri_bill =='yes'){
+          $enabled_payments[] = 'mandiri_bill';
         }
 
         $params['vtweb']['enabled_payments'] = $enabled_payments;
@@ -461,23 +472,7 @@
           }
 
         }
-
-    
-        /*
-        if (in_array($veritrans_notification->status_code, array(200, 201, 202))) {
-
-          $veritrans_confirmation = Veritrans_Transaction::status($veritrans_notification->order_id);
-         
-          if ($veritrans_confirmation) {
-            header( 'HTTP/1.1 200 OK' );
-
-            do_action( "valid-veritrans-web-request", $veritrans_notification );
-          }
-         
-        }
-        */
  
-      
       /**
        * Method ini akan dipanggil jika customer telah sukses melakukan
        * pembayaran. Method ini akan mengubah status order yang tersimpan
