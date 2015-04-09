@@ -1,3 +1,7 @@
+2.0.2
+-----
+- Add: mandiri bill payment
+
 2.0.1
 -----
 - Fix: Production bug, transaction result on production enviromnent can be recorded
