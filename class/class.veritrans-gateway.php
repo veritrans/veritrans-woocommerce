@@ -269,6 +269,7 @@
       function charge_payment( $order_id ) {
         global $woocommerce;
         $order_items = array();
+        $cart = $woocommerce->cart;
 
         $order = new WC_Order( $order_id );     
       
@@ -389,7 +390,7 @@
         if ( $order->get_order_discount() > 0) {
           $items[] = array(
             'id' => 'totaldiscount',
-            'price' => $order->get_total_discount() * -1,
+            'price' => $cart->get_cart_discount_total() * -1,
             'quantity' => 1,
             'name' => 'Total Discount'
           );
