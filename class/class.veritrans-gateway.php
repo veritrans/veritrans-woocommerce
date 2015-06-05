@@ -397,7 +397,7 @@
         }
 
         // Discount
-        if ( $order->get_order_discount() > 0) {
+        if ( $cart->get_cart_discount_total() > 0) {
           $items[] = array(
             'id' => 'totaldiscount',
             'price' => $cart->get_cart_discount_total() * -1,
