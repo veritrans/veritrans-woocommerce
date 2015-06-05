@@ -219,6 +219,13 @@
             'description' => __( 'Please contact us if you wish to enable this feature in the Production environment.', 'woocommerce' ),
             'default' => 'no'
           ),
+          'bbmmoney' => array(
+            'title' => __( 'Enable BBM Money', 'woocommerce' ),
+            'type' => 'checkbox',
+            'label' => __( 'Enable BBM Money?', 'woocommerce' ),
+            'description' => __( 'Please contact us if you wish to enable this feature in the Production environment.', 'woocommerce' ),
+            'default' => 'no'
+          ),
           'enable_3d_secure' => array(
             'title' => __( 'Enable 3D Secure', 'woocommerce' ),
             'type' => 'checkbox',
@@ -309,7 +316,10 @@
           $enabled_payments[] = 'xl_tunai';
         }
         if ($this->enable_mandiri_bill =='yes'){
-          $enabled_payments[] = 'mandiri_bill';
+          $enabled_payments[] = 'echannel';
+        }
+        if ($this->enable_bbmmoney =='yes'){
+          $enabled_payments[] = 'bbm_money';
         }
 
         $params['vtweb']['enabled_payments'] = $enabled_payments;
@@ -628,7 +638,7 @@
           'IM' => 'IMN',
           'IL' => 'ISR',
           'IT' => 'ITA',
-          'CI' => '',
+          'CI' => 'CIV',
           'JM' => 'JAM',
           'JP' => 'JPN',
           'JE' => 'JEY',
@@ -722,7 +732,7 @@
           'SO' => 'SOM',
           'ZA' => 'ZAF',
           'GS' => 'SGS',
-          'KR' => '',
+          'KR' => 'KOR',
           'SS' => 'SSD',
           'ES' => 'ESP',
           'LK' => 'LKA',
