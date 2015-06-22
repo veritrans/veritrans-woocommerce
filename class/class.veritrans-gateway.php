@@ -46,6 +46,7 @@
         $this->enable_telkomsel_cash = $this->get_option( 'telkomsel_cash' );
         $this->enable_xl_tunai = $this->get_option( 'xl_tunai' );
         $this->enable_mandiri_bill = $this->get_option( 'mandiri_bill' );
+        $this->enable_indomaret = $this->get_option('cstore');
 
         $this->client_key         = ($this->environment == 'production')
             ? $this->client_key_v2_production
@@ -184,7 +185,7 @@
             'description' => __( 'Please contact us if you wish to enable this feature in the Production environment.', 'woocommerce' ),
             'default' => 'no'
           ), 
-		      'bank_transfer' => array(
+          'bank_transfer' => array(
             'title' => __( 'Enable Permata VA', 'woocommerce' ),
             'type' => 'checkbox',
             'label' => __( 'Enable Permata VA?', 'woocommerce' ),
@@ -223,6 +224,13 @@
             'title' => __( 'Enable BBM Money', 'woocommerce' ),
             'type' => 'checkbox',
             'label' => __( 'Enable BBM Money?', 'woocommerce' ),
+            'description' => __( 'Please contact us if you wish to enable this feature in the Production environment.', 'woocommerce' ),
+            'default' => 'no'
+          ),
+          'cstore' => array(
+            'title' => __( 'Enable Indomaret', 'woocommerce' ),
+            'type' => 'checkbox',
+            'label' => __( 'Enable Indomaret?', 'woocommerce' ),
             'description' => __( 'Please contact us if you wish to enable this feature in the Production environment.', 'woocommerce' ),
             'default' => 'no'
           ),
@@ -302,7 +310,7 @@
         }
         if ($this->enable_cimb_clicks =='yes'){
           $enabled_payments[] = 'cimb_clicks';
-		    }
+        }
         if ($this->enable_permata_va =='yes'){
           $enabled_payments[] = 'bank_transfer';   
         }
@@ -320,6 +328,9 @@
         }
         if ($this->enable_bbmmoney =='yes'){
           $enabled_payments[] = 'bbm_money';
+        }
+        if ($this->enable_indomaret =='yes'){
+          $enabled_payments[] = 'cstore';
         }
 
         $params['vtweb']['enabled_payments'] = $enabled_payments;
