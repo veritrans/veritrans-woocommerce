@@ -47,6 +47,7 @@
         $this->enable_xl_tunai = $this->get_option( 'xl_tunai' );
         $this->enable_mandiri_bill = $this->get_option( 'mandiri_bill' );
         $this->enable_indomaret = $this->get_option('cstore');
+        $this->enable_indosat_dompetku = $this->get_option('indosat_dompetku');
 
         $this->client_key         = ($this->environment == 'production')
             ? $this->client_key_v2_production
@@ -234,6 +235,13 @@
             'description' => __( 'Please contact us if you wish to enable this feature in the Production environment.', 'woocommerce' ),
             'default' => 'no'
           ),
+          'indosat_dompetku' => array(
+            'title' => __( 'Enable Indosat Dompetku', 'woocommerce' ),
+            'type' => 'checkbox',
+            'label' => __( 'Enable Indosat Dompetku?', 'woocommerce' ),
+            'description' => __( 'Please contact us if you wish to enable this feature in the Production environment.', 'woocommerce' ),
+            'default' => 'no'
+          ),
           'enable_3d_secure' => array(
             'title' => __( 'Enable 3D Secure', 'woocommerce' ),
             'type' => 'checkbox',
@@ -331,6 +339,9 @@
         }
         if ($this->enable_indomaret =='yes'){
           $enabled_payments[] = 'cstore';
+        }
+        if ($this->enable_indosat_dompetku =='yes'){
+          $enabled_payments[] = 'indosat_dompetku';
         }
 
         $params['vtweb']['enabled_payments'] = $enabled_payments;
