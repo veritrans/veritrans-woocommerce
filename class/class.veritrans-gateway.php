@@ -345,24 +345,28 @@
         }
 
         $params['vtweb']['enabled_payments'] = $enabled_payments;
+        if( isset($_POST['billing_first_name']) &&  isset($_POST['billing_last_name']) &&  isset($_POST['billing_email']) &&  isset($_POST['billing_phone'])) 
+        {
+          $customer_details = array();
+          $customer_details['first_name'] = $_POST['billing_first_name'];
+          $customer_details['last_name'] = $_POST['billing_last_name'];
+          $customer_details['email'] = $_POST['billing_email'];
+          $customer_details['phone'] = $_POST['billing_phone'];
+        }
 
-        $customer_details = array();
-        $customer_details['first_name'] = $_POST['billing_first_name'];
-        $customer_details['last_name'] = $_POST['billing_last_name'];
-        $customer_details['email'] = $_POST['billing_email'];
-        $customer_details['phone'] = $_POST['billing_phone'];
-        
-        $billing_address = array();
-        $billing_address['first_name'] = $_POST['billing_first_name'];
-        $billing_address['last_name'] = $_POST['billing_last_name'];
-        $billing_address['address'] = $_POST['billing_address_1'];
-        $billing_address['city'] = $_POST['billing_city'];
-        $billing_address['postal_code'] = $_POST['billing_postcode'];
-        $billing_address['phone'] = $_POST['billing_phone'];
-        $billing_address['country_code'] = $this->convert_country_code($_POST['billing_country']);
-        
-        $customer_details['billing_address'] = $billing_address;
-      
+        if( isset($_POST['billing_first_name']) &&  isset($_POST['billing_last_name']) &&  isset($_POST['billing_address_1']) &&  isset($_POST['billing_city']) &&  isset($_POST['billing_postcode']) &&  isset($_POST['billing_phone']) &&  isset($_POST['billing_country'])) 
+        {
+          $billing_address = array();
+          $billing_address['first_name'] = $_POST['billing_first_name'];
+          $billing_address['last_name'] = $_POST['billing_last_name'];
+          $billing_address['address'] = $_POST['billing_address_1'];
+          $billing_address['city'] = $_POST['billing_city'];
+          $billing_address['postal_code'] = $_POST['billing_postcode'];
+          $billing_address['phone'] = $_POST['billing_phone'];
+          $billing_address['country_code'] = $this->convert_country_code($_POST['billing_country']);
+          
+          $customer_details['billing_address'] = $billing_address;
+        }
         if ($_POST['ship_to_different_address']) {
           $shipping_address = array();
           $shipping_address['first_name'] = $_POST['shipping_first_name'];
@@ -376,8 +380,10 @@
           $customer_details['shipping_address'] = $shipping_address;
         }
         
-        $params['customer_details'] = $customer_details;
-        
+        if( isset($customer_details)) 
+        {
+          $params['customer_details'] = $customer_details;
+        }
         // Populate Items
         $items = array();
 
