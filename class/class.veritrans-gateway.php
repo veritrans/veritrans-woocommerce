@@ -365,13 +365,13 @@
         
         if ($_POST['ship_to_different_address']) {
           $shipping_address = array();
-          $billing_address['first_name'] = $order->shipping_first_name;
-          $billing_address['last_name'] = $order->shipping_last_name;
-          $billing_address['address'] = $order->shipping_address_1;
-          $billing_address['city'] = $order->shipping_city;
-          $billing_address['postal_code'] = $order->shipping_postcode;
-          $billing_address['phone'] = $order->billing_phone;
-          $billing_address['country_code'] = $this->convert_country_code($order->shipping_country);
+          $shipping_address['first_name'] = $order->shipping_first_name;
+          $shipping_address['last_name'] = $order->shipping_last_name;
+          $shipping_address['address'] = $order->shipping_address_1;
+          $shipping_address['city'] = $order->shipping_city;
+          $shipping_address['postal_code'] = $order->shipping_postcode;
+          $shipping_address['phone'] = $order->billing_phone;
+          $shipping_address['country_code'] = $this->convert_country_code($order->shipping_country);
           
           $customer_details['shipping_address'] = $shipping_address;
         }
