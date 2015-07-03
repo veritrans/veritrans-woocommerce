@@ -377,7 +377,7 @@
         }
         
         $params['customer_details'] = $customer_details;
-        error_log(print_r($params,true));
+        //error_log(print_r($params,true));
 
         $items = array();
 
