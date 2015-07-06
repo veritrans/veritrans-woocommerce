@@ -534,7 +534,9 @@
           $order->update_status('failed');
         }
         else if ($veritrans_notification->transaction_status == 'settlement') {
-          $order->payment_complete();
+          if($veritrans_notification->payment_type != 'credit_card'){
+            $order->payment_complete();
+          }
         }
         else if ($veritrans_notification->transaction_status == 'pending') {
           $order->update_status('on-hold');
