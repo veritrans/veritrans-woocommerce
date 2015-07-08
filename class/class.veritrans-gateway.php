@@ -1,5 +1,6 @@
 <?php
-
+## TODO
+# empty cart should be after notification or redirection
     require_once(dirname(__FILE__) . '/../lib/veritrans/Veritrans.php');
 
     /**
@@ -470,6 +471,7 @@
        * apakah notifikasi tersebut berasal dari Veritrans dan melakukan
        * konfirmasi transaksi pembayaran yang dilakukan customer
        *
+       * update: sekaligus untuk menjadi finish/failed URL handler.
        * @access public
        * @return void
        */
@@ -491,18 +493,28 @@
           Veritrans_Config::$serverKey = $this->server_key_v2_sandbox;
         }
         
-        $veritrans_notification = new Veritrans_Notification();
-     
+        // check whether the request is GET or POST, 
+        // if request == GET, request is for finish OR failed URL, then redirect to WooCommerce's order complete/failed
+        // else if request == POST, request is for payment notification, then update the payment status
+        if(!isset($_GET['order_id'])){    // Check if POST, then create new notification
+          $veritrans_notification = new Veritrans_Notification();
+
           if (in_array($veritrans_notification->status_code, array(200, 201, 202))) {
               header( 'HTTP/1.1 200 OK' );
-            
-            if ($order->get_order($veritrans_notification->order_id) == true) 
-            {
+            if ($order->get_order($veritrans_notification->order_id) == true) {
               $veritrans_confirmation = Veritrans_Transaction::status($veritrans_notification->order_id);             
               do_action( "valid-veritrans-web-request", $veritrans_notification );
             }
-           
           }
+        } else {    // else if GET, redirect to order complete/failed
+          error_log('status_code '. $_GET['status_code']); //debug
+          error_log('status_code '. $_GET['transaction_status']); //debug
+          if( isset($_GET['order_id']) && isset($_GET['status_code']) && isset($_GET['transaction_status']) && $_GET['status_code'] == '200' && $_GET['transaction_status'] == 'capture'){
+            $order_id = $_GET['order_id'];
+            error_log($this->get_return_url( $order )); //debug
+            wp_redirect($this->get_return_url( $order ));
+          }
+        }
 
         }
  
