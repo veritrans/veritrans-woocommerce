@@ -509,7 +509,7 @@
         } else {    // else if GET, redirect to order complete/failed
           // error_log('status_code '. $_GET['status_code']); //debug
           // error_log('status_code '. $_GET['transaction_status']); //debug
-          if( isset($_GET['order_id']) && isset($_GET['transaction_status']) && ($_GET['transaction_status'] == 'capture' || $_GET['transaction_status'] == 'pending'))  //if capture or pending or challenge, redirect to order received page
+          if( isset($_GET['order_id']) && isset($_GET['transaction_status']) && ($_GET['transaction_status'] == 'capture' || $_GET['transaction_status'] == 'pending' || $_GET['transaction_status'] == 'settlement'))  //if capture or pending or challenge or settlement, redirect to order received page
           {
             $order_id = $_GET['order_id'];
             // error_log($this->get_return_url( $order )); //debug
