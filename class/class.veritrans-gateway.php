@@ -507,12 +507,24 @@
             }
           }
         } else {    // else if GET, redirect to order complete/failed
-          error_log('status_code '. $_GET['status_code']); //debug
-          error_log('status_code '. $_GET['transaction_status']); //debug
-          if( isset($_GET['order_id']) && isset($_GET['status_code']) && isset($_GET['transaction_status']) && $_GET['status_code'] == '200' && $_GET['transaction_status'] == 'capture'){
+          // error_log('status_code '. $_GET['status_code']); //debug
+          // error_log('status_code '. $_GET['transaction_status']); //debug
+          if( isset($_GET['order_id']) && isset($_GET['status_code']) && isset($_GET['transaction_status']) && ($_GET['status_code'] == '200' || $_GET['status_code'] == '201') && ($_GET['transaction_status'] == 'capture' || $_GET['transaction_status'] == 'pending'))  //if capture or pending or challenge, redirect to order received page
+          {
             $order_id = $_GET['order_id'];
-            error_log($this->get_return_url( $order )); //debug
-            wp_redirect($this->get_return_url( $order ));
+            // error_log($this->get_return_url( $order )); //debug
+            // wp_redirect($this->get_return_url( $order ));
+            $order = new WC_Order( $order_id );
+            wp_redirect($order->get_checkout_order_received_url());
+          }else if( isset($_GET['order_id']) && isset($_GET['status_code']) && isset($_GET['transaction_status']) && $_GET['status_code'] == '202' && $_GET['transaction_status'] == 'deny')  //if deny, redirect to order checkout page again
+          {
+            $order_id = $_GET['order_id'];
+            $order = new WC_Order( $order_id );
+            wp_redirect($order->get_checkout_payment_url(false));
+          } else if( isset($_GET['order_id']) && !isset($_GET['status_code']) && !isset($_GET['transaction_status'])){ // if customer click "back" button, redirect to checkout page again
+            $order_id = $_GET['order_id'];
+            $order = new WC_Order( $order_id );
+            wp_redirect($order->get_checkout_payment_url(false));
           }
         }
 
