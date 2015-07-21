@@ -363,6 +363,7 @@
         $billing_address['country_code'] = $this->convert_country_code($order->billing_country);
         
         $customer_details['billing_address'] = $billing_address;
+        $customer_details['shipping_address'] = $billing_address;
         
         if ($_POST['ship_to_different_address']) {
           $shipping_address = array();
