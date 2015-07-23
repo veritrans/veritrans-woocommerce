@@ -46,6 +46,7 @@
         $this->enable_bri_epay = $this->get_option( 'bri_epay' );
         $this->enable_telkomsel_cash = $this->get_option( 'telkomsel_cash' );
         $this->enable_xl_tunai = $this->get_option( 'xl_tunai' );
+        $this->enable_bbmmoney = $this->get_option( 'bbmmoney' );
         $this->enable_mandiri_bill = $this->get_option( 'mandiri_bill' );
         $this->enable_indomaret = $this->get_option('cstore');
         $this->enable_indosat_dompetku = $this->get_option('indosat_dompetku');
@@ -365,7 +366,7 @@
         $customer_details['billing_address'] = $billing_address;
         $customer_details['shipping_address'] = $billing_address;
         
-        if ($_POST['ship_to_different_address']) {
+        if ( isset ( $_POST['ship_to_different_address'] ) ) {
           $shipping_address = array();
           $shipping_address['first_name'] = $order->shipping_first_name;
           $shipping_address['last_name'] = $order->shipping_last_name;
