@@ -1,3 +1,7 @@
+2.0.4
+-----
+- push billing & shipping address to vtweb
+
 2.0.3
 -----
 - Fix notification bug
