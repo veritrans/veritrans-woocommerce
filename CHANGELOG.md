@@ -1,3 +1,13 @@
+2.0.4
+-----
+- push billing & shipping address to vtweb
+
+2.0.3
+-----
+- Fix notification bug
+- Add several payment method
+- Add finish, unfinish url
+
 2.0.2
 -----
 - Add: mandiri bill payment
