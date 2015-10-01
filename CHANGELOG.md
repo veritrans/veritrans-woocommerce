@@ -1,3 +1,7 @@
+2.0.5
+-----
+- Add Mandiri ecash
+
 2.0.4
 -----
 - push billing & shipping address to vtweb
