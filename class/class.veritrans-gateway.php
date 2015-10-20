@@ -372,7 +372,7 @@
         $billing_address['city'] = $order->billing_city;
         $billing_address['postal_code'] = $order->billing_postcode;
         $billing_address['phone'] = $order->billing_phone;
-        $billing_address['country_code'] = strlen($this->convert_country_code($order->billing_country) != 3 ) ? 'IDN';
+        $billing_address['country_code'] = (strlen($this->convert_country_code($order->billing_country) != 3 ) ? 'IDN' : $this->convert_country_code($order->billing_country) );
 
         $customer_details['billing_address'] = $billing_address;
         $customer_details['shipping_address'] = $billing_address;
@@ -385,7 +385,7 @@
           $shipping_address['city'] = $order->shipping_city;
           $shipping_address['postal_code'] = $order->shipping_postcode;
           $shipping_address['phone'] = $order->billing_phone;
-          $shipping_address['country_code'] = strlen($this->convert_country_code($order->shipping_country) != 3 ) ? 'IDN';
+          $shipping_address['country_code'] = (strlen($this->convert_country_code($order->shipping_country) != 3 ) ? 'IDN' : $this->convert_country_code($order->billing_country) );
           
           $customer_details['shipping_address'] = $shipping_address;
         }
