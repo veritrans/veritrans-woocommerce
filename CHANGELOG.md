@@ -1,3 +1,7 @@
+2.0.6
+-----
+fix country code issue
+
 2.0.5
 -----
 - Add Mandiri ecash
