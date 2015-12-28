@@ -1,3 +1,7 @@
+2.1.0
+-----
+Add All product installment feature
+
 2.0.6
 -----
 fix country code issue
