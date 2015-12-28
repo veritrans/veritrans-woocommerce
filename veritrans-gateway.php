@@ -37,11 +37,13 @@ function veritrans_gateway_init() {
   DEFINE ('VT_PLUGIN_DIR', plugins_url( basename( plugin_dir_path( __FILE__ ) ), basename( __FILE__ ) ) . '/' );
 
   require_once dirname( __FILE__ ) . '/class/class.veritrans-gateway.php';
+  require_once dirname( __FILE__ ) . '/class/class.veritrans-gateway-installment.php';
 
   add_filter( 'woocommerce_payment_gateways', 'add_veritrans_payment_gateway' );
 }
 
 function add_veritrans_payment_gateway( $methods ) {
   $methods[] = 'WC_Gateway_Veritrans';
+  $methods[] = 'WC_Gateway_Veritrans_Installment';
   return $methods;
 }

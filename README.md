@@ -37,4 +37,5 @@ The manual installation method involves downloading our feature-rich plugin and 
 * [Veritrans registration](https://my.veritrans.co.id/register)
 * [Veritrans documentation](http://docs.veritrans.co.id)
 * [Veritrans Woocommerce Documentation](http://docs.veritrans.co.id/vtweb/integration_woocommerce.html)
+* [Veritrans Woocommerce Installment Documentation](https://support.veritrans.co.id/hc/en-us/articles/215949477-Woocommerce-Installment-Feature)
 * Technical support [support@veritrans.co.id](mailto:support@veritrans.co.id)
