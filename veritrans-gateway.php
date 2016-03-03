@@ -3,7 +3,7 @@
 Plugin Name: Veritrans - WooCommerce Payment Gateway
 Plugin URI: https://github.com/veritrans/veritrans-woocommerce
 Description: Accept all payment directly on your WooCommerce site in a seamless and secure checkout environment with <a href="http://veritrans.co.id" target="_blank">Veritrans.co.id</a>
-Version: 2.0.6
+Version: 2.1.1
 Author: Veritrans
 Author URI: http://veritrans.co.id
 License: GPLv2 or later
