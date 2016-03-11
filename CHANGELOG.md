@@ -1,3 +1,15 @@
+2.1.0
+-----
+Add All product installment feature
+
+2.0.6
+-----
+fix country code issue
+
+2.0.5
+-----
+- Add Mandiri ecash
+
 2.0.4
 -----
 - push billing & shipping address to vtweb
