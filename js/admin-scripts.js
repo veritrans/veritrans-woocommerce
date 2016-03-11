@@ -1,6 +1,6 @@
 (function($){
 	function sensitiveOptions() {
-        var environment_type = $('#woocommerce_veritrans_select_veritrans_environment').val();
+        var environment_type = $("select[name*='veritrans_environment']").val();
         
         var api_environment_string = environment_type + '_settings';
 
@@ -10,7 +10,7 @@
 
 	$(document).ready(function(){
 		
-        $("#woocommerce_veritrans_select_veritrans_environment").on('change', function(e, data) {
+        $("select[name*='veritrans_environment']").on('change', function(e, data) {
             sensitiveOptions();
         });
 

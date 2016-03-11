@@ -6,17 +6,17 @@
     /**
        * Veritrans Payment Gateway Class
        */
-    class WC_Gateway_Veritrans_Installment extends WC_Payment_Gateway {
+    class WC_Gateway_Veritrans_Offinstallment extends WC_Payment_Gateway {
 
       /**
        * Constructor
        */
       function __construct() {
-        $this->id           = 'veritrans_installment';
+        $this->id           = 'veritrans_offinstallment';
         $this->icon         = apply_filters( 'woocommerce_veritrans_icon', '' );
-        $this->method_title = __( 'Veritrans Installment', 'colabsthemes' );
+        $this->method_title = __( 'Veritrans Offline Installment', 'colabsthemes' );
         $this->has_fields   = true;
-        $this->notify_url   = str_replace( 'https:', 'http:', add_query_arg( 'wc-api', 'WC_Gateway_Veritrans_Installment', home_url( '/' ) ) );
+        $this->notify_url   = str_replace( 'https:', 'http:', add_query_arg( 'wc-api', 'WC_Gateway_Veritrans_Offinstallment', home_url( '/' ) ) );
 
         // Load the settings
         $this->init_form_fields();
@@ -32,10 +32,11 @@
         $this->environment        = $this->get_option( 'select_veritrans_environment' );
         $this->to_idr_rate        = $this->get_option( 'to_idr_rate' );
         $this->enable_sanitization = $this->get_option( 'enable_sanitization' );
-        $this->enable_bni         = $this->get_option( 'enable_bni_installment' );
-        $this->bni_terms          = $this->get_option( 'enable_bni_installment_terms' );
-        $this->enable_mandiri     = $this->get_option( 'enable_mandiri_installment' );
-        $this->mandiri_terms      = $this->get_option( 'enable_mandiri_installment_terms' );
+        // $this->enable_bni         = $this->get_option( 'enable_bni_installment' );
+        // $this->bni_terms          = $this->get_option( 'enable_bni_installment_terms' );
+        // $this->enable_mandiri     = $this->get_option( 'enable_mandiri_installment' );
+        // $this->mandiri_terms      = $this->get_option( 'enable_mandiri_installment_terms' );
+        $this->installment_terms      = $this->get_option( 'installment_terms' );
         $this->bin_filter         = $this->get_option( 'enable_bin_filter' );
 
 
@@ -72,8 +73,8 @@
        * @return void
        */
       public function admin_options() { ?>
-        <h3><?php _e( 'Veritrans Installment', 'woocommerce' ); ?></h3>
-        <p><?php _e('Allows installment payments using Veritrans.', 'woocommerce' ); ?></p>
+        <h3><?php _e( 'Veritrans Offline Installment', 'woocommerce' ); ?></h3>
+        <p><?php _e('Allows offline installment payments using Veritrans.', 'woocommerce' ); ?></p>
         <table class="form-table">
           <?php
             // Generate the HTML For the settings form.
@@ -96,14 +97,14 @@
           'enabled' => array(
             'title' => __( 'Enable/Disable', 'woocommerce' ),
             'type' => 'checkbox',
-            'label' => __( 'Enable Veritrans installment Payment', 'woocommerce' ),
+            'label' => __( 'Enable Veritrans Offline installment Payment', 'woocommerce' ),
             'default' => 'no'
           ),
           'title' => array(
             'title' => __( 'Title', 'woocommerce' ),
             'type' => 'text',
             'description' => __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
-            'default' => __( 'Credit Card installment', 'woocommerce' ),
+            'default' => __( 'Credit Card Offline installment', 'woocommerce' ),
             'desc_tip'      => true,
           ),
           'description' => array(
@@ -136,31 +137,38 @@
             'default' => '',
             'class' => 'production_settings sensitive'
           ),
-          'enable_bni_installment' => array(
-            'title' => __( 'Enable BNI installment ', 'woocommerce' ),
-            'type' => 'checkbox',
-            'label' => __( 'Enable BNI installment?', 'woocommerce' ),
-            'description' => __( 'Please contact us if you wish to enable this feature in the Production environment.', 'woocommerce' ),
-            'default' => 'no'
-          ),
-          'enable_bni_installment_terms' => array(
-            'title' => __( 'BNI Installment terms', 'woocommerce' ),
+          // 'enable_bni_installment' => array(
+          //   'title' => __( 'Enable BNI installment ', 'woocommerce' ),
+          //   'type' => 'checkbox',
+          //   'label' => __( 'Enable BNI installment?', 'woocommerce' ),
+          //   'description' => __( 'Please contact us if you wish to enable this feature in the Production environment.', 'woocommerce' ),
+          //   'default' => 'no'
+          // ),
+          // 'enable_bni_installment_terms' => array(
+          //   'title' => __( 'BNI Installment terms', 'woocommerce' ),
+          //   'type' => 'text',
+          //   'label' => __( 'BNI Installment terms', 'woocommerce' ),
+          //   'description' => __( 'use comma to separate value. Only 6 and 12 months term available on sandbox environment.', 'woocommerce' ),
+          //   'default' => '6,12'
+          // ),
+          // 'enable_mandiri_installment' => array(
+          //   'title' => __( 'Enable Mandiri installment ', 'woocommerce' ),
+          //   'type' => 'checkbox',
+          //   'label' => __( 'Enable Mandiri installment?', 'woocommerce' ),
+          //   'description' => __( 'Please contact us if you wish to enable this feature in the Production environment.', 'woocommerce' ),
+          //   'default' => 'no'
+          // ),
+          // 'enable_mandiri_installment_terms' => array(
+          //   'title' => __( 'Mandiri Installment terms', 'woocommerce'),
+          //   'type' => 'text',
+          //   'label' => __( 'Mandiri Installment terms', 'woocommerce' ),
+          //   'description' => __( 'use comma to separate value. Only 6 and 12 months term available on sandbox environment.', 'woocommerce' ),
+          //   'default' => '6,12'
+          // ),
+          'installment_terms' => array(
+            'title' => __( 'Offline Installment terms', 'woocommerce'),
             'type' => 'text',
-            'label' => __( 'BNI Installment terms', 'woocommerce' ),
-            'description' => __( 'use comma to separate value. Only 6 and 12 months term available on sandbox environment.', 'woocommerce' ),
-            'default' => '6,12'
-          ),
-          'enable_mandiri_installment' => array(
-            'title' => __( 'Enable Mandiri installment ', 'woocommerce' ),
-            'type' => 'checkbox',
-            'label' => __( 'Enable Mandiri installment?', 'woocommerce' ),
-            'description' => __( 'Please contact us if you wish to enable this feature in the Production environment.', 'woocommerce' ),
-            'default' => 'no'
-          ),
-          'enable_mandiri_installment_terms' => array(
-            'title' => __( 'Mandiri Installment terms', 'woocommerce'),
-            'type' => 'text',
-            'label' => __( 'Mandiri Installment terms', 'woocommerce' ),
+            'label' => __( 'Offline Installment terms', 'woocommerce' ),
             'description' => __( 'use comma to separate value. Only 6 and 12 months term available on sandbox environment.', 'woocommerce' ),
             'default' => '6,12'
           ),
@@ -341,37 +349,43 @@
         }
 
         $params['transaction_details']['gross_amount'] = $order->get_total();
-        error_log('bni'.$this->enable_bni);
-        error_log('mandiri'.$this->enable_mandiri);
-        if($this->enable_bni == 'yes' || $this->enable_mandiri == 'yes')
+        // error_log('bni'.$this->enable_bni);
+        // error_log('mandiri'.$this->enable_mandiri);
+        // if($this->enable_bni == 'yes' || $this->enable_mandiri == 'yes')
+        if(true)
         {  
+            $installment_terms = array();
+
             $payment_options = array(
             'installment' => array(
-              'required' => true
+              'required' => true,
+              'installment_terms' => new stdClass(),
+              'offline_installment_terms' => []
               )
             );
 
-            $installment_terms = array();
-
-            $term_bni = $this->bni_terms;
-            error_log('term bni '.$term_bni);
-            $term_bni_array = explode(',' , $term_bni);
+            // $term_bni = $this->bni_terms;
+            // error_log('term bni '.$term_bni);
+            // $term_bni_array = explode(',' , $term_bni);
             
-            if($term_bni == "yes" || $term_bni_array != null)
-            {
-              $installment_terms['bni'] = $term_bni_array;
-            }
+            // if($term_bni == "yes" || $term_bni_array != null)
+            // {
+            //   $installment_terms['bni'] = $term_bni_array;
+            // }
             
-            $term_mandiri =  $this->mandiri_terms;
-            error_log('term mandiri '.$term_mandiri);
-            $term_mandiri_array = explode(',' , $term_mandiri);
+            // $term_mandiri =  $this->mandiri_terms;
+            // error_log('term mandiri '.$term_mandiri);
+            // $term_mandiri_array = explode(',' , $term_mandiri);
 
-            if($term_mandiri == "yes" || $term_mandiri_array != null)
-            {
-              $installment_terms['mandiri'] = $term_mandiri_array;
-            }
- 
-           
+            // if($term_mandiri == "yes" || $term_mandiri_array != null)
+            // {
+            //   $installment_terms['mandiri'] = $term_mandiri_array;
+            // }
+            
+            $term =  $this->installment_terms;
+            error_log('============installment_terms '.$term);
+            $term_array = explode(',' , $term);
+            
         }        
 
         // sift through the entire item to ensure that currency conversion is applied
@@ -390,13 +404,13 @@
         
         if($params['transaction_details']['gross_amount'] >= 500000)
         {
-          $payment_options['installment']['installment_terms'] = $installment_terms;
+          $payment_options['installment']['offline_installment_terms'] = $term_array;
           $params['vtweb']['payment_options'] = $payment_options;
         }
 
         $woocommerce->cart->empty_cart();
         error_log(print_r($params,TRUE));
-        error_log(json_encode($params));
+        // error_log(json_encode($params));
         return Veritrans_VtWeb::getRedirectionUrl($params);
       }
 
