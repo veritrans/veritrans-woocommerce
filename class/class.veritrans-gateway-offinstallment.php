@@ -38,6 +38,7 @@
         // $this->mandiri_terms      = $this->get_option( 'enable_mandiri_installment_terms' );
         $this->installment_terms      = $this->get_option( 'installment_terms' );
         $this->bin_filter         = $this->get_option( 'enable_bin_filter' );
+        $this->min_amount         = $this->get_option( 'min_amount' );
 
 
         $this->log = new WC_Logger();
@@ -111,7 +112,7 @@
             'title' => __( 'Customer Message', 'woocommerce' ),
             'type' => 'textarea',
             'description' => __( 'This controls the description which the user sees during checkout', 'woocommerce' ),
-            'default' => ''
+            'default' => 'Minimal transaction amount allowed for credit card offline installment is Rp. '.$this->get_option( 'min_amount' ). '</br> You will be redirected to fullpayment page if the transaction amount below this value'
           ),
           'select_veritrans_environment' => array(
             'title' => __( 'Environment', 'woocommerce' ),
@@ -178,6 +179,13 @@
             'label' => __( 'Bin Number', 'woocommerce' ),
             'description' => __( 'Please contact us if you wish to enable this feature in the Production environment.', 'woocommerce' ),
             'default' => '4,5'
+          ),
+          'min_amount' => array(
+            'title' => __( 'Minimal Transaction Amount', 'woocommerce'),
+            'type' => 'int',
+            'label' => __( 'Minimal Transaction Amount', 'woocommerce' ),
+            'description' => __( 'Minimal transaction amount allowed to be paid with installment. (amount in IDR, without comma or period) example: 500000 </br> if the transaction amount is below this value, customer will be redirected to Credit Card fullpayment page', 'woocommerce' ),
+            'default' => '500000'
           ),
           'enable_sanitization' => array(
             'title' => __( 'Enable Sanitization', 'woocommerce' ),
@@ -402,7 +410,7 @@
 
         $params['item_details'] = $items;
         
-        if($params['transaction_details']['gross_amount'] >= 500000)
+        if($params['transaction_details']['gross_amount'] >= $this->min_amount)
         {
           $payment_options['installment']['offline_installment_terms'] = $term_array;
           $params['vtweb']['payment_options'] = $payment_options;
