@@ -1,3 +1,7 @@
+2.1.3
+-----
+Add BIN Promo feature
+
 2.1.2
 -----
 - Add offline installment feature
