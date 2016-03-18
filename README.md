@@ -11,6 +11,12 @@ Payment Method Feature:
 
 - VT Web
 
+Additional & Optional feature:
+
+- VT Web Online Installment
+- VT Web Offline Installment
+- VT Web BIN Promo (discount)
+
 ### Installation
 
 #### Minimum Requirements
@@ -32,10 +38,8 @@ The manual installation method involves downloading our feature-rich plugin and 
 
 #### Get help
 
-* [Veritrans sandbox login](https://my.sandbox.veritrans.co.id/)
-* [Veritrans sandbox registration](https://my.sandbox.veritrans.co.id/register)
 * [Veritrans registration](https://my.veritrans.co.id/register)
 * [Veritrans documentation](http://docs.veritrans.co.id)
-* [Veritrans Woocommerce Documentation](http://docs.veritrans.co.id/vtweb/integration_woocommerce.html)
+* [Veritrans Woocommerce Documentation](http://docs.veritrans.co.id/en/vtweb/integration_woocommerce.html)
 * [Veritrans Woocommerce Installment Documentation](https://support.veritrans.co.id/hc/en-us/articles/215949477-Woocommerce-Installment-Feature)
 * Technical support [support@veritrans.co.id](mailto:support@veritrans.co.id)
