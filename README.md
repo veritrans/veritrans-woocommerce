@@ -11,6 +11,12 @@ Payment Method Feature:
 
 - VT Web
 
+Additional & Optional feature:
+
+- VT Web Online Installment
+- VT Web Offline Installment
+- VT Web BIN Promo (discount)
+
 ### Installation
 
 #### Minimum Requirements
