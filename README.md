@@ -17,6 +17,8 @@ Additional & Optional feature:
 - VT Web Offline Installment
 - VT Web BIN Promo (discount)
 
+See documentation below on how to use additional features.
+
 ### Installation
 
 #### Minimum Requirements
@@ -42,4 +44,5 @@ The manual installation method involves downloading our feature-rich plugin and 
 * [Veritrans documentation](http://docs.veritrans.co.id)
 * [Veritrans Woocommerce Documentation](http://docs.veritrans.co.id/en/vtweb/integration_woocommerce.html)
 * [Veritrans Woocommerce Installment Documentation](https://support.veritrans.co.id/hc/en-us/articles/215949477-Woocommerce-Installment-Feature)
+* [Veritrans Woocommerce BIN Promo Documentation](https://support.veritrans.co.id/hc/en-us/articles/217649088-Woocommerce-BIN-Promo)
 * Technical support [support@veritrans.co.id](mailto:support@veritrans.co.id)

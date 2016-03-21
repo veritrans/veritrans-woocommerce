@@ -1,10 +1,10 @@
-2.1.3
+2.2.0
 -----
-Add BIN Promo feature
+- Add BIN Promo feature
+- Add offline installment feature
 
 2.1.2
 -----
-- Add offline installment feature
 - Fix configuration page JS issue
 - Default Installment setting disabled
 
