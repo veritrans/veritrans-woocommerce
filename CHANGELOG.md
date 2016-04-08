@@ -1,3 +1,8 @@
+2.2.1
+-----
+- Fix veritrans.min.js url
+- Fix installment array initialization 
+
 2.2.0
 -----
 - Add BIN Promo feature
