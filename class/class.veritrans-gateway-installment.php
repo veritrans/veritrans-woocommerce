@@ -43,7 +43,7 @@
         $this->log = new WC_Logger();
 
         // Payment listener/API hook
-        add_action( 'woocommerce_api_wc_gateway_veritrans', array( &$this, 'veritrans_vtweb_response' ) );
+        // add_action( 'woocommerce_api_wc_gateway_veritrans', array( &$this, 'veritrans_vtweb_response' ) );
         add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( &$this, 'process_admin_options' ) ); 
         add_action( 'wp_enqueue_scripts', array( &$this, 'veritrans_scripts' ) );
         add_action( 'admin_print_scripts-woocommerce_page_woocommerce_settings', array( &$this, 'veritrans_admin_scripts' ));
