@@ -1,3 +1,8 @@
+2.2.2
+-----
+- Add BCA MIGS
+- Add BCA MIGS Installment
+
 2.2.1
 -----
 - Fix veritrans.min.js url
