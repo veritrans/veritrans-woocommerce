@@ -1,3 +1,7 @@
+2.2.3
+-----
+- change calculate gross amount method
+
 2.2.2
 -----
 - Add BCA MIGS

@@ -356,7 +356,16 @@
           }
         }
 
-        $params['transaction_details']['gross_amount'] = $order->get_total();
+        $total_amount=0;
+        // error_log('print r items[]' . print_r($items,true)); //debugan
+        foreach ($items as $item) {
+          $total_amount+=($item['price']*$item['quantity']);
+          // error_log('|||| Per item[]' . print_r($item,true)); //debugan
+        }
+
+        $params['transaction_details']['gross_amount'] = $total_amount;
+
+        //$params['transaction_details']['gross_amount'] = $order->get_total();
         // error_log('bni'.$this->enable_bni);
         // error_log('mandiri'.$this->enable_mandiri);
         // if($this->enable_bni == 'yes' || $this->enable_mandiri == 'yes')
@@ -371,24 +380,6 @@
               'offline_installment_terms' => array()
               )
             );
-
-            // $term_bni = $this->bni_terms;
-            // error_log('term bni '.$term_bni);
-            // $term_bni_array = explode(',' , $term_bni);
-            
-            // if($term_bni == "yes" || $term_bni_array != null)
-            // {
-            //   $installment_terms['bni'] = $term_bni_array;
-            // }
-            
-            // $term_mandiri =  $this->mandiri_terms;
-            // error_log('term mandiri '.$term_mandiri);
-            // $term_mandiri_array = explode(',' , $term_mandiri);
-
-            // if($term_mandiri == "yes" || $term_mandiri_array != null)
-            // {
-            //   $installment_terms['mandiri'] = $term_mandiri_array;
-            // }
             
             $term =  $this->installment_terms;
             error_log('============installment_terms '.$term);
@@ -418,7 +409,6 @@
 
         $woocommerce->cart->empty_cart();
         error_log(print_r($params,TRUE));
-        // error_log(json_encode($params));
         return Veritrans_VtWeb::getRedirectionUrl($params);
       }
 
