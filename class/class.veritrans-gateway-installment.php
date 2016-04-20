@@ -348,7 +348,15 @@
           }
         }
 
-        $params['transaction_details']['gross_amount'] = $order->get_total();
+        $total_amount=0;
+        // error_log('print r items[]' . print_r($items,true)); //debugan
+        foreach ($items as $item) {
+          $total_amount+=($item['price']*$item['quantity']);
+          // error_log('|||| Per item[]' . print_r($item,true)); //debugan
+        }
+
+        $params['transaction_details']['gross_amount'] = $total_amount;
+
         error_log('bni'.$this->enable_bni);
         error_log('mandiri'.$this->enable_mandiri);
         if($this->enable_bni == 'yes' || $this->enable_mandiri == 'yes')
