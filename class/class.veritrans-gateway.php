@@ -457,7 +457,16 @@
           }
         }
 
-        $params['transaction_details']['gross_amount'] = $order->get_total();
+        $total_amount=0;
+        // error_log('print r items[]' . print_r($items,true)); //debugan
+        foreach ($items as $item) {
+          $total_amount+=($item['price']*$item['quantity']);
+          // error_log('|||| Per item[]' . print_r($item,true)); //debugan
+        }
+
+        error_log('order get total = '.$order->get_total());
+        error_log('total amount = '.$total_amount);
+        $params['transaction_details']['gross_amount'] = $total_amount;
 
         // sift through the entire item to ensure that currency conversion is applied
         if (get_woocommerce_currency() != 'IDR')

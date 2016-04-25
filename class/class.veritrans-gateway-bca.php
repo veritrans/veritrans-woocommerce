@@ -6,17 +6,17 @@
     /**
        * Veritrans Payment Gateway Class
        */
-    class WC_Gateway_Veritrans_Offinstallment extends WC_Payment_Gateway {
+    class WC_Gateway_Veritrans_Bca extends WC_Payment_Gateway {
 
       /**
        * Constructor
        */
       function __construct() {
-        $this->id           = 'veritrans_offinstallment';
+        $this->id           = 'veritrans_bca';
         $this->icon         = apply_filters( 'woocommerce_veritrans_icon', '' );
-        $this->method_title = __( 'Veritrans Offline Installment', 'colabsthemes' );
+        $this->method_title = __( 'Veritrans BCA', 'colabsthemes' );
         $this->has_fields   = true;
-        $this->notify_url   = str_replace( 'https:', 'http:', add_query_arg( 'wc-api', 'WC_Gateway_Veritrans_Offinstallment', home_url( '/' ) ) );
+        $this->notify_url   = str_replace( 'https:', 'http:', add_query_arg( 'wc-api', 'WC_Gateway_Veritrans_Bca', home_url( '/' ) ) );
 
         // Load the settings
         $this->init_form_fields();
@@ -36,9 +36,9 @@
         // $this->bni_terms          = $this->get_option( 'enable_bni_installment_terms' );
         // $this->enable_mandiri     = $this->get_option( 'enable_mandiri_installment' );
         // $this->mandiri_terms      = $this->get_option( 'enable_mandiri_installment_terms' );
-        $this->installment_terms      = $this->get_option( 'installment_terms' );
-        $this->bin_filter         = $this->get_option( 'enable_bin_filter' );
-        $this->min_amount         = $this->get_option( 'min_amount' );
+        // $this->installment_terms      = $this->get_option( 'installment_terms' );
+        // $this->bin_filter         = $this->get_option( 'enable_bin_filter' );
+        // $this->min_amount         = $this->get_option( 'min_amount' );
 
 
         $this->log = new WC_Logger();
@@ -74,8 +74,8 @@
        * @return void
        */
       public function admin_options() { ?>
-        <h3><?php _e( 'Veritrans Offline Installment', 'woocommerce' ); ?></h3>
-        <p><?php _e('Allows offline installment payments using Veritrans.', 'woocommerce' ); ?></p>
+        <h3><?php _e( 'Veritrans BCA', 'woocommerce' ); ?></h3>
+        <p><?php _e('Allows payments using Veritrans with BCA acquiring.', 'woocommerce' ); ?></p>
         <table class="form-table">
           <?php
             // Generate the HTML For the settings form.
@@ -98,21 +98,21 @@
           'enabled' => array(
             'title' => __( 'Enable/Disable', 'woocommerce' ),
             'type' => 'checkbox',
-            'label' => __( 'Enable Veritrans Offline installment Payment', 'woocommerce' ),
+            'label' => __( 'Enable Veritrans BCA Acquiring', 'woocommerce' ),
             'default' => 'no'
           ),
           'title' => array(
             'title' => __( 'Title', 'woocommerce' ),
             'type' => 'text',
             'description' => __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
-            'default' => __( 'Credit Card Offline installment', 'woocommerce' ),
+            'default' => __( 'Credit Card BCA', 'woocommerce' ),
             'desc_tip'      => true,
           ),
           'description' => array(
             'title' => __( 'Customer Message', 'woocommerce' ),
             'type' => 'textarea',
             'description' => __( 'This controls the description which the user sees during checkout', 'woocommerce' ),
-            'default' => 'Minimal transaction amount allowed for credit card offline installment is Rp. '.$this->get_option( 'min_amount' ). '</br> You will be redirected to fullpayment page if the transaction amount below this value'
+            'default' => 'with bca acquiring'
           ),
           'select_veritrans_environment' => array(
             'title' => __( 'Environment', 'woocommerce' ),
@@ -137,61 +137,6 @@
             'description' => sprintf(__('Input your <b>Production</b> Veritrans Server Key. Get the key <a href="%s" target="_blank">here</a>', 'woocommerce' ),$v2_production_key_url),
             'default' => '',
             'class' => 'production_settings sensitive'
-          ),
-          // 'enable_bni_installment' => array(
-          //   'title' => __( 'Enable BNI installment ', 'woocommerce' ),
-          //   'type' => 'checkbox',
-          //   'label' => __( 'Enable BNI installment?', 'woocommerce' ),
-          //   'description' => __( 'Please contact us if you wish to enable this feature in the Production environment.', 'woocommerce' ),
-          //   'default' => 'no'
-          // ),
-          // 'enable_bni_installment_terms' => array(
-          //   'title' => __( 'BNI Installment terms', 'woocommerce' ),
-          //   'type' => 'text',
-          //   'label' => __( 'BNI Installment terms', 'woocommerce' ),
-          //   'description' => __( 'use comma to separate value. Only 6 and 12 months term available on sandbox environment.', 'woocommerce' ),
-          //   'default' => '6,12'
-          // ),
-          // 'enable_mandiri_installment' => array(
-          //   'title' => __( 'Enable Mandiri installment ', 'woocommerce' ),
-          //   'type' => 'checkbox',
-          //   'label' => __( 'Enable Mandiri installment?', 'woocommerce' ),
-          //   'description' => __( 'Please contact us if you wish to enable this feature in the Production environment.', 'woocommerce' ),
-          //   'default' => 'no'
-          // ),
-          // 'enable_mandiri_installment_terms' => array(
-          //   'title' => __( 'Mandiri Installment terms', 'woocommerce'),
-          //   'type' => 'text',
-          //   'label' => __( 'Mandiri Installment terms', 'woocommerce' ),
-          //   'description' => __( 'use comma to separate value. Only 6 and 12 months term available on sandbox environment.', 'woocommerce' ),
-          //   'default' => '6,12'
-          // ),
-          'installment_terms' => array(
-            'title' => __( 'Offline Installment terms', 'woocommerce'),
-            'type' => 'text',
-            'label' => __( 'Offline Installment terms', 'woocommerce' ),
-            'description' => __( 'use comma to separate value. Only 6 and 12 months term available on sandbox environment.', 'woocommerce' ),
-            'default' => '6,12'
-          ),
-          'enable_bin_filter' => array(
-            'title' => __( 'Bin Number', 'woocommerce'),
-            'type' => 'text',
-            'label' => __( 'Bin Number', 'woocommerce' ),
-            'description' => __( 'Please contact us if you wish to enable this feature in the Production environment.', 'woocommerce' ),
-            'default' => '4,5'
-          ),
-          'min_amount' => array(
-            'title' => __( 'Minimal Transaction Amount', 'woocommerce'),
-            'type' => 'int',
-            'label' => __( 'Minimal Transaction Amount', 'woocommerce' ),
-            'description' => __( 'Minimal transaction amount allowed to be paid with installment. (amount in IDR, without comma or period) example: 500000 </br> if the transaction amount is below this value, customer will be redirected to Credit Card fullpayment page', 'woocommerce' ),
-            'default' => '500000'
-          ),
-          'enable_sanitization' => array(
-            'title' => __( 'Enable Sanitization', 'woocommerce' ),
-            'type' => 'checkbox',
-            'label' => __( 'Enable Sanitization?', 'woocommerce' ),
-            'default' => 'yes'
           )
         );
 
@@ -231,12 +176,21 @@
         $order_items = array();
         $cart = $woocommerce->cart;
 
-        $order = new WC_Order( $order_id );     
-      
+        $order = new WC_Order( $order_id );
+        
+        $order->set_total( WC()->cart->shipping_total, 'shipping' );
+        $order->set_total( WC()->cart->get_cart_discount_total(), 'cart_discount' );
+        $order->set_total( WC()->cart->get_cart_discount_tax_total(), 'cart_discount_tax' );
+        $order->set_total( WC()->cart->tax_total, 'tax' );
+        $order->set_total( WC()->cart->shipping_tax_total, 'shipping_tax' );
+        $order->set_total( WC()->cart->total );
+        // $order->add_coupon('veritrans',10000);
+        // end of add discount
+
         Veritrans_Config::$isProduction = ($this->environment == 'production') ? true : false;
         Veritrans_Config::$serverKey = (Veritrans_Config::$isProduction) ? $this->server_key_v2_production : $this->server_key_v2_sandbox;     
         Veritrans_Config::$is3ds = true;
-        Veritrans_Config::$isSanitized = ($this->enable_sanitization == 'yes') ? true : false;
+        Veritrans_Config::$isSanitized = true;
         
         $params = array(
           'transaction_details' => array(
@@ -247,16 +201,13 @@
         );
 
         $enabled_payments = array();
-        if ($this->enable_credit_card == 'yes'){
-          $enabled_payments[] = 'credit_card';
-        }
+        // if ($this->enable_credit_card == 'yes'){
+        //   $enabled_payments[] = 'credit_card';
+        // }
 
         $params['vtweb']['enabled_payments'] = 'credit_card';
-        $bins = $this->bin_filter;
-        
-        $bins = explode(',', $bins);
-        $params['vtweb']['credit_card_bins'] = $bins;
-
+        $params['vtweb']['credit_card']['bank'] = 'bca';
+        $params['vtweb']['credit_card']['channel'] = 'migs';
 
         $customer_details = array();
         $customer_details['first_name'] = $order->billing_first_name;
@@ -332,10 +283,10 @@
         }
 
         // Discount
-        if ( $cart->get_cart_discount_total() > 0) {
+        if ( $order->get_cart_discount() > 0) {
           $items[] = array(
             'id' => 'totaldiscount',
-            'price' => $cart->get_cart_discount_total() * -1,
+            'price' => $order->get_cart_discount() * -1,
             'quantity' => 1,
             'name' => 'Total Discount'
           );
@@ -356,20 +307,20 @@
           }
         }
 
+        //calculate gross amount
         $total_amount=0;
         // error_log('print r items[]' . print_r($items,true)); //debugan
         foreach ($items as $item) {
           $total_amount+=($item['price']*$item['quantity']);
           // error_log('|||| Per item[]' . print_r($item,true)); //debugan
+
         }
 
         $params['transaction_details']['gross_amount'] = $total_amount;
-
-        //$params['transaction_details']['gross_amount'] = $order->get_total();
         // error_log('bni'.$this->enable_bni);
         // error_log('mandiri'.$this->enable_mandiri);
         // if($this->enable_bni == 'yes' || $this->enable_mandiri == 'yes')
-        if(true)
+        if(false)
         {  
             $installment_terms = array();
 
@@ -380,10 +331,6 @@
               'offline_installment_terms' => array()
               )
             );
-            
-            $term =  $this->installment_terms;
-            error_log('============installment_terms '.$term);
-            $term_array = explode(',' , $term);
             
         }        
 
@@ -401,14 +348,15 @@
 
         $params['item_details'] = $items;
         
-        if($params['transaction_details']['gross_amount'] >= $this->min_amount)
-        {
-          $payment_options['installment']['offline_installment_terms'] = $term_array;
-          $params['vtweb']['payment_options'] = $payment_options;
-        }
+        // if($params['transaction_details']['gross_amount'] >= $this->min_amount)
+        // {
+        //   $payment_options['installment']['offline_installment_terms'] = $term_array;
+        //   $params['vtweb']['payment_options'] = $payment_options;
+        // }
 
         $woocommerce->cart->empty_cart();
         error_log(print_r($params,TRUE));
+        // error_log(json_encode($params));
         return Veritrans_VtWeb::getRedirectionUrl($params);
       }
 
