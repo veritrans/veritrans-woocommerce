@@ -32,14 +32,11 @@
         $this->environment        = $this->get_option( 'select_veritrans_environment' );
         $this->to_idr_rate        = $this->get_option( 'to_idr_rate' );
         $this->enable_sanitization = $this->get_option( 'enable_sanitization' );
-        // $this->enable_bni         = $this->get_option( 'enable_bni_installment' );
-        // $this->bni_terms          = $this->get_option( 'enable_bni_installment_terms' );
-        // $this->enable_mandiri     = $this->get_option( 'enable_mandiri_installment' );
-        // $this->mandiri_terms      = $this->get_option( 'enable_mandiri_installment_terms' );
-        // $this->installment_terms      = $this->get_option( 'installment_terms' );
-        $this->bin_filter         = $this->get_option( 'enable_bin_filter' );
-        // $this->min_amount         = $this->get_option( 'min_amount' );
 
+        $this->bin_filter         = $this->get_option( 'enable_bin_filter' );
+
+        $this->enable_credit_card = $this->get_option( 'credit_card' );
+        $this->enable_permata_va = $this->get_option( 'bank_transfer' );
 
         $this->log = new WC_Logger();
 
@@ -105,7 +102,7 @@
             'title' => __( 'Title', 'woocommerce' ),
             'type' => 'text',
             'description' => __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
-            'default' => __( 'Credit Card Discount!', 'woocommerce' ),
+            'default' => __( 'Online Payment With Discount', 'woocommerce' ),
             'desc_tip'      => true,
           ),
           'description' => array(
@@ -137,6 +134,20 @@
             'description' => sprintf(__('Input your <b>Production</b> Veritrans Server Key. Get the key <a href="%s" target="_blank">here</a>', 'woocommerce' ),$v2_production_key_url),
             'default' => '',
             'class' => 'production_settings sensitive'
+          ),
+          'credit_card' => array(
+            'title' => __( 'Enable credit card', 'woocommerce' ),
+            'type' => 'checkbox',
+            'label' => __( 'Enable Credit card?', 'woocommerce' ),
+            'description' => __( 'Allow credit card payment method for this promo.', 'woocommerce' ),
+            'default' => 'yes'
+          ),
+          'bank_transfer' => array(
+            'title' => __( 'Enable Permata VA Bank Transfer', 'woocommerce' ),
+            'type' => 'checkbox',
+            'label' => __( 'Enable Permata VA Bank Transfer?', 'woocommerce' ),
+            'description' => __( 'Allow bank transfer payment method for this promo.', 'woocommerce' ),
+            'default' => 'no'
           ),
           // 'enable_bni_installment' => array(
           //   'title' => __( 'Enable BNI installment ', 'woocommerce' ),
@@ -264,7 +275,13 @@
         //   $enabled_payments[] = 'credit_card';
         // }
 
-        $params['vtweb']['enabled_payments'] = 'credit_card';
+        // check enabled payment
+        if ($this->enable_credit_card == 'yes')
+          $params['vtweb']['enabled_payments'] = 'credit_card';
+        if ($this->enable_permata_va == 'yes')
+          $params['vtweb']['enabled_payments'] = 'bank_transfer';
+
+        // add bin filter
         $bins = $this->bin_filter;
         
         $bins = explode(',', $bins);
