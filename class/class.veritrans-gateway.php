@@ -77,8 +77,8 @@
       function veritrans_scripts() {
         if( is_checkout() ) {
           wp_enqueue_script( 'veritrans', 'https://api.veritrans.co.id/v2/assets/js/veritrans.min.js', array('jquery') );
-          wp_enqueue_script( 'veritrans-integration', VT_PLUGIN_DIR . 'js/script.js', array('veritrans') );
-          wp_localize_script( 'veritrans-integration', 'wc_veritrans_client_key', $this->client_key );
+          //wp_enqueue_script( 'veritrans-integration', VT_PLUGIN_DIR . 'js/script.js', array('veritrans') );
+          //wp_localize_script( 'veritrans-integration', 'wc_veritrans_client_key', $this->client_key );
         }
       }
 
