@@ -231,6 +231,15 @@
           'redirect' => $this->charge_payment( $order_id )
         );
       }
+      // Backward compatibility WC v3 & v2
+      function getOrderProperty($order, $property){
+        $functionName = "get_".$property;
+        if (method_exists($order, $functionName)){ // WC v3
+          return (string)$order->{$functionName}();
+        } else { // WC v2
+          return (string)$order->{$property};
+        }
+      }
 
       /**
        * Charge Payment
@@ -289,32 +298,34 @@
 
 
         $customer_details = array();
-        $customer_details['first_name'] = $order->billing_first_name;
-        $customer_details['last_name'] = $order->billing_last_name;
-        $customer_details['email'] = $order->billing_email;
-        $customer_details['phone'] = $order->billing_phone;
+        $customer_details['first_name'] = $this->getOrderProperty($order,'billing_first_name');
+        $customer_details['last_name'] = $this->getOrderProperty($order,'billing_last_name');
+        $customer_details['email'] = $this->getOrderProperty($order,'billing_email');
+        $customer_details['phone'] = $this->getOrderProperty($order,'billing_phone');
 
         $billing_address = array();
-        $billing_address['first_name'] = $order->billing_first_name;
-        $billing_address['last_name'] = $order->billing_last_name;
-        $billing_address['address'] = $order->billing_address_1;
-        $billing_address['city'] = $order->billing_city;
-        $billing_address['postal_code'] = $order->billing_postcode;
-        $billing_address['phone'] = $order->billing_phone;
-        $billing_address['country_code'] = (strlen($this->convert_country_code($order->billing_country) != 3 ) ? 'IDN' : $this->convert_country_code($order->billing_country) );
+        $billing_address['first_name'] = $this->getOrderProperty($order,'billing_first_name');
+        $billing_address['last_name'] = $this->getOrderProperty($order,'billing_last_name');
+        $billing_address['address'] = $this->getOrderProperty($order,'billing_address_1');
+        $billing_address['city'] = $this->getOrderProperty($order,'billing_city');
+        $billing_address['postal_code'] = $this->getOrderProperty($order,'billing_postcode');
+        $billing_address['phone'] = $this->getOrderProperty($order,'billing_phone');
+        $converted_country_code = $this->convert_country_code($this->getOrderProperty($order,'billing_country'));
+        $billing_address['country_code'] = (strlen($converted_country_code) != 3 ) ? 'IDN' : $converted_country_code ;
 
         $customer_details['billing_address'] = $billing_address;
         $customer_details['shipping_address'] = $billing_address;
         
         if ( isset ( $_POST['ship_to_different_address'] ) ) {
           $shipping_address = array();
-          $shipping_address['first_name'] = $order->shipping_first_name;
-          $shipping_address['last_name'] = $order->shipping_last_name;
-          $shipping_address['address'] = $order->shipping_address_1;
-          $shipping_address['city'] = $order->shipping_city;
-          $shipping_address['postal_code'] = $order->shipping_postcode;
-          $shipping_address['phone'] = $order->billing_phone;
-          $shipping_address['country_code'] = (strlen($this->convert_country_code($order->shipping_country) != 3 ) ? 'IDN' : $this->convert_country_code($order->billing_country) );
+          $shipping_address['first_name'] = $this->getOrderProperty($order,'shipping_first_name');
+          $shipping_address['last_name'] = $this->getOrderProperty($order,'shipping_last_name');
+          $shipping_address['address'] = $this->getOrderProperty($order,'shipping_address_1');
+          $shipping_address['city'] = $this->getOrderProperty($order,'shipping_city');
+          $shipping_address['postal_code'] = $this->getOrderProperty($order,'shipping_postcode');
+          $shipping_address['phone'] = $this->getOrderProperty($order,'billing_phone');
+          $converted_country_code = $this->convert_country_code($this->getOrderProperty($order,'shipping_country'));
+          $shipping_address['country_code'] = (strlen($converted_country_code) != 3 ) ? 'IDN' : $converted_country_code;
           
           $customer_details['shipping_address'] = $shipping_address;
         }
