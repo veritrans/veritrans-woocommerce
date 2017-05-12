@@ -32,14 +32,11 @@
         $this->environment        = $this->get_option( 'select_veritrans_environment' );
         $this->to_idr_rate        = $this->get_option( 'to_idr_rate' );
         $this->enable_sanitization = $this->get_option( 'enable_sanitization' );
-        // $this->enable_bni         = $this->get_option( 'enable_bni_installment' );
-        // $this->bni_terms          = $this->get_option( 'enable_bni_installment_terms' );
-        // $this->enable_mandiri     = $this->get_option( 'enable_mandiri_installment' );
-        // $this->mandiri_terms      = $this->get_option( 'enable_mandiri_installment_terms' );
-        // $this->installment_terms      = $this->get_option( 'installment_terms' );
-        $this->bin_filter         = $this->get_option( 'enable_bin_filter' );
-        // $this->min_amount         = $this->get_option( 'min_amount' );
 
+        $this->bin_filter         = $this->get_option( 'enable_bin_filter' );
+
+        $this->enable_credit_card = $this->get_option( 'credit_card' );
+        $this->enable_permata_va = $this->get_option( 'bank_transfer' );
 
         $this->log = new WC_Logger();
 
@@ -105,7 +102,7 @@
             'title' => __( 'Title', 'woocommerce' ),
             'type' => 'text',
             'description' => __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
-            'default' => __( 'Credit Card Discount!', 'woocommerce' ),
+            'default' => __( 'Online Payment With Discount', 'woocommerce' ),
             'desc_tip'      => true,
           ),
           'description' => array(
@@ -137,6 +134,20 @@
             'description' => sprintf(__('Input your <b>Production</b> Veritrans Server Key. Get the key <a href="%s" target="_blank">here</a>', 'woocommerce' ),$v2_production_key_url),
             'default' => '',
             'class' => 'production_settings sensitive'
+          ),
+          'credit_card' => array(
+            'title' => __( 'Enable credit card', 'woocommerce' ),
+            'type' => 'checkbox',
+            'label' => __( 'Enable Credit card?', 'woocommerce' ),
+            'description' => __( 'Allow credit card payment method for this promo.', 'woocommerce' ),
+            'default' => 'yes'
+          ),
+          'bank_transfer' => array(
+            'title' => __( 'Enable Permata VA Bank Transfer', 'woocommerce' ),
+            'type' => 'checkbox',
+            'label' => __( 'Enable Permata VA Bank Transfer?', 'woocommerce' ),
+            'description' => __( 'Allow bank transfer payment method for this promo.', 'woocommerce' ),
+            'default' => 'no'
           ),
           // 'enable_bni_installment' => array(
           //   'title' => __( 'Enable BNI installment ', 'woocommerce' ),
@@ -220,6 +231,15 @@
           'redirect' => $this->charge_payment( $order_id )
         );
       }
+      // Backward compatibility WC v3 & v2
+      function getOrderProperty($order, $property){
+        $functionName = "get_".$property;
+        if (method_exists($order, $functionName)){ // WC v3
+          return (string)$order->{$functionName}();
+        } else { // WC v2
+          return (string)$order->{$property};
+        }
+      }
 
       /**
        * Charge Payment
@@ -264,7 +284,13 @@
         //   $enabled_payments[] = 'credit_card';
         // }
 
-        $params['vtweb']['enabled_payments'] = 'credit_card';
+        // check enabled payment
+        if ($this->enable_credit_card == 'yes')
+          $params['vtweb']['enabled_payments'] = 'credit_card';
+        if ($this->enable_permata_va == 'yes')
+          $params['vtweb']['enabled_payments'] = 'bank_transfer';
+
+        // add bin filter
         $bins = $this->bin_filter;
         
         $bins = explode(',', $bins);
@@ -272,32 +298,34 @@
 
 
         $customer_details = array();
-        $customer_details['first_name'] = $order->billing_first_name;
-        $customer_details['last_name'] = $order->billing_last_name;
-        $customer_details['email'] = $order->billing_email;
-        $customer_details['phone'] = $order->billing_phone;
+        $customer_details['first_name'] = $this->getOrderProperty($order,'billing_first_name');
+        $customer_details['last_name'] = $this->getOrderProperty($order,'billing_last_name');
+        $customer_details['email'] = $this->getOrderProperty($order,'billing_email');
+        $customer_details['phone'] = $this->getOrderProperty($order,'billing_phone');
 
         $billing_address = array();
-        $billing_address['first_name'] = $order->billing_first_name;
-        $billing_address['last_name'] = $order->billing_last_name;
-        $billing_address['address'] = $order->billing_address_1;
-        $billing_address['city'] = $order->billing_city;
-        $billing_address['postal_code'] = $order->billing_postcode;
-        $billing_address['phone'] = $order->billing_phone;
-        $billing_address['country_code'] = (strlen($this->convert_country_code($order->billing_country) != 3 ) ? 'IDN' : $this->convert_country_code($order->billing_country) );
+        $billing_address['first_name'] = $this->getOrderProperty($order,'billing_first_name');
+        $billing_address['last_name'] = $this->getOrderProperty($order,'billing_last_name');
+        $billing_address['address'] = $this->getOrderProperty($order,'billing_address_1');
+        $billing_address['city'] = $this->getOrderProperty($order,'billing_city');
+        $billing_address['postal_code'] = $this->getOrderProperty($order,'billing_postcode');
+        $billing_address['phone'] = $this->getOrderProperty($order,'billing_phone');
+        $converted_country_code = $this->convert_country_code($this->getOrderProperty($order,'billing_country'));
+        $billing_address['country_code'] = (strlen($converted_country_code) != 3 ) ? 'IDN' : $converted_country_code ;
 
         $customer_details['billing_address'] = $billing_address;
         $customer_details['shipping_address'] = $billing_address;
         
         if ( isset ( $_POST['ship_to_different_address'] ) ) {
           $shipping_address = array();
-          $shipping_address['first_name'] = $order->shipping_first_name;
-          $shipping_address['last_name'] = $order->shipping_last_name;
-          $shipping_address['address'] = $order->shipping_address_1;
-          $shipping_address['city'] = $order->shipping_city;
-          $shipping_address['postal_code'] = $order->shipping_postcode;
-          $shipping_address['phone'] = $order->billing_phone;
-          $shipping_address['country_code'] = (strlen($this->convert_country_code($order->shipping_country) != 3 ) ? 'IDN' : $this->convert_country_code($order->billing_country) );
+          $shipping_address['first_name'] = $this->getOrderProperty($order,'shipping_first_name');
+          $shipping_address['last_name'] = $this->getOrderProperty($order,'shipping_last_name');
+          $shipping_address['address'] = $this->getOrderProperty($order,'shipping_address_1');
+          $shipping_address['city'] = $this->getOrderProperty($order,'shipping_city');
+          $shipping_address['postal_code'] = $this->getOrderProperty($order,'shipping_postcode');
+          $shipping_address['phone'] = $this->getOrderProperty($order,'billing_phone');
+          $converted_country_code = $this->convert_country_code($this->getOrderProperty($order,'shipping_country'));
+          $shipping_address['country_code'] = (strlen($converted_country_code) != 3 ) ? 'IDN' : $converted_country_code;
           
           $customer_details['shipping_address'] = $shipping_address;
         }
